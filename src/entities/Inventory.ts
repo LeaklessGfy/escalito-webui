@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { observable, action } from 'mobx';
 
 import { IngredientKey } from './Ingredient';
 import { ProviderKey } from './Provider';
@@ -25,6 +25,7 @@ export class Inventory {
     return ingredients.get(ingredient) ?? 0;
   }
 
+  @action
   public addIngredient(provider: ProviderKey, ingredient: IngredientKey): void {
     const ingredients = this.ingredients.get(provider) ?? new Map();
     const value = ingredients.get(ingredient) ?? 0;
@@ -32,6 +33,7 @@ export class Inventory {
     this.ingredients.set(provider, ingredients);
   }
 
+  @action
   public removeIngredient(
     provider: ProviderKey,
     ingredient: IngredientKey
