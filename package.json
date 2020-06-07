@@ -23,6 +23,7 @@
     "build/*"
   ],
   "dependencies": {
+    "firebase": "^7.15.0",
     "mobx": "^5.15.4",
     "mobx-preact": "^3.0.0",
     "preact": "^10.3.1",

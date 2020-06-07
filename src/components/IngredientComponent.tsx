@@ -6,26 +6,27 @@ interface IngredientComponentProps {
   stock: number;
   disabled: boolean;
 
-  onRemove?: () => void;
   onAdd?: () => void;
+  onRemove?: () => void;
 }
 
 const IngredientComponent: FunctionalComponent<IngredientComponentProps> = props => {
   return (
-    <article class="max-w-xs bg-white rounded overflow-hidden shadow-lg px-6 py-4">
+    <article class="max-w-xs bg-white rounded overflow-hidden shadow-lg px-6 py-4 mt-2">
       <header>
         <h4 class="font-bold text-xl text-teal-500 mb-2">{props.name}</h4>
       </header>
 
       <div>
         <p class="text-gray-700 text-base">
-          Price : {props.price * props.stock}$ / Day
+          Price : {props.price * props.stock}$ / Day <br />
+          Stock : {props.stock} / Day
         </p>
       </div>
 
       <footer class="border-t-2 mt-2 pt-2 grid grid-cols-2 items-center text-center">
         <button
-          class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          class="py-2 px-4 text-white font-bold bg-red-500 rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:shadow-outline"
           disabled={props.stock === 0}
           onClick={props.onRemove}
         >
@@ -33,7 +34,7 @@ const IngredientComponent: FunctionalComponent<IngredientComponentProps> = props
         </button>
 
         <button
-          class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          class="py-2 px-4 text-white font-bold bg-green-500 rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:shadow-outline"
           disabled={props.disabled}
           onClick={props.onAdd}
         >

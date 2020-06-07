@@ -2,7 +2,6 @@ import { FunctionalComponent, h } from 'preact';
 import { Route, Router } from 'preact-router';
 
 import Home from './routes/home';
-import Profile from './routes/profile';
 import NotFoundPage from './routes/notfound';
 import NavComponent from './components/NavComponent';
 
@@ -19,8 +18,6 @@ const App: FunctionalComponent = () => {
       <div class="p-2">
         <Router>
           <Route path="/" component={Home} />
-          <Route path="/profile/" component={Profile} user="me" />
-          <Route path="/profile/:user" component={Profile} />
           <NotFoundPage default />
         </Router>
       </div>

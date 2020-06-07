@@ -32,14 +32,14 @@ const ShopComponent: FunctionalComponent = () => {
           </ul>
         </aside>
 
-        <section class="rounded flex-grow">
+        <section class="rounded flex-grow grid grid-cols-3">
           {Array.from(active.ingredients.values()).map((ingredient, index) => (
             <IngredientComponent
               key={index}
               name={ingredient.name}
               price={ingredient.price}
               stock={inventory.getStock(active.key, ingredient.key)}
-              disabled={inventory.cash < ingredient.price}
+              disabled={inventory.isIngredientDisabled(active.key, ingredient)}
               onAdd={() => inventory.addIngredient(active.key, ingredient.key)}
               onRemove={() =>
                 inventory.removeIngredient(active.key, ingredient.key)
