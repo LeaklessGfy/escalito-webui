@@ -7,8 +7,6 @@ import CocktailComponent from './CocktailComponent';
 const MenuComponent: FunctionalComponent = () => {
   const { inventory, cocktails } = useStore();
 
-  console.log('Render');
-
   return (
     <section class="rounded overflow-hidden shadow-lg px-6 py-4">
       <header class="border-b-2">

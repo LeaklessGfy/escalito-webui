@@ -9,11 +9,5 @@ export const inventoryMock: InventoryDTO = {
       stock: 1
     }
   ],
-  cocktails: [
-    {
-      cocktail: 0,
-      price: 5,
-      hype: 0
-    }
-  ]
+  cocktails: []
 };

@@ -26,7 +26,9 @@ export class Client {
 
   constructor() {
     this.env = ClientEnv.DEV;
-    this.app = firebase.initializeApp(CONFIG);
+    this.app = !firebase.apps.length
+      ? firebase.initializeApp(CONFIG)
+      : firebase.app();
   }
 
   public async fetchInventory(userId: number): Promise<InventoryDTO> {

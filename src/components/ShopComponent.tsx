@@ -1,14 +1,22 @@
 import { observer } from 'mobx-preact';
 import { FunctionalComponent, h } from 'preact';
-import { useState } from 'preact/hooks';
+import { useContext, useState } from 'preact/hooks';
 
 import { Provider } from '../entities/Provider';
-import { useStore } from '../store';
+import { storeContext } from '../store';
 import IngredientComponent from './IngredientComponent';
 
+function getFirstKey<T, R>(map: Map<T, R>): R | undefined {
+  const keys = map.keys();
+  const key = keys.next().value;
+  return map.get(key);
+}
+
 const ShopComponent: FunctionalComponent = () => {
-  const { inventory, providers } = useStore();
-  const [active, setActive] = useState<Provider | undefined>(undefined);
+  const { inventory, providers } = useContext(storeContext);
+  const [active, setActive] = useState<Provider | undefined>(
+    getFirstKey(providers)
+  );
 
   return (
     <section class="rounded overflow-hidden shadow-lg px-6 py-4">

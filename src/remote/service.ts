@@ -19,5 +19,3 @@ export class Service {
     }
   }
 }
-
-export const globalService = new Service();

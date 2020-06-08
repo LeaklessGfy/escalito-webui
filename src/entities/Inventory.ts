@@ -130,6 +130,7 @@ export class Inventory {
         new Map<ProviderKey, number>();
       const stock = providers.get(ingredientDto.provider) ?? 0;
       providers.set(ingredientDto.ingredient, stock + 1);
+      ingredients.set(ingredientDto.ingredient, providers);
     }
 
     const cocktails = new Map<CocktailKey, CocktailExtended>();
