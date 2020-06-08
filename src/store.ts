@@ -1,9 +1,9 @@
 import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
 
+import { Cocktails } from './entities/Cocktail';
 import { Inventory } from './entities/Inventory';
-import { Provider } from './entities/Provider';
-import { CocktailExtended } from './entities/Cocktail';
+import { Providers } from './entities/Provider';
 import { globalService } from './remote/service';
 
 export const store = {
@@ -12,8 +12,8 @@ export const store = {
     this.inventory = inventory;
   },
   inventory: new Inventory(100),
-  providers: [Provider.buildSuperMarket()],
-  cocktails: [CocktailExtended.buildMojito(), CocktailExtended.buildCubaLibre()]
+  providers: Providers,
+  cocktails: Cocktails
 };
 
 export const storeContext = createContext(store);

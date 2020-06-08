@@ -1,6 +1,5 @@
-import { Client } from './firebase';
-
 import { Inventory } from '../entities/Inventory';
+import { Client } from './firebase';
 
 export class Service {
   private readonly client: Client;

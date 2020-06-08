@@ -1,13 +1,14 @@
+import { observer } from 'mobx-preact';
 import { FunctionalComponent, h } from 'preact';
 import { useState } from 'preact/hooks';
 
-import IngredientComponent from './IngredientComponent';
-import { observer } from 'mobx-preact';
+import { Provider } from '../entities/Provider';
 import { useStore } from '../store';
+import IngredientComponent from './IngredientComponent';
 
 const ShopComponent: FunctionalComponent = () => {
   const { inventory, providers } = useStore();
-  const [active, setActive] = useState(providers[0]);
+  const [active, setActive] = useState<Provider | undefined>(undefined);
 
   return (
     <section class="rounded overflow-hidden shadow-lg px-6 py-4">
@@ -20,7 +21,7 @@ const ShopComponent: FunctionalComponent = () => {
       <div class="mt-5 flex justify-between">
         <aside class="mr-10">
           <ul class="border rounded">
-            {providers.map(provider => (
+            {Array.from(providers.values()).map(provider => (
               <li
                 key={provider.name}
                 class="px-4 py-2 border-b last:border-b-0 cursor-pointer"
@@ -33,19 +34,31 @@ const ShopComponent: FunctionalComponent = () => {
         </aside>
 
         <section class="rounded flex-grow grid grid-cols-3">
-          {Array.from(active.ingredients.values()).map((ingredient, index) => (
-            <IngredientComponent
-              key={index}
-              name={ingredient.name}
-              price={ingredient.price}
-              stock={inventory.getStock(active.key, ingredient.key)}
-              disabled={inventory.isIngredientDisabled(active.key, ingredient)}
-              onAdd={() => inventory.addIngredient(active.key, ingredient.key)}
-              onRemove={() =>
-                inventory.removeIngredient(active.key, ingredient.key)
-              }
-            />
-          ))}
+          {active &&
+            active.ingredients.map(ingredient => (
+              <IngredientComponent
+                key={ingredient.key}
+                name={ingredient.name}
+                price={ingredient.price}
+                stock={inventory.getIngredientStock(
+                  ingredient.key,
+                  ingredient.providerKey
+                )}
+                disabled={inventory.isIngredientDisabled(ingredient)}
+                onAdd={() =>
+                  inventory.addIngredient(
+                    ingredient.key,
+                    ingredient.providerKey
+                  )
+                }
+                onRemove={() =>
+                  inventory.removeIngredient(
+                    ingredient.key,
+                    ingredient.providerKey
+                  )
+                }
+              />
+            ))}
         </section>
       </div>
     </section>

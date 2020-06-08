@@ -1,4 +1,5 @@
 import { FunctionalComponent, h } from 'preact';
+
 import { IngredientKey, IngredientNames } from '../entities/Ingredient';
 
 interface CocktailComponentProps {
@@ -6,7 +7,7 @@ interface CocktailComponentProps {
   price: number;
   recipe: Map<IngredientKey, number>;
   disabled: boolean;
-  isOnMenu: boolean;
+  added: boolean;
 
   onAdd?: () => void;
   onRemove?: () => void;
@@ -32,7 +33,7 @@ const CocktailComponent: FunctionalComponent<CocktailComponentProps> = props => 
       </div>
 
       <footer class="border-t-2 mt-2 pt-2 items-center text-center">
-        {!props.isOnMenu && (
+        {!props.added && (
           <button
             class="w-full py-2 px-4 text-white font-bold bg-green-500 rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:shadow-outline"
             disabled={props.disabled}
@@ -42,7 +43,7 @@ const CocktailComponent: FunctionalComponent<CocktailComponentProps> = props => 
           </button>
         )}
 
-        {props.isOnMenu && <input type="number" value={props.price} />}
+        {props.added && <input type="number" value={props.price} />}
       </footer>
     </article>
   );

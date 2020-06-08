@@ -1,9 +1,9 @@
 import { FunctionalComponent, h } from 'preact';
 import { Route, Router } from 'preact-router';
 
+import NavComponent from './components/NavComponent';
 import Home from './routes/home';
 import NotFoundPage from './routes/notfound';
-import NavComponent from './components/NavComponent';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 if ((module as any).hot) {

@@ -1,7 +1,8 @@
-import { FunctionalComponent, h } from 'preact';
-import CocktailComponent from './CocktailComponent';
-import { useStore } from '../store';
 import { observer } from 'mobx-preact';
+import { FunctionalComponent, h } from 'preact';
+
+import { useStore } from '../store';
+import CocktailComponent from './CocktailComponent';
 
 const MenuComponent: FunctionalComponent = () => {
   const { inventory, cocktails } = useStore();
@@ -15,15 +16,16 @@ const MenuComponent: FunctionalComponent = () => {
       </header>
 
       <div class="grid grid-cols-3">
-        {cocktails.map(cocktail => (
+        {Array.from(cocktails.values()).map(cocktail => (
           <CocktailComponent
             key={cocktail.key}
             name={cocktail.name}
-            price={cocktail.price}
-            recipe={cocktail.getRecipe()}
+            price={inventory.getCocktailPrice(cocktail.key)}
+            recipe={cocktail.recipe}
             disabled={inventory.isCocktailDisabled(cocktail)}
-            isOnMenu={inventory.hasCocktail(cocktail)}
+            added={inventory.hasCocktail(cocktail.key)}
             onAdd={() => inventory.addCocktail(cocktail)}
+            onRemove={() => inventory.removeCocktail(cocktail.key)}
           />
         ))}
       </div>

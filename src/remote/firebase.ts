@@ -1,5 +1,6 @@
-import firebase from 'firebase/app';
 import 'firebase/database';
+
+import firebase from 'firebase/app';
 
 import { InventoryDTO } from '../dto/InventoryDTO';
 import { inventoryMock } from '../mocks/inventoryMock';

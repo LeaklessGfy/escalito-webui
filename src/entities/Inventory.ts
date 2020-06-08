@@ -1,83 +1,107 @@
-import { observable, action, computed } from 'mobx';
+import { action, observable } from 'mobx';
 
-import { IngredientKey, IngredientExtended } from './Ingredient';
-import { ProviderKey } from './Provider';
-import { CocktailKey, CocktailExtended } from './Cocktail';
 import { InventoryDTO } from '../dto/InventoryDTO';
+import { Cocktail, CocktailExtended, CocktailKey } from './Cocktail';
+import { IngredientExtended, IngredientKey } from './Ingredient';
+import { ProviderKey } from './Provider';
 
 export class Inventory {
-  public readonly user: number = 1;
-
-  public cash: number;
+  @observable
+  private _cash: number;
 
   @observable
-  private readonly ingredients: Map<ProviderKey, Map<IngredientKey, number>>;
+  private readonly _ingredients: Map<IngredientKey, Map<ProviderKey, number>>;
 
   @observable
-  private readonly cocktails: Map<CocktailKey, CocktailExtended>;
+  private readonly _cocktails: Map<CocktailKey, CocktailExtended>;
 
-  constructor(cash: number) {
-    this.cash = cash;
-    this.ingredients = new Map();
-    this.cocktails = new Map();
+  constructor(
+    cash: number,
+    ingredients: Map<IngredientKey, Map<ProviderKey, number>> = new Map(),
+    cocktails: Map<CocktailKey, CocktailExtended> = new Map()
+  ) {
+    this._cash = cash;
+    this._ingredients = ingredients;
+    this._cocktails = cocktails;
   }
 
-  public getStock(provider: ProviderKey, ingredient: IngredientKey): number {
-    const ingredients = this.ingredients.get(provider);
-    if (ingredients === undefined) {
+  public get cash(): number {
+    return this._cash;
+  }
+
+  public getIngredientStock(
+    ingredientKey: IngredientKey,
+    providerKey: ProviderKey
+  ): number {
+    const providers = this._ingredients.get(ingredientKey);
+    if (providers === undefined) {
       return 0;
     }
-    return ingredients.get(ingredient) ?? 0;
+    return providers.get(providerKey) ?? 0;
   }
 
-  public isIngredientDisabled(
-    provider: ProviderKey,
-    ingredient: IngredientExtended
-  ): boolean {
+  public isIngredientDisabled(ingredient: IngredientExtended): boolean {
     return (
-      this.cash < ingredient.price * this.getStock(provider, ingredient.key) + 1
+      this._cash <
+      ingredient.price *
+        this.getIngredientStock(ingredient.key, ingredient.providerKey) +
+        1
     );
   }
 
   @action
-  public addIngredient(provider: ProviderKey, ingredient: IngredientKey): void {
-    const ingredients = this.ingredients.get(provider) ?? new Map();
-    const value = ingredients.get(ingredient) ?? 0;
-    ingredients.set(ingredient, value + 1);
-    this.ingredients.set(provider, ingredients);
+  public addIngredient(
+    ingredientKey: IngredientKey,
+    providerKey: ProviderKey
+  ): void {
+    const providers =
+      this._ingredients.get(ingredientKey) ?? new Map<ProviderKey, number>();
+    const value = providers.get(providerKey) ?? 0;
+    providers.set(providerKey, value + 1);
+    this._ingredients.set(ingredientKey, providers);
   }
 
   @action
   public removeIngredient(
-    provider: ProviderKey,
-    ingredient: IngredientKey
+    ingredientKey: IngredientKey,
+    providerKey: ProviderKey
   ): void {
-    const ingredients = this.ingredients.get(provider);
-    if (ingredients === undefined) {
+    const providers = this._ingredients.get(ingredientKey);
+    if (providers === undefined) {
       return;
     }
-    const value = ingredients.get(ingredient);
+
+    const value = providers.get(providerKey);
     if (value === undefined || value === 0) {
       return;
     }
+
     if (value > 1) {
-      ingredients.set(ingredient, value - 1);
+      providers.set(providerKey, value - 1);
     } else {
-      ingredients.delete(ingredient);
+      providers.delete(providerKey);
     }
-    this.ingredients.set(provider, ingredients);
+
+    if (providers.size > 0) {
+      this._ingredients.set(ingredientKey, providers);
+    } else {
+      this._ingredients.delete(ingredientKey);
+    }
   }
 
-  public hasCocktail(cocktail: CocktailExtended) {
-    return this.cocktails.has(cocktail.key);
+  public getCocktailPrice(cocktailKey: CocktailKey): number {
+    return this._cocktails.get(cocktailKey)?.price ?? 0;
   }
 
-  public isCocktailDisabled(cocktail: CocktailExtended): boolean {
-    const recipe = cocktail.getRecipe();
-    const availableIngredients = this.availableIngredients;
+  public hasCocktail(cocktailKey: CocktailKey): boolean {
+    return this._cocktails.has(cocktailKey);
+  }
 
-    for (const ingredient of recipe.keys()) {
-      if (!availableIngredients.has(ingredient)) {
+  public isCocktailDisabled(cocktail: Cocktail): boolean {
+    const ingredients = cocktail.ingredients;
+
+    for (const ingredient of ingredients) {
+      if (!this._ingredients.has(ingredient)) {
         return true;
       }
     }
@@ -86,33 +110,25 @@ export class Inventory {
   }
 
   @action
-  public addCocktail(cocktail: CocktailExtended): void {
-    // Check requirements for cocktail : ingredients
-    this.cocktails.set(cocktail.key, cocktail);
+  public addCocktail(cocktail: Cocktail): void {
+    if (this.isCocktailDisabled(cocktail)) {
+      return;
+    }
+    this._cocktails.set(cocktail.key, new CocktailExtended(cocktail, 0, 0));
   }
 
   @action
-  public removeCocktail(cocktail: CocktailExtended): void {
-    this.cocktails.delete(cocktail.key);
-  }
-
-  @computed
-  public get availableIngredients(): Set<IngredientKey> {
-    return Array.from(this.ingredients.values()).reduce((set, map) => {
-      for (const key of map.keys()) {
-        set.add(key);
-      }
-      return set;
-    }, new Set<IngredientKey>());
+  public removeCocktail(cocktailKey: CocktailKey): void {
+    this._cocktails.delete(cocktailKey);
   }
 
   public static fromDTO(dto: InventoryDTO): Inventory {
-    const inventory = new Inventory(dto.cash);
-
-    const ingredients = new Map<ProviderKey, Map<IngredientKey, number>>();
+    const ingredients = new Map<IngredientKey, Map<ProviderKey, number>>();
     for (const ingredientDto of dto.ingredients) {
-      const providers = ingredients.get(ingredientDto.provider) ?? new Map();
-      const stock = providers.get(ingredientDto.ingredient) ?? 0;
+      const providers =
+        ingredients.get(ingredientDto.ingredient) ??
+        new Map<ProviderKey, number>();
+      const stock = providers.get(ingredientDto.provider) ?? 0;
       providers.set(ingredientDto.ingredient, stock + 1);
     }
 
@@ -126,6 +142,6 @@ export class Inventory {
       cocktails.set(cocktailDto.cocktail, cocktail);
     }
 
-    return inventory;
+    return new Inventory(dto.cash, ingredients, cocktails);
   }
 }

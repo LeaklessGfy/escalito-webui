@@ -11,28 +11,34 @@ export const CocktailNames: { [key in CocktailKey]: string } = {
 };
 
 export class Cocktail {
-  public readonly key: CocktailKey;
-  public readonly name: string;
-  private readonly recipe: Map<IngredientKey, number>;
+  private readonly _key: CocktailKey;
+  private readonly _recipe: Map<IngredientKey, number>;
 
   constructor(key: CocktailKey, recipe: Map<IngredientKey, number>) {
-    this.key = key;
-    this.name = CocktailNames[key];
-    this.recipe = recipe;
+    this._key = key;
+    this._recipe = recipe;
   }
 
-  public getIngredients(): IngredientKey[] {
-    return Array.from(this.recipe.keys());
+  public get key(): CocktailKey {
+    return this._key;
   }
 
-  public getRecipe(): Map<IngredientKey, number> {
-    return new Map(this.recipe);
+  public get name(): string {
+    return CocktailNames[this._key];
   }
 
-  public static build(cocktailKey: CocktailKey): Cocktail {
+  public get ingredients(): IngredientKey[] {
+    return Array.from(this._recipe.keys());
+  }
+
+  public get recipe(): Map<IngredientKey, number> {
+    return new Map(this._recipe);
+  }
+
+  public static build(key: CocktailKey): Cocktail {
     const recipe = new Map();
 
-    switch (cocktailKey) {
+    switch (key) {
       case CocktailKey.Mojito:
         recipe.set(IngredientKey.Rum, 100);
         break;
@@ -43,41 +49,42 @@ export class Cocktail {
         break;
     }
 
-    return new Cocktail(cocktailKey, recipe);
+    return new Cocktail(key, recipe);
   }
 }
 
 export class CocktailExtended extends Cocktail {
-  public readonly price: number;
-  public readonly hype: number;
+  private readonly _price: number;
+  private readonly _hype: number;
 
   constructor(cocktail: Cocktail, price: number, hype: number) {
-    super(cocktail.key, cocktail.getRecipe());
-    this.price = price;
-    this.hype = hype;
+    super(cocktail.key, cocktail.recipe);
+    this._price = price;
+    this._hype = hype;
   }
 
-  public static buildExtended(
-    cocktailKey: CocktailKey,
-    price: number,
-    hype: number
-  ) {
-    return new CocktailExtended(Cocktail.build(cocktailKey), price, hype);
+  public get price(): number {
+    return this._price;
   }
 
-  public static buildMojito() {
-    const cocktail = Cocktail.build(CocktailKey.Mojito);
-    const defaultPrice = 5;
-    const defaultHype = 0;
-
-    return new CocktailExtended(cocktail, defaultPrice, defaultHype);
+  public get hype(): number {
+    return this._hype;
   }
 
-  public static buildCubaLibre() {
-    const cocktail = Cocktail.build(CocktailKey.CubaLibra);
-    const defaultPrice = 5;
-    const defaultHype = 0;
-
-    return new CocktailExtended(cocktail, defaultPrice, defaultHype);
+  public static buildExtended(key: CocktailKey, price: number, hype: number) {
+    const original = Cocktails.get(key);
+    if (original === undefined) {
+      throw new Error('Undefined cocktail key to build extended ' + key);
+    }
+    return new CocktailExtended(original, price, hype);
   }
 }
+
+function buildCocktails(): Map<CocktailKey, Cocktail> {
+  const map: Map<CocktailKey, Cocktail> = new Map();
+  map.set(CocktailKey.Mojito, Cocktail.build(CocktailKey.Mojito));
+  map.set(CocktailKey.CubaLibra, Cocktail.build(CocktailKey.CubaLibra));
+  return map;
+}
+
+export const Cocktails = buildCocktails();
