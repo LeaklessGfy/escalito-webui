@@ -11,28 +11,20 @@ export const CocktailNames: { [key in CocktailKey]: string } = {
 };
 
 export class Cocktail {
-  private readonly _key: CocktailKey;
-  private readonly _recipe: Map<IngredientKey, number>;
+  public readonly key: CocktailKey;
+  public readonly recipe: Map<IngredientKey, number>;
 
   constructor(key: CocktailKey, recipe: Map<IngredientKey, number>) {
-    this._key = key;
-    this._recipe = recipe;
-  }
-
-  public get key(): CocktailKey {
-    return this._key;
+    this.key = key;
+    this.recipe = recipe;
   }
 
   public get name(): string {
-    return CocktailNames[this._key];
+    return CocktailNames[this.key];
   }
 
   public get ingredients(): IngredientKey[] {
-    return Array.from(this._recipe.keys());
-  }
-
-  public get recipe(): Map<IngredientKey, number> {
-    return new Map(this._recipe);
+    return Array.from(this.recipe.keys());
   }
 
   public static build(key: CocktailKey): Cocktail {
@@ -54,21 +46,13 @@ export class Cocktail {
 }
 
 export class CocktailExtended extends Cocktail {
-  private readonly _price: number;
-  private readonly _hype: number;
+  public readonly price: number;
+  public readonly hype: number;
 
   constructor(cocktail: Cocktail, price: number, hype: number) {
     super(cocktail.key, cocktail.recipe);
-    this._price = price;
-    this._hype = hype;
-  }
-
-  public get price(): number {
-    return this._price;
-  }
-
-  public get hype(): number {
-    return this._hype;
+    this.price = price;
+    this.hype = hype;
   }
 
   public static buildExtended(key: CocktailKey, price: number, hype: number) {

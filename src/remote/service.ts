@@ -1,21 +1,42 @@
+import { EmployeeKey } from '../entities/Employee';
 import { Inventory } from '../entities/Inventory';
+import { inventoryMock } from '../mocks/inventoryMock';
 import { Client } from './firebase';
 
 export class Service {
-  private readonly client: Client;
-  private readonly userId: number;
+  private readonly _client: Client;
+  private readonly _userId: string;
 
   constructor() {
-    this.client = new Client();
-    this.userId = 1;
+    this._client = new Client();
+    this._userId = '1';
   }
 
   public async getInventory(): Promise<Inventory> {
-    try {
-      const dto = await this.client.fetchInventory(this.userId);
-      return Inventory.fromDTO(dto);
-    } catch (err) {
-      throw err;
-    }
+    const dto = await this._client.fetchValue(
+      `inventory/${this._userId}`,
+      inventoryMock
+    );
+    return Inventory.fromDTO(dto);
+  }
+
+  public async updateCash(cash: number): Promise<boolean> {
+    return await this._client.writeValue(
+      `inventory/${this._userId}/cash`,
+      cash
+    );
+  }
+
+  public async addEmployee(employeeKey: EmployeeKey): Promise<boolean> {
+    return await this._client.writeValue(
+      `inventory/${this._userId}/employee/${employeeKey}`,
+      true
+    );
+  }
+
+  public async removeEmployee(employeeKey: EmployeeKey): Promise<boolean> {
+    return await this._client.removeValue(
+      `inventory/${this._userId}/employee/${employeeKey}`
+    );
   }
 }

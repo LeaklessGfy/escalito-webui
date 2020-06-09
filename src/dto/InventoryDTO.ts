@@ -14,4 +14,5 @@ export interface InventoryDTO {
   cash: number;
   ingredients: IngredientInventoryDTO[];
   cocktails: CocktailInventoryDTO[];
+  employees: number[];
 }

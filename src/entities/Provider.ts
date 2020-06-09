@@ -9,27 +9,23 @@ export const ProviderNames: { [key in ProviderKey]: string } = {
 };
 
 export class Provider {
-  private readonly _key: ProviderKey;
-  private readonly _ingredients: Map<IngredientKey, IngredientExtended>;
+  public readonly key: ProviderKey;
+  public readonly ingredients: Map<IngredientKey, IngredientExtended>;
 
   constructor(
     key: ProviderKey,
     ingredients: Map<IngredientKey, IngredientExtended>
   ) {
-    this._key = key;
-    this._ingredients = ingredients;
-  }
-
-  public get key(): ProviderKey {
-    return this._key;
+    this.key = key;
+    this.ingredients = ingredients;
   }
 
   public get name(): string {
-    return ProviderNames[this._key];
+    return ProviderNames[this.key];
   }
 
-  public get ingredients(): IngredientExtended[] {
-    return Array.from(this._ingredients.values());
+  public get ingredientsArray(): IngredientExtended[] {
+    return Array.from(this.ingredients.values());
   }
 
   public static buildSuperMarket() {

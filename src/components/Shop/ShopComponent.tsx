@@ -1,22 +1,14 @@
-import { Provider } from 'entities/Provider';
 import { observer } from 'mobx-preact';
 import { FunctionalComponent, h } from 'preact';
-import { useContext, useState } from 'preact/hooks';
-import { storeContext } from 'store';
+import { useState } from 'preact/hooks';
 
+import { Provider } from '../../entities/Provider';
+import { useStore } from '../../store';
 import IngredientComponent from './IngredientComponent';
 
-function getFirstKey<T, R>(map: Map<T, R>): R | undefined {
-  const keys = map.keys();
-  const key = keys.next().value;
-  return map.get(key);
-}
-
 const ShopComponent: FunctionalComponent = () => {
-  const { inventory, providers } = useContext(storeContext);
-  const [active, setActive] = useState<Provider | undefined>(
-    getFirstKey(providers)
-  );
+  const { inventory, providersArray } = useStore();
+  const [active, setActive] = useState<Provider | undefined>(providersArray[0]);
 
   return (
     <section class="card">
@@ -28,8 +20,8 @@ const ShopComponent: FunctionalComponent = () => {
 
       <div class="card-body flex justify-between">
         <aside class="mr-10">
-          <ul class="list">
-            {Array.from(providers.values()).map(provider => (
+          <ul class="list bg-white">
+            {providersArray.map(provider => (
               <li
                 key={provider.key}
                 class="list-item"
@@ -43,7 +35,7 @@ const ShopComponent: FunctionalComponent = () => {
 
         <section class="flex-grow grid grid-cols-3">
           {active &&
-            active.ingredients.map(ingredient => (
+            active.ingredientsArray.map(ingredient => (
               <IngredientComponent
                 key={ingredient.key}
                 name={ingredient.name}

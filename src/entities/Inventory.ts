@@ -1,7 +1,9 @@
 import { action, observable } from 'mobx';
 
 import { InventoryDTO } from '../dto/InventoryDTO';
+import { Service } from '../remote/service';
 import { Cocktail, CocktailExtended, CocktailKey } from './Cocktail';
+import { Employee, EmployeeKey } from './Employee';
 import { IngredientExtended, IngredientKey } from './Ingredient';
 import { ProviderKey } from './Provider';
 
@@ -15,14 +17,21 @@ export class Inventory {
   @observable
   private readonly _cocktails: Map<CocktailKey, CocktailExtended>;
 
+  @observable
+  private readonly _employees: Set<EmployeeKey>;
+
+  private $service: Service | undefined;
+
   constructor(
     cash: number,
     ingredients: Map<IngredientKey, Map<ProviderKey, number>> = new Map(),
-    cocktails: Map<CocktailKey, CocktailExtended> = new Map()
+    cocktails: Map<CocktailKey, CocktailExtended> = new Map(),
+    employees: Set<EmployeeKey> = new Set()
   ) {
     this._cash = cash;
     this._ingredients = ingredients;
     this._cocktails = cocktails;
+    this._employees = employees;
   }
 
   public get cash(): number {
@@ -122,6 +131,32 @@ export class Inventory {
     this._cocktails.delete(cocktailKey);
   }
 
+  public hasEmployee(employeeKey: EmployeeKey): boolean {
+    return this._employees.has(employeeKey);
+  }
+
+  @action
+  public addEmployee(employee: Employee): void {
+    if (this._cash < employee.price) {
+      return;
+    }
+
+    this._cash -= employee.price;
+    this._employees.add(employee.key);
+    this.$service?.updateCash(this._cash);
+    this.$service?.addEmployee(employee.key);
+  }
+
+  @action
+  public removeEmployee(employeeKey: EmployeeKey): void {
+    this._employees.delete(employeeKey);
+    this.$service?.removeEmployee(employeeKey);
+  }
+
+  public attachService(service: Service): void {
+    this.$service = service;
+  }
+
   public static fromDTO(dto: InventoryDTO): Inventory {
     const ingredients = new Map<IngredientKey, Map<ProviderKey, number>>();
     for (const ingredientDto of dto.ingredients) {
@@ -143,6 +178,11 @@ export class Inventory {
       cocktails.set(cocktailDto.cocktail, cocktail);
     }
 
-    return new Inventory(dto.cash, ingredients, cocktails);
+    const employees = new Set<EmployeeKey>();
+    for (const employee of dto.employees) {
+      employees.add(employee);
+    }
+
+    return new Inventory(dto.cash, ingredients, cocktails, employees);
   }
 }

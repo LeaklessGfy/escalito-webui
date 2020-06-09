@@ -38,6 +38,6 @@ export default {
       'index'
     );
 
-    config.resolve.modules.push(env.src);
+    // config.resolve.modules.push(env.src);
   }
 };

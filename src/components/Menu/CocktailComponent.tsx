@@ -1,5 +1,6 @@
-import { IngredientKey, IngredientNames } from 'entities/Ingredient';
 import { FunctionalComponent, h } from 'preact';
+
+import { IngredientKey, IngredientNames } from '../../entities/Ingredient';
 
 interface CocktailComponentProps {
   name: string;

@@ -1,11 +1,11 @@
 import { observer } from 'mobx-preact';
 import { FunctionalComponent, h } from 'preact';
-import { useStore } from 'store';
 
+import { useStore } from '../../store';
 import CocktailComponent from './CocktailComponent';
 
 const MenuComponent: FunctionalComponent = () => {
-  const { inventory, cocktails } = useStore();
+  const { inventory, cocktailsArray } = useStore();
 
   return (
     <section class="card">
@@ -13,8 +13,8 @@ const MenuComponent: FunctionalComponent = () => {
         <h2 class="card-title">Menu</h2>
       </header>
 
-      <div class="grid grid-cols-3">
-        {Array.from(cocktails.values()).map(cocktail => (
+      <div class="card-body grid grid-cols-3">
+        {cocktailsArray.map(cocktail => (
           <CocktailComponent
             key={cocktail.key}
             name={cocktail.name}

@@ -2,9 +2,6 @@ import 'firebase/database';
 
 import firebase from 'firebase/app';
 
-import { InventoryDTO } from '../dto/InventoryDTO';
-import { inventoryMock } from '../mocks/inventoryMock';
-
 const CONFIG = {
   apiKey: 'AIzaSyD89Uoox6OEt3ZfJWMDZ1HgDJ-_pf7e7vQ',
   authDomain: 'escalito-game.firebaseapp.com',
@@ -24,30 +21,42 @@ export class Client {
   private readonly env: ClientEnv;
   private readonly app: firebase.app.App;
 
-  constructor() {
-    this.env = ClientEnv.DEV;
+  constructor(env: ClientEnv = ClientEnv.DEV) {
+    this.env = env;
     this.app = !firebase.apps.length
       ? firebase.initializeApp(CONFIG)
       : firebase.app();
   }
 
-  public async fetchInventory(userId: number): Promise<InventoryDTO> {
+  public async fetchValue<T>(ref: string, defaultValue: T): Promise<T> {
     if (this.env === ClientEnv.PROD) {
-      return await this.fetchValue(`inventory/${userId}`);
-    }
-    return inventoryMock;
-  }
-
-  private async fetchValue<T>(ref: string): Promise<T> {
-    try {
       const snapshot = await this.app
         .database()
         .ref(ref)
         .once('value');
 
       return snapshot.val();
-    } catch (err) {
-      throw err;
     }
+    return defaultValue;
+  }
+
+  public async writeValue<T>(ref: string, value: T): Promise<boolean> {
+    if (this.env === ClientEnv.PROD) {
+      await this.app
+        .database()
+        .ref(ref)
+        .set(value);
+    }
+    return true;
+  }
+
+  public async removeValue(ref: string): Promise<boolean> {
+    if (this.env === ClientEnv.PROD) {
+      await this.app
+        .database()
+        .ref(ref)
+        .set(null);
+    }
+    return true;
   }
 }

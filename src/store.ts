@@ -3,6 +3,7 @@ import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
 
 import { Cocktail, CocktailKey, Cocktails } from './entities/Cocktail';
+import { Employee, EmployeeKey, Employees } from './entities/Employee';
 import { Inventory } from './entities/Inventory';
 import { Provider, ProviderKey, Providers } from './entities/Provider';
 import { Service } from './remote/service';
@@ -10,34 +11,39 @@ import { Service } from './remote/service';
 export class Store {
   @observable
   private _inventory: Inventory;
-
-  private readonly _providers: Map<ProviderKey, Provider>;
-  private readonly _cocktails: Map<CocktailKey, Cocktail>;
-
   private readonly $service: Service;
+
+  public readonly providers: Map<ProviderKey, Provider>;
+  public readonly cocktails: Map<CocktailKey, Cocktail>;
+  public readonly employees: Map<EmployeeKey, Employee>;
 
   constructor() {
     this._inventory = new Inventory(0);
-    this._providers = Providers;
-    this._cocktails = Cocktails;
+    this.providers = Providers;
+    this.cocktails = Cocktails;
+    this.employees = Employees;
     this.$service = new Service();
   }
 
   public async init() {
-    const inventory = await this.$service.getInventory();
-    this._inventory = inventory;
+    this._inventory = await this.$service.getInventory();
+    this._inventory.attachService(this.$service);
   }
 
   public get inventory() {
     return this._inventory;
   }
 
-  public get providers() {
-    return this._providers;
+  public get providersArray() {
+    return Array.from(this.providers.values());
   }
 
-  public get cocktails() {
-    return this._cocktails;
+  public get cocktailsArray() {
+    return Array.from(this.cocktails.values());
+  }
+
+  public get employeesArray(): Employee[] {
+    return Array.from(this.employees.values());
   }
 }
 
