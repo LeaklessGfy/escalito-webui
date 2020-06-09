@@ -1,4 +1,5 @@
 import { resolve } from 'path';
+
 import tailwindcss from 'tailwindcss';
 
 export default {
@@ -12,8 +13,6 @@ export default {
    * @param {object} options - this is mainly relevant for plugins (will always be empty in the config), default to an empty object
    **/
   webpack(config, env, helpers, options) {
-    // Switch css-loader for typings-for-css-modules-loader, which is a wrapper
-    // that automatically generates .d.ts files for loaded CSS
     helpers.getLoadersByName(config, 'css-loader').forEach(({ loader }) => {
       loader.loader = 'typings-for-css-modules-loader';
       loader.options = Object.assign(loader.options, {
@@ -25,6 +24,13 @@ export default {
       });
     });
 
+    helpers.getLoadersByName(config, 'postcss-loader').forEach(({ loader }) => {
+      loader.options.plugins = [
+        tailwindcss('./tailwind.config.js'),
+        ...loader.options.plugins
+      ];
+    });
+
     // Use any `index` file, not just index.js
     config.resolve.alias['preact-cli-entrypoint'] = resolve(
       process.cwd(),
@@ -32,13 +38,6 @@ export default {
       'index'
     );
 
-    const results = helpers.getLoadersByName(config, 'postcss-loader');
-    for (const result of results) {
-      result.loader.options.plugins = [
-        tailwindcss('./tailwind.config.js'),
-        // other postcss plugins can be added here
-        ...result.loader.options.plugins
-      ];
-    }
+    config.resolve.modules.push(env.src);
   }
 };

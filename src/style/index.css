@@ -24,4 +24,52 @@ body {
 
 @import 'tailwindcss/components';
 
+.card {
+  @apply rounded overflow-hidden shadow-lg px-6 py-4;
+}
+
+.card-header {
+  @apply border-b-2 flex justify-between;
+}
+
+.card-title {
+  @apply font-bold text-xl text-teal-500 mb-2;
+}
+
+.card-body {
+  @apply mt-5;
+}
+
+.card-content {
+  @apply text-base text-gray-700;
+}
+
+.card-footer {
+  @apply border-t-2 mt-2 pt-2 items-center text-center;
+}
+
+.list {
+  @apply border rounded;
+}
+
+.list-item {
+  @apply px-4 py-2 border-b cursor-pointer;
+}
+
+.list-item:last-child {
+  @apply border-b-0;
+}
+
+.btn {
+  @apply py-2 px-4 text-white font-bold rounded;
+}
+
+.btn:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.btn:focus {
+  @apply outline-none shadow-outline;
+}
+
 @import 'tailwindcss/utilities';

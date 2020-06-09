@@ -1,9 +1,9 @@
+import { Provider } from 'entities/Provider';
 import { observer } from 'mobx-preact';
 import { FunctionalComponent, h } from 'preact';
 import { useContext, useState } from 'preact/hooks';
+import { storeContext } from 'store';
 
-import { Provider } from '../entities/Provider';
-import { storeContext } from '../store';
 import IngredientComponent from './IngredientComponent';
 
 function getFirstKey<T, R>(map: Map<T, R>): R | undefined {
@@ -19,20 +19,20 @@ const ShopComponent: FunctionalComponent = () => {
   );
 
   return (
-    <section class="rounded overflow-hidden shadow-lg px-6 py-4">
-      <header class="border-b-2 flex justify-between">
-        <h2>Shop</h2>
+    <section class="card">
+      <header class="card-header">
+        <h2 class="card-title">Shop</h2>
 
         <em>{inventory.cash}$</em>
       </header>
 
-      <div class="mt-5 flex justify-between">
+      <div class="card-body flex justify-between">
         <aside class="mr-10">
-          <ul class="border rounded">
+          <ul class="list">
             {Array.from(providers.values()).map(provider => (
               <li
-                key={provider.name}
-                class="px-4 py-2 border-b last:border-b-0 cursor-pointer"
+                key={provider.key}
+                class="list-item"
                 onClick={() => setActive(provider)}
               >
                 {provider.name}
@@ -41,7 +41,7 @@ const ShopComponent: FunctionalComponent = () => {
           </ul>
         </aside>
 
-        <section class="rounded flex-grow grid grid-cols-3">
+        <section class="flex-grow grid grid-cols-3">
           {active &&
             active.ingredients.map(ingredient => (
               <IngredientComponent

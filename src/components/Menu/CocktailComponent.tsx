@@ -1,6 +1,5 @@
+import { IngredientKey, IngredientNames } from 'entities/Ingredient';
 import { FunctionalComponent, h } from 'preact';
-
-import { IngredientKey, IngredientNames } from '../entities/Ingredient';
 
 interface CocktailComponentProps {
   name: string;
@@ -15,9 +14,9 @@ interface CocktailComponentProps {
 
 const CocktailComponent: FunctionalComponent<CocktailComponentProps> = props => {
   return (
-    <article class="max-w-xs bg-white rounded overflow-hidden shadow-lg px-6 py-4 mt-2">
+    <article class="card max-w-xs bg-white">
       <header>
-        <h4 class="font-bold text-xl text-teal-500 mb-2">{props.name}</h4>
+        <h4 class="card-title">{props.name}</h4>
       </header>
 
       <div class="h-20">
@@ -32,10 +31,10 @@ const CocktailComponent: FunctionalComponent<CocktailComponentProps> = props => 
         </ul>
       </div>
 
-      <footer class="border-t-2 mt-2 pt-2 items-center text-center">
+      <footer class="card-footer">
         {!props.added && (
           <button
-            class="w-full py-2 px-4 text-white font-bold bg-green-500 rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:shadow-outline"
+            class="w-full btn bg-green-500 hover:bg-green-700"
             disabled={props.disabled}
             onClick={props.onAdd}
           >

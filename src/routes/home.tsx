@@ -1,9 +1,8 @@
+import MenuComponent from 'components/Menu/MenuComponent';
+import ShopComponent from 'components/Shop/ShopComponent';
 import { FunctionalComponent, h } from 'preact';
 import { useEffect } from 'preact/hooks';
-
-import MenuComponent from '../../components/MenuComponent';
-import ShopComponent from '../../components/ShopComponent';
-import { Store, storeContext } from '../../store';
+import { Store, storeContext } from 'store';
 
 const Home: FunctionalComponent = () => {
   const store = new Store();

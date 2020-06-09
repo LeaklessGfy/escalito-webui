@@ -1,16 +1,16 @@
 import { observer } from 'mobx-preact';
 import { FunctionalComponent, h } from 'preact';
+import { useStore } from 'store';
 
-import { useStore } from '../store';
 import CocktailComponent from './CocktailComponent';
 
 const MenuComponent: FunctionalComponent = () => {
   const { inventory, cocktails } = useStore();
 
   return (
-    <section class="rounded overflow-hidden shadow-lg px-6 py-4">
-      <header class="border-b-2">
-        <h2>Menu</h2>
+    <section class="card">
+      <header class="card-header">
+        <h2 class="card-title">Menu</h2>
       </header>
 
       <div class="grid grid-cols-3">
