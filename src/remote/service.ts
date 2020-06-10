@@ -6,8 +6,8 @@ import { Client } from './firebase';
 export class Service {
   private readonly _client: Client;
   private readonly _tasks: Function[][];
-  private readonly _listeners: ((user: firebase.User | null) => void)[];
-  private _user: firebase.User | null;
+  private readonly _listeners: ((user: firebase.UserInfo | null) => void)[];
+  private _user: firebase.UserInfo | null;
 
   constructor() {
     this._client = new Client();
@@ -17,7 +17,7 @@ export class Service {
     this._client.onAuthStateChanged = this.onAuth.bind(this);
   }
 
-  public addAuthListener(listener: (user: firebase.User | null) => void) {
+  public addAuthListener(listener: (user: firebase.UserInfo | null) => void) {
     this._listeners.push(listener);
     listener(this._user);
   }
@@ -27,7 +27,9 @@ export class Service {
       `inventory/${this._user?.uid}`,
       inventoryMock
     );
-    return Inventory.fromDTO(dto);
+    const inventory = Inventory.fromDTO(dto);
+    inventory.attachService(this);
+    return inventory;
   }
 
   public async updateCash(cash: number): Promise<void> {
@@ -68,7 +70,7 @@ export class Service {
     return await promise;
   }
 
-  private onAuth(user: firebase.User | null): void {
+  private onAuth(user: firebase.UserInfo | null): void {
     this._user = user;
 
     while (this._tasks.length > 0) {

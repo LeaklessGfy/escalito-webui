@@ -10,24 +10,37 @@ import { Service } from './remote/service';
 
 export class Store {
   @observable
-  private _inventory: Inventory;
-  private readonly $service: Service;
+  private _user: firebase.UserInfo | null;
 
+  @observable
+  private _inventory: Inventory;
+
+  public readonly service: Service;
   public readonly providers: Map<ProviderKey, Provider>;
   public readonly cocktails: Map<CocktailKey, Cocktail>;
   public readonly employees: Map<EmployeeKey, Employee>;
 
   constructor() {
+    this.service = new Service();
     this._inventory = new Inventory(0);
+    this._user = null;
+
     this.providers = Providers;
     this.cocktails = Cocktails;
     this.employees = Employees;
-    this.$service = new Service();
   }
 
   public async init() {
-    this._inventory = await this.$service.getInventory();
-    this._inventory.attachService(this.$service);
+    this.service.addAuthListener(async user => {
+      this._user = user;
+      if (user) {
+        this._inventory = await this.service.getInventory();
+      }
+    });
+  }
+
+  public get user() {
+    return this._user;
   }
 
   public get inventory() {
@@ -47,5 +60,6 @@ export class Store {
   }
 }
 
-export const storeContext = createContext(new Store());
+export const store = new Store();
+export const storeContext = createContext(store);
 export const useStore = () => useContext(storeContext);
