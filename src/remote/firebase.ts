@@ -1,3 +1,4 @@
+import 'firebase/auth';
 import 'firebase/database';
 
 import firebase from 'firebase/app';
@@ -21,11 +22,29 @@ export class Client {
   private readonly env: ClientEnv;
   private readonly app: firebase.app.App;
 
+  public onAuthStateChanged: (user: firebase.User | null) => void = () => {};
+
   constructor(env: ClientEnv = ClientEnv.DEV) {
     this.env = env;
     this.app = !firebase.apps.length
       ? firebase.initializeApp(CONFIG)
       : firebase.app();
+
+    this.app.auth().onAuthStateChanged(user => {
+      this.onAuthStateChanged(user);
+    });
+  }
+
+  public async createUser(email: string, password: string) {
+    if (this.env === ClientEnv.PROD) {
+      await this.app.auth().createUserWithEmailAndPassword(email, password);
+    }
+  }
+
+  public async login(email: string, password: string) {
+    if (this.env === ClientEnv.PROD) {
+      await this.app.auth().signInWithEmailAndPassword(email, password);
+    }
   }
 
   public async fetchValue<T>(ref: string, defaultValue: T): Promise<T> {
@@ -40,23 +59,16 @@ export class Client {
     return defaultValue;
   }
 
-  public async writeValue<T>(ref: string, value: T): Promise<boolean> {
+  public async writeValue<T>(ref: string, value: T): Promise<void> {
     if (this.env === ClientEnv.PROD) {
       await this.app
         .database()
         .ref(ref)
         .set(value);
     }
-    return true;
   }
 
-  public async removeValue(ref: string): Promise<boolean> {
-    if (this.env === ClientEnv.PROD) {
-      await this.app
-        .database()
-        .ref(ref)
-        .set(null);
-    }
-    return true;
+  public async removeValue(ref: string): Promise<void> {
+    this.writeValue(ref, null);
   }
 }
