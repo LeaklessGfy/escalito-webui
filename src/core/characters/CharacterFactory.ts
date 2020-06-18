@@ -22,8 +22,24 @@ export class CharacterFactory {
     return barmaid;
   }
 
-  public buildClient(scene: Scene, texture: string): Client {
-    const sprite = scene.add.sprite(0, 0, CharacterKey.Client1);
+  public buildClient(scene: Scene): Client {
+    const x = 100;
+    const y = $S.floor(scene);
+
+    const sprite = scene.add.sprite(x, y, CharacterKey.Client1);
+    sprite
+      .setScale(2)
+      .setY(sprite.y - 20)
+      .setDepth(2);
+
+    sprite.setInteractive();
+    sprite.on('pointerover', () => {
+      scene.input.setDefaultCursor('url(assets/cursor.hover.png), pointer');
+    });
+    sprite.on('pointerout', () => {
+      scene.input.setDefaultCursor('url(assets/cursor.basic.png), pointer');
+    });
+
     const client = new Client(sprite, CharacterKey.Client1);
 
     return client;

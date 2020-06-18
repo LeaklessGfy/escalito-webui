@@ -14,7 +14,7 @@ export enum CharacterAnim {
 }
 
 export abstract class AbstractCharacter {
-  private static readonly PATIENCE: number = 20;
+  private static readonly PATIENCE: number = 0.01;
   private static readonly SPEED: number = 2;
 
   protected readonly _state: State;
@@ -40,7 +40,7 @@ export abstract class AbstractCharacter {
     return { x: this._sprite.x, y: this._sprite.y };
   }
 
-  public abstract behave(point: Point): void;
+  public abstract behave(next: Point, bar: Point): void;
 
   public update(delta: number): void {
     if (this._state.idling) {
@@ -102,7 +102,11 @@ export abstract class AbstractCharacter {
   }
 
   public isNear(dst: Point | null, distance: number = 0): boolean {
-    return true;
+    if (dst == null) {
+      return false;
+    }
+
+    return Math.abs(dst.x - this._sprite.x) < distance;
   }
 
   private stepIdle(): void {
@@ -110,6 +114,10 @@ export abstract class AbstractCharacter {
   }
 
   private stepMove(): void {
+    if (this._dst === null) {
+      return;
+    }
+
     if (this.isNear(this._dst, this._distance)) {
       this._state.idle();
 
@@ -118,7 +126,8 @@ export abstract class AbstractCharacter {
       this._onArrive = null;
     } else {
       this.animate(CharacterAnim.Move);
-      this._sprite.setX(this._sprite.x + AbstractCharacter.SPEED);
+      const dir = this._dst.x < this._sprite.x ? -1 : 1;
+      this._sprite.setX(this._sprite.x + AbstractCharacter.SPEED * dir);
     }
   }
 

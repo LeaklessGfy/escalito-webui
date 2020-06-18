@@ -1,10 +1,10 @@
 import { Scene } from 'phaser';
 
+import { $S } from '../Settings';
 import { CharacterAnim, CharacterKey } from '../characters/AbstractCharacter';
 import { Barmaid } from '../characters/Barmaid';
 import { CharacterFactory } from '../characters/CharacterFactory';
 import { Client } from '../characters/Client';
-import { Point } from '../drawables/Point';
 import { IController } from './IController';
 
 const BARMAID_IDLE = CharacterKey.Barmaid + '.' + CharacterAnim.Idle;
@@ -83,10 +83,11 @@ export class CharacterController implements IController {
     scene.time.addEvent({
       delay: 3000,
       loop: true,
-      callback: () => {
-        //this.createClient(queue);
-      }
+      callback: () => {}
     });
+
+    const client = this._factory.buildClient(scene);
+    this._clients.push(client);
 
     this._barmaid = this._factory.buildBarmaid(scene);
   }
@@ -94,12 +95,13 @@ export class CharacterController implements IController {
   public update(delta: number): void {
     const c = this._clients;
     const l = this._clients.length;
+    const barPosition = $S.positionBag.get('bar');
 
     this._barmaid?.update(delta);
 
     for (let i = 0; i < l; i++) {
       const current = c[i];
-      let next: Point = { x: 0, y: 0 };
+      let next = barPosition;
 
       // Has leader
       if (i + 1 < l) {
@@ -107,7 +109,9 @@ export class CharacterController implements IController {
       }
 
       current.update(delta);
-      current.behave(next);
+      if (next !== undefined && barPosition !== undefined) {
+        current.behave(next, barPosition);
+      }
     }
   }
 }
