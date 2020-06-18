@@ -1,4 +1,6 @@
-export const userMock: firebase.UserInfo = {
+import { UserDTO } from '../dto/UserDTO';
+
+export const userMock: UserDTO = {
   uid: '1',
   displayName: null,
   email: 'test@test.fr',

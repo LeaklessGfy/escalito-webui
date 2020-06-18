@@ -1,18 +1,18 @@
-export interface IngredientInventoryDTO {
-  provider: number;
+export interface IIngredientDTO {
   ingredient: number;
+  provider: number;
   stock: number;
 }
 
-export interface CocktailInventoryDTO {
+export interface ICocktailDTO {
   cocktail: number;
   price: number;
   hype: number;
 }
 
-export interface InventoryDTO {
+export interface IInventoryDTO {
   cash: number;
-  ingredients: IngredientInventoryDTO[];
-  cocktails: CocktailInventoryDTO[];
+  ingredients: IIngredientDTO[];
+  cocktails: ICocktailDTO[];
   employees: number[];
 }

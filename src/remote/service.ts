@@ -1,89 +1,61 @@
+import { UserListener } from '../dto/UserDTO';
 import { EmployeeKey } from '../entities/Employee';
+import { IngredientKey } from '../entities/Ingredient';
 import { Inventory } from '../entities/Inventory';
-import { inventoryMock } from '../mocks/inventoryMock';
-import { Client } from './firebase';
+import { ProviderKey } from '../entities/Provider';
+import { ClientEnv, ClientFactory, IClient } from './IClient';
 
 export class Service {
-  private readonly _client: Client;
-  private readonly _tasks: Function[][];
-  private readonly _listeners: ((user: firebase.UserInfo | null) => void)[];
-  private _user: firebase.UserInfo | null;
+  private readonly _client: IClient;
 
   constructor() {
-    this._client = new Client();
-    this._tasks = [];
-    this._listeners = [];
-    this._user = null;
-    this._client.onAuthStateChanged = this.onAuth.bind(this);
+    this._client = ClientFactory.BuildClient(ClientEnv.DEV);
   }
 
-  public addAuthListener(listener: (user: firebase.UserInfo | null) => void) {
-    this._listeners.push(listener);
-    listener(this._user);
+  public async createUser(email: string, password: string): Promise<void> {
+    await this._client.createUser(email, password);
+  }
+
+  public async login(email: string, password: string): Promise<void> {
+    await this._client.login(email, password);
+  }
+
+  public subscribe(subscriber: UserListener): void {
+    this._client.subscribe(subscriber);
   }
 
   public async getInventory(): Promise<Inventory> {
-    const dto = await this._client.fetchValue(
-      `inventory/${this._user?.uid}`,
-      inventoryMock
-    );
+    const dto = await this._client.fetchInventory();
     const inventory = Inventory.fromDTO(dto);
     inventory.attachService(this);
     return inventory;
   }
 
-  public async updateCash(cash: number): Promise<void> {
-    await this._client.writeValue(`inventory/${this._user?.uid}/cash`, cash);
+  public async setCash(cash: number): Promise<void> {
+    await this._client.updateCash(cash);
   }
 
-  public async addEmployee(employeeKey: EmployeeKey): Promise<void> {
-    await this._client.writeValue(
-      `inventory/${this._user?.uid}/employee/${employeeKey}`,
-      true
-    );
+  public async addIngredient(
+    ingredient: IngredientKey,
+    provider: ProviderKey,
+    stock: number
+  ): Promise<void> {
+    await this._client.updateIngredient({ ingredient, provider, stock });
   }
 
-  public async removeEmployee(employeeKey: EmployeeKey): Promise<void> {
-    await this._client.removeValue(
-      `inventory/${this._user?.uid}/employee/${employeeKey}`
-    );
+  public async removeIngredient(
+    ingredient: IngredientKey,
+    provider: ProviderKey,
+    stock: number
+  ): Promise<void> {
+    await this._client.updateIngredient({ ingredient, provider, stock });
   }
 
-  public async createUser(
-    email: string,
-    password: string
-  ): Promise<firebase.User> {
-    const promise = new Promise<firebase.User>((resolve, reject) => {
-      this._tasks.push([resolve, reject]);
-      setTimeout(() => reject('Timeout'), 2000);
-    });
-    await this._client.createUser(email, password);
-    return await promise;
+  public async addEmployee(employee: EmployeeKey): Promise<void> {
+    await this._client.updateEmployee(employee, true);
   }
 
-  public async login(email: string, password: string): Promise<firebase.User> {
-    const promise = new Promise<firebase.User>((resolve, reject) => {
-      this._tasks.push([resolve, reject]);
-      setTimeout(() => reject('Timeout'), 2000);
-    });
-    await this._client.login(email, password);
-    return await promise;
-  }
-
-  private onAuth(user: firebase.UserInfo | null): void {
-    this._user = user;
-
-    while (this._tasks.length > 0) {
-      const task = this._tasks.pop();
-      if (task !== undefined) {
-        const [resolve, reject] = task;
-        if (user) resolve(user);
-        else reject('Unlogged');
-      }
-    }
-
-    for (const listener of this._listeners) {
-      listener(user);
-    }
+  public async removeEmployee(employee: EmployeeKey): Promise<void> {
+    await this._client.updateEmployee(employee, null);
   }
 }

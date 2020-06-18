@@ -1,6 +1,6 @@
-import { InventoryDTO } from '../dto/InventoryDTO';
+import { IInventoryDTO } from '../dto/InventoryDTO';
 
-export const inventoryMock: InventoryDTO = {
+export const inventoryMock: IInventoryDTO = {
   cash: 100,
   ingredients: [
     {

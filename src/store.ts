@@ -1,19 +1,23 @@
-import { observable } from 'mobx';
+import { computed, observable } from 'mobx';
 import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
 
+import { IUserDTO } from './dto/UserDTO';
 import { Cocktail, CocktailKey, Cocktails } from './entities/Cocktail';
 import { Employee, EmployeeKey, Employees } from './entities/Employee';
 import { Inventory } from './entities/Inventory';
 import { Provider, ProviderKey, Providers } from './entities/Provider';
-import { Service } from './remote/service';
+import { Service } from './remote/Service';
 
 export class Store {
   @observable
-  private _user: firebase.UserInfo | null;
+  public ready: boolean;
 
   @observable
-  private _inventory: Inventory;
+  public user: IUserDTO;
+
+  @observable
+  public inventory: Inventory;
 
   public readonly service: Service;
   public readonly providers: Map<ProviderKey, Provider>;
@@ -21,40 +25,37 @@ export class Store {
   public readonly employees: Map<EmployeeKey, Employee>;
 
   constructor() {
-    this.service = new Service();
-    this._inventory = new Inventory(0);
-    this._user = null;
+    this.ready = false;
+    this.user = null;
+    this.inventory = new Inventory(0);
 
+    this.service = new Service();
     this.providers = Providers;
     this.cocktails = Cocktails;
     this.employees = Employees;
-  }
 
-  public async init() {
-    this.service.addAuthListener(async user => {
-      this._user = user;
+    this.service.subscribe(async user => {
+      if (!this.ready) {
+        this.ready = true;
+      }
+      this.user = user;
       if (user) {
-        this._inventory = await this.service.getInventory();
+        this.inventory = await this.service.getInventory();
       }
     });
   }
 
-  public get user() {
-    return this._user;
-  }
-
-  public get inventory() {
-    return this._inventory;
-  }
-
+  @computed
   public get providersArray() {
     return Array.from(this.providers.values());
   }
 
+  @computed
   public get cocktailsArray() {
     return Array.from(this.cocktails.values());
   }
 
+  @computed
   public get employeesArray(): Employee[] {
     return Array.from(this.employees.values());
   }

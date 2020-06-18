@@ -1,4 +1,4 @@
-import { observer } from 'mobx-preact';
+import { observer } from 'mobx-react-lite';
 import { FunctionalComponent, h } from 'preact';
 import { useState } from 'preact/hooks';
 
@@ -9,6 +9,8 @@ import IngredientComponent from './IngredientComponent';
 const ShopComponent: FunctionalComponent = () => {
   const { inventory, providersArray } = useStore();
   const [active, setActive] = useState<Provider | undefined>(providersArray[0]);
+
+  console.log('Render Shop');
 
   return (
     <section class="card">

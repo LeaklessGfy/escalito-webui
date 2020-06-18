@@ -1,7 +1,7 @@
 import { action, observable } from 'mobx';
 
-import { InventoryDTO } from '../dto/InventoryDTO';
-import { Service } from '../remote/service';
+import { IInventoryDTO } from '../dto/InventoryDTO';
+import { Service } from '../remote/Service';
 import { Cocktail, CocktailExtended, CocktailKey } from './Cocktail';
 import { Employee, EmployeeKey } from './Employee';
 import { IngredientExtended, IngredientKey } from './Ingredient';
@@ -68,6 +68,7 @@ export class Inventory {
     const value = providers.get(providerKey) ?? 0;
     providers.set(providerKey, value + 1);
     this._ingredients.set(ingredientKey, providers);
+    this.$service?.addIngredient(ingredientKey, providerKey, value + 1);
   }
 
   @action
@@ -96,6 +97,8 @@ export class Inventory {
     } else {
       this._ingredients.delete(ingredientKey);
     }
+
+    this.$service?.removeIngredient(ingredientKey, providerKey, value - 1);
   }
 
   public getCocktailPrice(cocktailKey: CocktailKey): number {
@@ -143,7 +146,7 @@ export class Inventory {
 
     this._cash -= employee.price;
     this._employees.add(employee.key);
-    this.$service?.updateCash(this._cash);
+    this.$service?.setCash(this._cash);
     this.$service?.addEmployee(employee.key);
   }
 
@@ -157,7 +160,7 @@ export class Inventory {
     this.$service = service;
   }
 
-  public static fromDTO(dto: InventoryDTO): Inventory {
+  public static fromDTO(dto: IInventoryDTO): Inventory {
     const ingredients = new Map<IngredientKey, Map<ProviderKey, number>>();
     for (const ingredientDto of dto.ingredients) {
       const providers =

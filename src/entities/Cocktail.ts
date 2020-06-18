@@ -1,3 +1,4 @@
+import { GlassKey } from './Glass';
 import { IngredientKey } from './Ingredient';
 
 export enum CocktailKey {
@@ -12,10 +13,16 @@ export const CocktailNames: { [key in CocktailKey]: string } = {
 
 export class Cocktail {
   public readonly key: CocktailKey;
+  public readonly glassKey: GlassKey;
   public readonly recipe: Map<IngredientKey, number>;
 
-  constructor(key: CocktailKey, recipe: Map<IngredientKey, number>) {
+  constructor(
+    key: CocktailKey,
+    glassKey: GlassKey,
+    recipe: Map<IngredientKey, number>
+  ) {
     this.key = key;
+    this.glassKey = glassKey;
     this.recipe = recipe;
   }
 
@@ -41,7 +48,7 @@ export class Cocktail {
         break;
     }
 
-    return new Cocktail(key, recipe);
+    return new Cocktail(key, GlassKey.Default, recipe);
   }
 }
 
@@ -50,7 +57,7 @@ export class CocktailExtended extends Cocktail {
   public readonly hype: number;
 
   constructor(cocktail: Cocktail, price: number, hype: number) {
-    super(cocktail.key, cocktail.recipe);
+    super(cocktail.key, cocktail.glassKey, cocktail.recipe);
     this.price = price;
     this.hype = hype;
   }

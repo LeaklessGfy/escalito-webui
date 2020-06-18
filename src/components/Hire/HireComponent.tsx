@@ -1,4 +1,4 @@
-import { observer } from 'mobx-preact';
+import { observer } from 'mobx-react-lite';
 import { FunctionalComponent, h } from 'preact';
 
 import { useStore } from '../../store';
