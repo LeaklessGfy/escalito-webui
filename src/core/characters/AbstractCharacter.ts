@@ -22,13 +22,13 @@ export abstract class AbstractCharacter {
   private _patience: number = 0;
   private _timeAwaited: number = 0;
 
-  private _dst: Point | null = null;
+  private _dst?: Point;
   private _distance: number = 0;
 
-  private _onArrive: Function | null = null;
-  private _onLeave: Function | null = null;
-  private _onServe: Function | null = null;
-  private _onExhaust: Function | null = null;
+  private _onArrive?: Function;
+  private _onLeave?: Function;
+  private _onServe?: Function;
+  private _onExhaust?: Function;
 
   constructor(sprite: Phaser.GameObjects.Sprite, texture: string) {
     this._state = new State();
@@ -119,7 +119,7 @@ export abstract class AbstractCharacter {
     return promise;
   }
 
-  public isNear(dst: Point | null, distance: number = 0): boolean {
+  public isNear(dst: Point | undefined, distance: number = 0): boolean {
     if (dst == null) {
       return false;
     }
@@ -136,7 +136,7 @@ export abstract class AbstractCharacter {
   }
 
   private stepMove(): void {
-    if (this._dst === null) {
+    if (this._dst === undefined) {
       return;
     }
 
@@ -145,7 +145,7 @@ export abstract class AbstractCharacter {
 
       this._distance = 0;
       this._onArrive?.(true);
-      this._onArrive = null;
+      this._onArrive = undefined;
     } else {
       this.animate(CharacterAnim.Move);
       const dir = this._dst.x < this._sprite.x ? -1 : 1;
@@ -164,9 +164,9 @@ export abstract class AbstractCharacter {
     }
 
     this._state.exhaust();
-    this._onServe = null;
+    this._onServe = undefined;
     this._onExhaust?.();
-    this._onExhaust = null;
+    this._onExhaust = undefined;
   }
 
   private animate(anim: CharacterAnim): void {

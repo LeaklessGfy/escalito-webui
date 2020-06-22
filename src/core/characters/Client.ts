@@ -3,7 +3,12 @@ import { Order } from '../orders/Order';
 import { AbstractCharacter } from './AbstractCharacter';
 
 export class Client extends AbstractCharacter {
-  private _order: Order | null = null;
+  private _order?: Order;
+  private _orderFactory?: () => Order;
+
+  public set orderFactory(orderFactory: () => Order) {
+    this._orderFactory = orderFactory;
+  }
 
   public behave(next: Point, bar: Point, spawn: Point): void {
     if (!this._state.moving && !this._state.waiting && !this.isNear(next, 4)) {
@@ -38,11 +43,15 @@ export class Client extends AbstractCharacter {
   }
 
   private askOrder(): void {
-    if (this._order !== null) {
+    if (this._order !== undefined) {
       throw new Error('Client has already order');
     }
 
-    this._order = new Order(null);
+    if (this._orderFactory === undefined) {
+      throw new Error('Undefined order factory');
+    }
+
+    this._order = this._orderFactory();
     // orderImage.sprite = MagicBag.Bag.cocktail.GetSprite(Order.Cocktail.Key);
     // orderImage.gameObject.SetActive(true);
   }
