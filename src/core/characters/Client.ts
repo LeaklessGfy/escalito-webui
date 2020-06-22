@@ -5,7 +5,7 @@ import { AbstractCharacter } from './AbstractCharacter';
 export class Client extends AbstractCharacter {
   private _order: Order | null = null;
 
-  public behave(next: Point, bar: Point): void {
+  public behave(next: Point, bar: Point, spawn: Point): void {
     if (!this._state.moving && !this._state.waiting && !this.isNear(next, 4)) {
       this.moveTo(next, 4);
     }
@@ -18,7 +18,22 @@ export class Client extends AbstractCharacter {
       this.askOrder();
       this.await();
     } else if (this._state.exhausted) {
-      this.leave();
+      this.leave(spawn);
+    }
+  }
+
+  private async behaveAsync(next: Point, bar: Point, spawn: Point) {
+    await this.moveToAsync(next, 4);
+
+    if (next !== bar) {
+      return;
+    }
+
+    this.askOrder();
+    try {
+      await this.await();
+    } catch (exhausted) {
+      await this.leave(spawn);
     }
   }
 
@@ -27,10 +42,12 @@ export class Client extends AbstractCharacter {
       throw new Error('Client has already order');
     }
 
-    this._order = null;
+    this._order = new Order(null);
     // orderImage.sprite = MagicBag.Bag.cocktail.GetSprite(Order.Cocktail.Key);
     // orderImage.gameObject.SetActive(true);
   }
 
-  private leave(): void {}
+  private async leave(spawn: Point): Promise<void> {
+    this.leaveTo(spawn);
+  }
 }

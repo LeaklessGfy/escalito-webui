@@ -1,7 +1,7 @@
-import { Scene } from 'phaser';
+import { IScene } from '../scenes/IScene';
 
 export interface IController {
-  preload(scene: Scene): void;
-  create(scene: Scene): void;
-  update(delta: number): void;
+  preload(scene: IScene): void;
+  create(scene: IScene): void;
+  update(scene: IScene, delta: number): void;
 }

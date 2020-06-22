@@ -1,5 +1,3 @@
-import { GameObjects } from 'phaser';
-
 import { Point } from '../drawables/Point';
 import { State } from './State';
 
@@ -14,11 +12,11 @@ export enum CharacterAnim {
 }
 
 export abstract class AbstractCharacter {
-  private static readonly PATIENCE: number = 0.01;
+  private static readonly PATIENCE: number = 2000;
   private static readonly SPEED: number = 2;
 
   protected readonly _state: State;
-  private readonly _sprite: GameObjects.Sprite;
+  private readonly _sprite: Phaser.GameObjects.Sprite;
   private readonly _texture: string;
 
   private _patience: number = 0;
@@ -29,8 +27,10 @@ export abstract class AbstractCharacter {
 
   private _onArrive: Function | null = null;
   private _onLeave: Function | null = null;
+  private _onServe: Function | null = null;
+  private _onExhaust: Function | null = null;
 
-  constructor(sprite: GameObjects.Sprite, texture: string) {
+  constructor(sprite: Phaser.GameObjects.Sprite, texture: string) {
     this._state = new State();
     this._sprite = sprite;
     this._texture = texture;
@@ -40,7 +40,11 @@ export abstract class AbstractCharacter {
     return { x: this._sprite.x, y: this._sprite.y };
   }
 
-  public abstract behave(next: Point, bar: Point): void;
+  public set onLeave(listener: Function) {
+    this._onLeave = listener;
+  }
+
+  public abstract behave(next: Point, bar: Point, spawn: Point): void;
 
   public update(delta: number): void {
     if (this._state.idling) {
@@ -61,7 +65,10 @@ export abstract class AbstractCharacter {
     this._dst = dst;
     this._distance = distance;
     this._state.move();
-    // SpriteRenderer.flipX = Flip(_dst.x);
+
+    if (dst.x < this._sprite.x) {
+      this._sprite.setFlipX(true);
+    }
   }
 
   public moveToAsync(dst: Point, distance: number = 0): Promise<void> {
@@ -77,7 +84,7 @@ export abstract class AbstractCharacter {
     this._state.leave();
     // waitingSlider.gameObject.SetActive(false);
     this._onLeave?.();
-    this.moveTo(dst);
+    this.moveTo(dst, 4);
   }
 
   public leaveToAsync(dst: Point): Promise<void> {
@@ -87,10 +94,19 @@ export abstract class AbstractCharacter {
     return this.moveToAsync(dst);
   }
 
-  public await(): void {
+  public followAlong(dst: Point): void {
+    this._dst = dst;
+  }
+
+  public await(): Promise<void> {
     if (this._state.waiting) {
       throw new Error('Client is already awaiting');
     }
+
+    const promise = new Promise<void>((resolve, reject) => {
+      this._onServe = resolve;
+      //this._onExhaust = reject;
+    });
 
     this._state.wait();
     this._patience = AbstractCharacter.PATIENCE;
@@ -99,6 +115,8 @@ export abstract class AbstractCharacter {
     // waitingSlider.gameObject.SetActive(true);
     // waitingSlider.minValue = 0;
     // waitingSlider.maxValue = _currentPatience;
+
+    return promise;
   }
 
   public isNear(dst: Point | null, distance: number = 0): boolean {
@@ -107,6 +125,10 @@ export abstract class AbstractCharacter {
     }
 
     return Math.abs(dst.x - this._sprite.x) < distance;
+  }
+
+  public destroy() {
+    this._sprite.destroy();
   }
 
   private stepIdle(): void {
@@ -142,6 +164,9 @@ export abstract class AbstractCharacter {
     }
 
     this._state.exhaust();
+    this._onServe = null;
+    this._onExhaust?.();
+    this._onExhaust = null;
   }
 
   private animate(anim: CharacterAnim): void {

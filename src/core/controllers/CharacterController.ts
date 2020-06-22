@@ -1,10 +1,8 @@
-import { Scene } from 'phaser';
-
-import { $S } from '../Settings';
 import { CharacterAnim, CharacterKey } from '../characters/AbstractCharacter';
 import { Barmaid } from '../characters/Barmaid';
 import { CharacterFactory } from '../characters/CharacterFactory';
 import { Client } from '../characters/Client';
+import { IScene } from '../scenes/IScene';
 import { IController } from './IController';
 
 const BARMAID_IDLE = CharacterKey.Barmaid + '.' + CharacterAnim.Idle;
@@ -13,17 +11,21 @@ const CLIENT1_IDLE = CharacterKey.Client1 + '.' + CharacterAnim.Idle;
 const CLIENT1_MOVE = CharacterKey.Client1 + '.' + CharacterAnim.Move;
 
 export class CharacterController implements IController {
+  public static readonly KEY: Symbol = Symbol();
+
   private readonly _factory: CharacterFactory;
   private readonly _clients: Client[];
+  private readonly _leaving: Client[];
 
   private _barmaid?: Barmaid;
 
   constructor() {
     this._factory = new CharacterFactory();
     this._clients = [];
+    this._leaving = [];
   }
 
-  public preload(scene: Scene): void {
+  public preload(scene: IScene): void {
     scene.load.spritesheet(BARMAID_IDLE, 'assets/barmaid.idle.png', {
       frameWidth: 19,
       frameHeight: 34
@@ -42,7 +44,7 @@ export class CharacterController implements IController {
     });
   }
 
-  public create(scene: Scene): void {
+  public create(scene: IScene): void {
     scene.anims.create({
       key: BARMAID_IDLE,
       frames: scene.anims.generateFrameNumbers(BARMAID_IDLE, {
@@ -87,15 +89,24 @@ export class CharacterController implements IController {
     });
 
     const client = this._factory.buildClient(scene);
+    client.onLeave = () => {
+      this._clients.pop();
+      this._leaving.push(client);
+    };
     this._clients.push(client);
 
     this._barmaid = this._factory.buildBarmaid(scene);
   }
 
-  public update(delta: number): void {
+  public update(scene: IScene, delta: number): void {
     const c = this._clients;
     const l = this._clients.length;
-    const barPosition = $S.positionBag.get('bar');
+    const barPosition = scene.settings.positionBag.get('bar');
+    const spawnPosition = scene.settings.positionBag.get('door');
+
+    if (barPosition === undefined || spawnPosition === undefined) {
+      throw new Error('Positions are undefined');
+    }
 
     this._barmaid?.update(delta);
 
@@ -109,9 +120,22 @@ export class CharacterController implements IController {
       }
 
       current.update(delta);
-      if (next !== undefined && barPosition !== undefined) {
-        current.behave(next, barPosition);
+      current.behave(next, barPosition, spawnPosition);
+    }
+
+    let toRemove = 0;
+    for (const leaving of this._leaving) {
+      leaving.update(delta);
+
+      if (leaving.isNear(spawnPosition, 4)) {
+        leaving.destroy();
+        toRemove++;
       }
+    }
+
+    while (toRemove > 0) {
+      this._leaving.pop();
+      toRemove--;
     }
   }
 }
