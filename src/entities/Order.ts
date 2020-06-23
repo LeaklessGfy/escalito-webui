@@ -1,4 +1,4 @@
-import { CocktailExtended } from '../../entities/Cocktail';
+import { CocktailExtended } from './Cocktail';
 
 export class Order {
   private readonly _cocktail: CocktailExtended;
@@ -9,5 +9,9 @@ export class Order {
 
   public get price() {
     return this._cocktail.price;
+  }
+
+  public get title() {
+    return this._cocktail.name;
   }
 }

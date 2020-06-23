@@ -1,4 +1,7 @@
-import { Point } from '../drawables/Point';
+import { Order } from '../../entities/Order';
+import { Point, PositionKey } from '../positions/Point';
+import { IScene } from '../scenes/IScene';
+import { TintHelper } from '../utils/TintHelper';
 import { State } from './State';
 
 export enum CharacterKey {
@@ -14,9 +17,11 @@ export enum CharacterAnim {
 export abstract class AbstractCharacter {
   private static readonly PATIENCE: number = 2000;
   private static readonly SPEED: number = 2;
+  private static readonly SATISFACTION_THRESHOLD: number = 20;
 
   protected readonly _state: State;
-  private readonly _sprite: Phaser.GameObjects.Sprite;
+  protected readonly _scene: IScene;
+  protected readonly _sprite: Phaser.GameObjects.Sprite;
   private readonly _texture: string;
 
   private _patience: number = 0;
@@ -25,19 +30,41 @@ export abstract class AbstractCharacter {
   private _dst?: Point;
   private _distance: number = 0;
 
+  protected _order?: Order;
+
+  private _satisfaction: number = 0;
+
   private _onArrive?: Function;
   private _onLeave?: Function;
   private _onServe?: Function;
   private _onExhaust?: Function;
 
-  constructor(sprite: Phaser.GameObjects.Sprite, texture: string) {
+  constructor(
+    scene: IScene,
+    sprite: Phaser.GameObjects.Sprite,
+    texture: string
+  ) {
     this._state = new State();
+    this._scene = scene;
     this._sprite = sprite;
     this._texture = texture;
   }
 
   public get position(): Point {
     return { x: this._sprite.x, y: this._sprite.y };
+  }
+
+  public get satisfaction(): number {
+    return this._satisfaction;
+  }
+
+  public get satisfied(): boolean {
+    return this._satisfaction > AbstractCharacter.SATISFACTION_THRESHOLD;
+  }
+
+  public set satisfaction(satisfaction: number) {
+    this._satisfaction = satisfaction;
+    this._sprite.tint = TintHelper.getTint(satisfaction);
   }
 
   public set onLeave(listener: Function) {
@@ -94,8 +121,41 @@ export abstract class AbstractCharacter {
     return this.moveToAsync(dst);
   }
 
-  public followAlong(dst: Point): void {
-    this._dst = dst;
+  public serve(glass: any) {
+    if (glass === undefined) {
+      this.satisfaction = 0;
+      return;
+    }
+    this.satisfaction = 100;
+  }
+
+  public askOrder(): void {
+    if (this._order !== undefined) {
+      throw new Error('Client has already order');
+    }
+
+    this._order = this.createOrder();
+
+    if (this._order === undefined) {
+      return;
+    }
+
+    this._scene.add
+      .text(this._sprite.x, this._sprite.y, this._order.title, {
+        color: '#FFF',
+        fontFamily: 'Arial Black',
+        fontSize: '10px',
+        backgroundColor: '#000',
+        padding: {
+          x: 5,
+          y: 2
+        }
+      })
+      .setDepth(2)
+      .setInteractive()
+      .on('pointerdown', () => {
+        this._onServe?.();
+      });
   }
 
   public await(): Promise<void> {
@@ -103,9 +163,8 @@ export abstract class AbstractCharacter {
       throw new Error('Client is already awaiting');
     }
 
-    const promise = new Promise<void>((resolve, reject) => {
+    const promise = new Promise<void>(resolve => {
       this._onServe = resolve;
-      //this._onExhaust = reject;
     });
 
     this._state.wait();
@@ -123,7 +182,6 @@ export abstract class AbstractCharacter {
     if (dst == null) {
       return false;
     }
-
     return Math.abs(dst.x - this._sprite.x) < distance;
   }
 
@@ -174,5 +232,21 @@ export abstract class AbstractCharacter {
     if (this._sprite.anims.getCurrentKey() !== fullKey) {
       this._sprite.anims.play(fullKey);
     }
+  }
+
+  private createOrder(): Order | undefined {
+    const { cocktails } = this._scene.inventory;
+    const settings = this._scene.settings;
+
+    if (cocktails.length < 1) {
+      const spawn = settings.getPosition(PositionKey.Door);
+      this.serve(undefined);
+      this.leaveTo(spawn);
+
+      return undefined;
+    }
+
+    const cocktail = cocktails[0]; // select based from hype and maybe other factor depending on client
+    return new Order(cocktail);
   }
 }

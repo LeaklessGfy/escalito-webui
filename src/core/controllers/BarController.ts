@@ -1,3 +1,4 @@
+import { PositionKey } from '../positions/Point';
 import { IScene } from '../scenes/IScene';
 import { IController } from './IController';
 import { SelectController } from './SelectControllers';
@@ -19,13 +20,13 @@ export class BarController implements IController {
       .setY(spriteBar.y - 10)
       .setScale(0.8)
       .setDepth(1);
-    scene.settings.positionBag.set('bar', spriteBar);
+    scene.settings.addPosition(PositionKey.Bar, spriteBar);
 
     const spriteBarTop = scene.add.sprite(x, y - 80, 'bar.top');
     spriteBarTop.setScale(0.8);
 
     const spriteDoor = scene.add.image(100, y - 25, 'door');
-    scene.settings.positionBag.set('door', spriteDoor);
+    scene.settings.addPosition(PositionKey.Door, spriteDoor);
 
     const selectController: SelectController = scene.getController(
       SelectController.KEY

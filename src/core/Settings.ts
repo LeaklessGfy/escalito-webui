@@ -1,7 +1,7 @@
-import { Point } from './drawables/Point';
+import { Point, PositionKey } from './positions/Point';
 
 export class Settings {
-  public readonly positionBag: Map<string, Point> = new Map();
+  private readonly _bag: Map<PositionKey, Point> = new Map();
 
   public scene?: Phaser.Scene;
   public readonly entrance: number = 0;
@@ -24,5 +24,17 @@ export class Settings {
     }
 
     return this.scene.scale.displaySize.height - this.floorHeight;
+  }
+
+  public getPosition(key: PositionKey) {
+    const position = this._bag.get(key);
+    if (position === undefined) {
+      throw new Error(`Position with key ${key} is undefined`);
+    }
+    return position;
+  }
+
+  public addPosition(key: PositionKey, position: Point) {
+    this._bag.set(key, position);
   }
 }

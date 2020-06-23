@@ -15,12 +15,7 @@ export class CharacterFactory {
       .setY(sprite.y - sprite.displayHeight / 2)
       .setFlipX(true);
 
-    scene.settings.positionBag.set(CharacterKey.Barmaid, {
-      x: sprite.x,
-      y: sprite.y
-    });
-
-    const barmaid = new Barmaid(sprite, CharacterKey.Barmaid);
+    const barmaid = new Barmaid(scene, sprite, CharacterKey.Barmaid);
 
     const selectController: SelectController = scene.getController(
       SelectController.KEY
@@ -40,7 +35,7 @@ export class CharacterFactory {
       .setY(sprite.y - 20)
       .setDepth(2);
 
-    const client = new Client(sprite, CharacterKey.Client1);
+    const client = new Client(scene, sprite, CharacterKey.Client1);
 
     const selectController: SelectController = scene.getController(
       SelectController.KEY

@@ -5,10 +5,6 @@ export class SelectController implements IController {
   public static readonly KEY = Symbol();
   private readonly _selectors: Phaser.GameObjects.GameObject[] = [];
 
-  public get key(): Symbol {
-    return SelectController.KEY;
-  }
-
   public preload(scene: IScene): void {}
 
   public create(scene: IScene): void {

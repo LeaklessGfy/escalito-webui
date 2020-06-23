@@ -2,17 +2,19 @@ import { FunctionalComponent, h } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 
 import { createGame } from '../../core/Game';
+import { useStore } from '../../store';
 
 const GameComponent: FunctionalComponent = () => {
+  const { ready, inventory } = useStore();
   const ref = useRef<HTMLCanvasElement>();
 
   useEffect(() => {
-    if (ref.current) {
-      createGame(ref.current);
+    if (ref.current && ready) {
+      createGame(ref.current, inventory);
     }
-  }, [ref]);
+  }, [ref, ready]);
 
-  return <canvas ref={ref} width="100wh" height="200px" />;
+  return <canvas ref={ref} />;
 };
 
 export default GameComponent;

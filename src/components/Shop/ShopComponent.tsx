@@ -10,8 +10,6 @@ const ShopComponent: FunctionalComponent = () => {
   const { inventory, providersArray } = useStore();
   const [active, setActive] = useState<Provider | undefined>(providersArray[0]);
 
-  console.log('Render Shop');
-
   return (
     <section class="card">
       <header class="card-header">

@@ -38,6 +38,10 @@ export class Inventory {
     return this._cash;
   }
 
+  public get cocktails(): CocktailExtended[] {
+    return Array.from(this._cocktails.values());
+  }
+
   public getIngredientStock(
     ingredientKey: IngredientKey,
     providerKey: ProviderKey

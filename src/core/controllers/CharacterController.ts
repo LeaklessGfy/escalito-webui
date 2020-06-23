@@ -2,6 +2,7 @@ import { CharacterAnim, CharacterKey } from '../characters/AbstractCharacter';
 import { Barmaid } from '../characters/Barmaid';
 import { CharacterFactory } from '../characters/CharacterFactory';
 import { Client } from '../characters/Client';
+import { PositionKey } from '../positions/Point';
 import { IScene } from '../scenes/IScene';
 import { IController } from './IController';
 
@@ -82,31 +83,21 @@ export class CharacterController implements IController {
       repeat: -1
     });
 
-    scene.time.addEvent({
+    /*scene.time.addEvent({
       delay: 3000,
       loop: true,
       callback: () => {}
-    });
-
-    const client = this._factory.buildClient(scene);
-    client.onLeave = () => {
-      this._clients.pop();
-      this._leaving.push(client);
-    };
-    this._clients.push(client);
+    });*/
 
     this._barmaid = this._factory.buildBarmaid(scene);
+    this.createClient(scene);
   }
 
   public update(scene: IScene, delta: number): void {
     const c = this._clients;
     const l = this._clients.length;
-    const barPosition = scene.settings.positionBag.get('bar');
-    const spawnPosition = scene.settings.positionBag.get('door');
-
-    if (barPosition === undefined || spawnPosition === undefined) {
-      throw new Error('Positions are undefined');
-    }
+    const barPosition = scene.settings.getPosition(PositionKey.Bar);
+    const spawnPosition = scene.settings.getPosition(PositionKey.Door);
 
     this._barmaid?.update(delta);
 
@@ -137,5 +128,16 @@ export class CharacterController implements IController {
       this._leaving.pop();
       toRemove--;
     }
+  }
+
+  private createClient(scene: IScene) {
+    const client = this._factory.buildClient(scene);
+
+    client.onLeave = () => {
+      this._clients.pop();
+      this._leaving.push(client);
+    };
+
+    this._clients.push(client);
   }
 }

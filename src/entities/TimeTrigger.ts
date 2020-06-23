@@ -1,4 +1,11 @@
-export enum TriggerUnit {}
+export enum TriggerUnit {
+  Week,
+  Day,
+  Hour,
+  Minute,
+  Second,
+  MilliSecond
+}
 
 export class TimeTrigger {
   public readonly triggerTime: number;
