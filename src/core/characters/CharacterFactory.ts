@@ -17,10 +17,10 @@ export class CharacterFactory {
 
     const barmaid = new Barmaid(scene, sprite, CharacterKey.Barmaid);
 
-    const selectController: SelectController = scene.getController(
+    const selectCtr = scene.getController<SelectController>(
       SelectController.KEY
     );
-    selectController.addSelect(scene, sprite);
+    selectCtr.addSelect(scene, sprite);
 
     return barmaid;
   }
@@ -37,10 +37,10 @@ export class CharacterFactory {
 
     const client = new Client(scene, sprite, CharacterKey.Client1);
 
-    const selectController: SelectController = scene.getController(
+    const selectCtr = scene.getController<SelectController>(
       SelectController.KEY
     );
-    selectController.addSelect(scene, sprite);
+    selectCtr.addSelect(scene, sprite);
 
     return client;
   }

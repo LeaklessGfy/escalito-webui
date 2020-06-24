@@ -34,7 +34,6 @@ export class MainScene extends Phaser.Scene implements IScene {
   }
 
   public preload(): void {
-    //this.load.audio('background', 'assets/sound/background.mp3');
     this._settings.scene = this;
     for (const controller of this._controllers.values()) {
       controller.preload(this);
@@ -42,7 +41,6 @@ export class MainScene extends Phaser.Scene implements IScene {
   }
 
   public create(): void {
-    //this.sound.play('background');
     for (const controller of this._controllers.values()) {
       controller.create(this);
     }

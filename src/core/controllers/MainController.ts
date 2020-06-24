@@ -1,9 +1,13 @@
+import { Order } from '../../entities/Order';
 import { Client } from '../characters/Client';
 import { IScene } from '../scenes/IScene';
+import { AudioController } from './AudioController';
 import { IController } from './IController';
 
 export class MainController implements IController {
   public static readonly KEY = Symbol();
+
+  private _audioCtr?: AudioController;
 
   private _currentDifficulty: number = 1;
   private _currentReputation: number = 1;
@@ -13,27 +17,29 @@ export class MainController implements IController {
   private _positiveCombo: number = 0;
   private _negativeCombo: number = 0;
 
-  public preload(scene: IScene): void {}
+  public preload(scene: IScene): void {
+    this._audioCtr = scene.getController<AudioController>(AudioController.KEY);
+  }
 
   public create(scene: IScene): void {}
 
   public update(scene: IScene, delta: number): void {}
 
-  public increment(client: Client): number {
+  public increment(client: Client, order: Order): number {
     return client.satisfied
-      ? this.incrementSuccess(client)
-      : this.incrementFailure(client);
+      ? this.incrementSuccess(client, order)
+      : this.incrementFailure(client, order);
   }
 
-  private incrementSuccess(client: Client): number {
+  private incrementSuccess(client: Client, order: Order): number {
     this._positiveCombo++;
     this._negativeCombo = 0;
 
     const amount = this.applyBonuses(client);
-    // play success song
+    this._audioCtr?.playSuccess();
 
     if (this._positiveCombo % 3 == 0) {
-      // play laught song
+      this._audioCtr?.playLaught();
     }
 
     if (this._positiveCombo % 10 == 0) {
@@ -49,12 +55,12 @@ export class MainController implements IController {
     return amount;
   }
 
-  private incrementFailure(client: Client): number {
+  private incrementFailure(client: Client, order: Order): number {
     this._positiveCombo = 0;
     this._negativeCombo++;
 
     const amount = this.applyPenalties(client);
-    // play failure song
+    this._audioCtr?.playFailue();
 
     if (this._negativeCombo % 10 == 0) {
       this._nextReputation--;

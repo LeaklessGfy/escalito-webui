@@ -1,7 +1,5 @@
-import { Order } from '../../entities/Order';
-import { Point, PositionKey } from '../positions/Point';
+import { Point } from '../positions/Point';
 import { IScene } from '../scenes/IScene';
-import { TintHelper } from '../utils/TintHelper';
 import { State } from './State';
 
 export enum CharacterKey {
@@ -15,29 +13,18 @@ export enum CharacterAnim {
 }
 
 export abstract class AbstractCharacter {
-  private static readonly PATIENCE: number = 2000;
   private static readonly SPEED: number = 2;
-  private static readonly SATISFACTION_THRESHOLD: number = 20;
 
   protected readonly _state: State;
   protected readonly _scene: IScene;
   protected readonly _sprite: Phaser.GameObjects.Sprite;
   private readonly _texture: string;
 
-  private _patience: number = 0;
-  private _timeAwaited: number = 0;
-
   private _dst?: Point;
   private _distance: number = 0;
 
-  protected _order?: Order;
-
-  private _satisfaction: number = 0;
-
   private _onArrive?: Function;
   private _onLeave?: Function;
-  private _onServe?: Function;
-  private _onExhaust?: Function;
 
   constructor(
     scene: IScene,
@@ -48,23 +35,11 @@ export abstract class AbstractCharacter {
     this._scene = scene;
     this._sprite = sprite;
     this._texture = texture;
+    console.log(this._sprite.texture);
   }
 
   public get position(): Point {
     return { x: this._sprite.x, y: this._sprite.y };
-  }
-
-  public get satisfaction(): number {
-    return this._satisfaction;
-  }
-
-  public get satisfied(): boolean {
-    return this._satisfaction > AbstractCharacter.SATISFACTION_THRESHOLD;
-  }
-
-  public set satisfaction(satisfaction: number) {
-    this._satisfaction = satisfaction;
-    this._sprite.tint = TintHelper.getTint(satisfaction);
   }
 
   public set onLeave(listener: Function) {
@@ -78,9 +53,6 @@ export abstract class AbstractCharacter {
       this.stepIdle();
     } else if (this._state.moving) {
       this.stepMove();
-    }
-    if (this._state.waiting) {
-      this.stepWait(delta);
     }
   }
 
@@ -121,63 +93,6 @@ export abstract class AbstractCharacter {
     return this.moveToAsync(dst);
   }
 
-  public serve(glass: any) {
-    if (glass === undefined) {
-      this.satisfaction = 0;
-      return;
-    }
-    this.satisfaction = 100;
-  }
-
-  public askOrder(): void {
-    if (this._order !== undefined) {
-      throw new Error('Client has already order');
-    }
-
-    this._order = this.createOrder();
-
-    if (this._order === undefined) {
-      return;
-    }
-
-    this._scene.add
-      .text(this._sprite.x, this._sprite.y, this._order.title, {
-        color: '#FFF',
-        fontFamily: 'Arial Black',
-        fontSize: '10px',
-        backgroundColor: '#000',
-        padding: {
-          x: 5,
-          y: 2
-        }
-      })
-      .setDepth(2)
-      .setInteractive()
-      .on('pointerdown', () => {
-        this._onServe?.();
-      });
-  }
-
-  public await(): Promise<void> {
-    if (this._state.waiting) {
-      throw new Error('Client is already awaiting');
-    }
-
-    const promise = new Promise<void>(resolve => {
-      this._onServe = resolve;
-    });
-
-    this._state.wait();
-    this._patience = AbstractCharacter.PATIENCE;
-    this._timeAwaited = 0;
-
-    // waitingSlider.gameObject.SetActive(true);
-    // waitingSlider.minValue = 0;
-    // waitingSlider.maxValue = _currentPatience;
-
-    return promise;
-  }
-
   public isNear(dst: Point | undefined, distance: number = 0): boolean {
     if (dst == null) {
       return false;
@@ -211,42 +126,10 @@ export abstract class AbstractCharacter {
     }
   }
 
-  private stepWait(delta: number): void {
-    this._timeAwaited += delta;
-    // waitingSlider.value = _currentPatience - _timeAwaited;
-    // var percent = 100 - _timeAwaited / _currentPatience * 100;
-    // waitingImage.color = PercentHelper.GetColor((int) percent);
-
-    if (this._timeAwaited < this._patience) {
-      return;
-    }
-
-    this._state.exhaust();
-    this._onServe = undefined;
-    this._onExhaust?.();
-    this._onExhaust = undefined;
-  }
-
   private animate(anim: CharacterAnim): void {
     const fullKey = this._texture + '.' + anim;
     if (this._sprite.anims.getCurrentKey() !== fullKey) {
       this._sprite.anims.play(fullKey);
     }
-  }
-
-  private createOrder(): Order | undefined {
-    const { cocktails } = this._scene.inventory;
-    const settings = this._scene.settings;
-
-    if (cocktails.length < 1) {
-      const spawn = settings.getPosition(PositionKey.Door);
-      this.serve(undefined);
-      this.leaveTo(spawn);
-
-      return undefined;
-    }
-
-    const cocktail = cocktails[0]; // select based from hype and maybe other factor depending on client
-    return new Order(cocktail);
   }
 }

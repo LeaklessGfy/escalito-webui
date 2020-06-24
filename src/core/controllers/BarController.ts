@@ -28,11 +28,11 @@ export class BarController implements IController {
     const spriteDoor = scene.add.image(100, y - 25, 'door');
     scene.settings.addPosition(PositionKey.Door, spriteDoor);
 
-    const selectController: SelectController = scene.getController(
+    const selectCtr = scene.getController<SelectController>(
       SelectController.KEY
     );
-    selectController.addSelect(scene, spriteDoor);
-    selectController.addSelect(scene, spriteBar);
+    selectCtr.addSelect(scene, spriteDoor);
+    selectCtr.addSelect(scene, spriteBar);
   }
 
   public update(scene: IScene, delta: number): void {}
