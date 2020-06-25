@@ -1,4 +1,4 @@
-import { Point } from '../positions/Point';
+import { Point } from '../sprites/Point';
 import { AbstractCharacter } from './AbstractCharacter';
 
 export class Barmaid extends AbstractCharacter {

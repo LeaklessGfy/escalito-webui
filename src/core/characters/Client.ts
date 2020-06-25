@@ -1,6 +1,6 @@
 import { Order } from '../../entities/Order';
 import { MainController } from '../controllers/MainController';
-import { Point } from '../positions/Point';
+import { Point } from '../sprites/Point';
 import { TintHelper } from '../utils/TintHelper';
 import { AbstractCharacter } from './AbstractCharacter';
 

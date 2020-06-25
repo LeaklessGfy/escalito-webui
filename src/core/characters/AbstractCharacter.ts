@@ -1,16 +1,8 @@
-import { Point } from '../positions/Point';
 import { IScene } from '../scenes/IScene';
+import { AnimKey } from '../sprites/AnimKey';
+import { Point } from '../sprites/Point';
+import { SpriteKey } from '../sprites/SpriteKey';
 import { State } from './State';
-
-export enum CharacterKey {
-  Barmaid = 'barmaid',
-  Client1 = 'client1'
-}
-
-export enum CharacterAnim {
-  Idle = 'idle',
-  Move = 'move'
-}
 
 export abstract class AbstractCharacter {
   private static readonly SPEED: number = 2;
@@ -18,7 +10,7 @@ export abstract class AbstractCharacter {
   protected readonly _state: State;
   protected readonly _scene: IScene;
   protected readonly _sprite: Phaser.GameObjects.Sprite;
-  private readonly _texture: string;
+  private readonly _texture: SpriteKey;
 
   private _dst?: Point;
   private _distance: number = 0;
@@ -29,7 +21,7 @@ export abstract class AbstractCharacter {
   constructor(
     scene: IScene,
     sprite: Phaser.GameObjects.Sprite,
-    texture: string
+    texture: SpriteKey
   ) {
     this._state = new State();
     this._scene = scene;
@@ -105,7 +97,7 @@ export abstract class AbstractCharacter {
   }
 
   private stepIdle(): void {
-    this.animate(CharacterAnim.Idle);
+    this.animate(AnimKey.Idle);
   }
 
   private stepMove(): void {
@@ -120,13 +112,13 @@ export abstract class AbstractCharacter {
       this._onArrive?.(true);
       this._onArrive = undefined;
     } else {
-      this.animate(CharacterAnim.Move);
+      this.animate(AnimKey.Move);
       const dir = this._dst.x < this._sprite.x ? -1 : 1;
       this._sprite.setX(this._sprite.x + AbstractCharacter.SPEED * dir);
     }
   }
 
-  private animate(anim: CharacterAnim): void {
+  private animate(anim: AnimKey): void {
     const fullKey = this._texture + '.' + anim;
     if (this._sprite.anims.getCurrentKey() !== fullKey) {
       this._sprite.anims.play(fullKey);

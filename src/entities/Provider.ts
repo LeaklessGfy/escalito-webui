@@ -33,25 +33,49 @@ export class Provider {
     const ingredients = new Map();
     ingredients.set(
       IngredientKey.Rum,
-      IngredientExtended.buildExtended(IngredientKey.Rum, key, 5)
+      IngredientExtended.buildExtended(IngredientKey.Rum, key, 5, 0)
     );
     ingredients.set(
       IngredientKey.Cola,
-      IngredientExtended.buildExtended(IngredientKey.Cola, key, 5)
+      IngredientExtended.buildExtended(IngredientKey.Cola, key, 5, 0)
     );
     ingredients.set(
       IngredientKey.Lemonade,
-      IngredientExtended.buildExtended(IngredientKey.Lemonade, key, 5)
+      IngredientExtended.buildExtended(IngredientKey.Lemonade, key, 5, 0)
     );
     ingredients.set(
       IngredientKey.Lemon,
-      IngredientExtended.buildExtended(IngredientKey.Lemon, key, 5)
+      IngredientExtended.buildExtended(IngredientKey.Lemon, key, 5, 0)
     );
     ingredients.set(
       IngredientKey.Strawberry,
-      IngredientExtended.buildExtended(IngredientKey.Strawberry, key, 5)
+      IngredientExtended.buildExtended(IngredientKey.Strawberry, key, 5, 0)
     );
     return new Provider(key, ingredients);
+  }
+
+  public static buildIngredient(
+    ingredientKey: IngredientKey,
+    providerKey: ProviderKey,
+    stock: number
+  ): IngredientExtended {
+    const provider = Providers.get(providerKey);
+
+    if (provider === undefined) {
+      throw new Error('Unknown provider with key ' + providerKey);
+    }
+
+    const ingredient = provider.ingredients.get(ingredientKey);
+
+    if (ingredient === undefined) {
+      throw new Error(
+        'Unknown ingredient for provider ' + providerKey + ' : ' + ingredientKey
+      );
+    }
+
+    ingredient.stock = stock;
+
+    return ingredient;
   }
 }
 

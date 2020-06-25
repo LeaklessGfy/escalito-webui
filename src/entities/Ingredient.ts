@@ -61,29 +61,33 @@ export class IngredientExtended extends Ingredient {
   public readonly providerKey: ProviderKey;
   public readonly price: number;
   public readonly quality: number;
+  public stock: number;
 
   constructor(
     ingredient: Ingredient,
     providerKey: ProviderKey,
     price: number,
+    stock: number,
     quality: number = 0
   ) {
     super(ingredient.key, ingredient.amount);
     this.providerKey = providerKey;
     this.price = price;
+    this.stock = stock;
     this.quality = quality;
   }
 
   public static buildExtended(
     key: IngredientKey,
     providerKey: ProviderKey,
-    price: number
+    price: number,
+    stock: number
   ): IngredientExtended {
     const original = Ingredients.get(key);
     if (original === undefined) {
       throw new Error('Undefined ingredient key to build extended ' + key);
     }
-    return new IngredientExtended(original, providerKey, price);
+    return new IngredientExtended(original, providerKey, price, stock);
   }
 }
 
