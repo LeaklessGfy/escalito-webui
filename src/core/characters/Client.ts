@@ -1,4 +1,4 @@
-import { Order } from '../../entities/Order';
+import { Order } from '../../entities/static/Order';
 import { MainController } from '../controllers/MainController';
 import { Point } from '../sprites/Point';
 import { TintHelper } from '../utils/TintHelper';

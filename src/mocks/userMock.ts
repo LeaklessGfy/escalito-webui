@@ -1,6 +1,6 @@
-import { UserDTO } from '../dto/UserDTO';
+import { UserDto } from '../dto/UserDTO';
 
-export const userMock: UserDTO = {
+export const userMock: UserDto = {
   uid: '1',
   displayName: null,
   email: 'test@test.fr',

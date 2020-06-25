@@ -1,4 +1,5 @@
 import { Inventory } from '../../entities/Inventory';
+import { Store } from '../../store';
 import { Settings } from '../Settings';
 import { BarController } from '../controllers/BarController';
 import { CharacterController } from '../controllers/CharacterController';
@@ -8,14 +9,14 @@ import { SelectController } from '../controllers/SelectControllers';
 import { IScene } from './IScene';
 
 export class MainScene extends Phaser.Scene implements IScene {
-  private readonly _inventory: Inventory;
+  private readonly _store: Store;
   private readonly _settings: Settings;
   private readonly _controllers: Map<Symbol, IController>;
 
-  constructor(inventory: Inventory) {
+  constructor(store: Store) {
     super({ key: MainScene.name });
 
-    this._inventory = inventory;
+    this._store = store;
     this._settings = new Settings();
     this._controllers = new Map();
 
@@ -25,11 +26,15 @@ export class MainScene extends Phaser.Scene implements IScene {
     this._controllers.set(ClockController.KEY, new ClockController());
   }
 
-  public get inventory() {
-    return this._inventory;
+  public get store(): Store {
+    return this._store;
   }
 
-  public get settings() {
+  public get inventory(): Inventory {
+    return this._store.inventory;
+  }
+
+  public get settings(): Settings {
     return this._settings;
   }
 
@@ -53,6 +58,10 @@ export class MainScene extends Phaser.Scene implements IScene {
   }
 
   public getController<T extends IController>(key: Symbol): T {
-    return this._controllers.get(key) as T;
+    const controller = this._controllers.get(key);
+    if (controller === undefined) {
+      throw new Error('Undefined controller with key ' + key);
+    }
+    return controller as T;
   }
 }

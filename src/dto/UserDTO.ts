@@ -1,4 +1,4 @@
-export interface IUserInfoDTO {
+export interface UserInfoDto {
   uid: string;
   displayName: string | null;
   email: string | null;
@@ -7,6 +7,6 @@ export interface IUserInfoDTO {
   providerId: string;
 }
 
-export type IUserDTO = IUserInfoDTO | null;
+export type UserDto = UserInfoDto | null;
 
-export type UserListener = (user: IUserDTO) => void;
+export type UserListener = (user: UserDto) => void;

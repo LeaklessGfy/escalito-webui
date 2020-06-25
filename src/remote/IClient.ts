@@ -1,8 +1,4 @@
-import {
-  ICocktailDTO,
-  IIngredientDTO,
-  IInventoryDTO
-} from '../dto/InventoryDTO';
+import { CocktailDto, IngredientDto, InventoryDto } from '../dto/InventoryDTO';
 import { UserListener } from '../dto/UserDTO';
 import { FirebaseClient } from './FirebaseClient';
 import { LocalClient } from './LocalClient';
@@ -14,12 +10,12 @@ export interface IClient {
   subscribe(subscriber: UserListener): void;
 
   // FETCH
-  fetchInventory(): Promise<IInventoryDTO>;
+  fetchInventory(): Promise<InventoryDto>;
 
   // UPDATE
   updateCash(cash: number): Promise<void>;
-  updateIngredient(dto: IIngredientDTO): Promise<void>;
-  updateCocktail(dto: ICocktailDTO, value: true | null): Promise<void>;
+  updateIngredient(dto: IngredientDto): Promise<void>;
+  updateCocktail(dto: CocktailDto, value: true | null): Promise<void>;
   updateEmployee(employee: number, value: true | null): Promise<void>;
 }
 

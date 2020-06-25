@@ -1,16 +1,12 @@
-import {
-  ICocktailDTO,
-  IIngredientDTO,
-  IInventoryDTO
-} from '../dto/InventoryDTO';
-import { IUserDTO, UserListener } from '../dto/UserDTO';
+import { CocktailDto, IngredientDto, InventoryDto } from '../dto/InventoryDTO';
+import { UserDto, UserListener } from '../dto/UserDTO';
 import { IClient } from './IClient';
 
 export class LocalClient implements IClient {
   private readonly _subscribers: UserListener[] = [];
 
   public async createUser(email: string, password: string): Promise<void> {
-    const user: IUserDTO = {
+    const user: UserDto = {
       uid: '1',
       displayName: email,
       email: email,
@@ -23,24 +19,24 @@ export class LocalClient implements IClient {
   }
 
   public async login(email: string, password: string): Promise<void> {
-    const user = await this.fetchValue<IUserDTO>('user', null);
+    const user = await this.fetchValue<UserDto>('user', null);
     this._subscribers.forEach(s => s(user));
   }
 
   public subscribe(subscriber: UserListener): void {
     this._subscribers.push(subscriber);
-    this.fetchValue<IUserDTO>('user', null).then(user => subscriber(user));
+    this.fetchValue<UserDto>('user', null).then(user => subscriber(user));
   }
 
   // FETCH
-  public async fetchInventory(): Promise<IInventoryDTO> {
-    const cash: number = await this.fetchValue('cash', 0);
-    const ingredients: IIngredientDTO[] = await this.fetchValue(
+  public async fetchInventory(): Promise<InventoryDto> {
+    const cash = await this.fetchValue<number>('cash', 0);
+    const ingredients = await this.fetchValue<IngredientDto[]>(
       'ingredients',
       []
     );
-    const cocktails: ICocktailDTO[] = await this.fetchValue('cocktails', []);
-    const employees: number[] = await this.fetchValue('employees', []);
+    const cocktails = await this.fetchValue<CocktailDto[]>('cocktails', []);
+    const employees = await this.fetchValue<number[]>('employees', []);
 
     return {
       cash,
@@ -55,8 +51,8 @@ export class LocalClient implements IClient {
     await this.writeValue('cash', cash);
   }
 
-  public async updateIngredient(dto: IIngredientDTO): Promise<void> {
-    const ingredients: IIngredientDTO[] = await this.fetchValue(
+  public async updateIngredient(dto: IngredientDto): Promise<void> {
+    const ingredients = await this.fetchValue<IngredientDto[]>(
       'ingredients',
       []
     );
@@ -70,10 +66,10 @@ export class LocalClient implements IClient {
   }
 
   public async updateCocktail(
-    dto: ICocktailDTO,
+    dto: CocktailDto,
     value: true | null
   ): Promise<void> {
-    const cocktails: ICocktailDTO[] = await this.fetchValue('cocktails', []);
+    const cocktails = await this.fetchValue<CocktailDto[]>('cocktails', []);
     const filters = cocktails.filter(c => c.cocktail !== dto.cocktail);
     if (value) {
       filters.push(dto);
@@ -85,7 +81,7 @@ export class LocalClient implements IClient {
     employee: number,
     value: true | null
   ): Promise<void> {
-    const employees: number[] = await this.fetchValue('employees', []);
+    const employees = await this.fetchValue<number[]>('employees', []);
     const filters = employees.filter(e => e !== employee);
     if (value) {
       filters.push(employee);

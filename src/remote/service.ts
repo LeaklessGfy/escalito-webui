@@ -1,8 +1,9 @@
+import { fromDto } from '../dto/InventoryDTO';
 import { UserListener } from '../dto/UserDTO';
-import { EmployeeKey } from '../entities/Employee';
-import { IngredientKey } from '../entities/Ingredient';
 import { Inventory } from '../entities/Inventory';
-import { ProviderKey } from '../entities/Provider';
+import { EmployeeKey } from '../entities/static/Employee';
+import { IngredientKey } from '../entities/static/Ingredient';
+import { ProviderKey } from '../entities/static/Provider';
 import { ClientEnv, ClientFactory, IClient } from './IClient';
 
 export class Service {
@@ -26,7 +27,7 @@ export class Service {
 
   public async getInventory(): Promise<Inventory> {
     const dto = await this._client.fetchInventory();
-    const inventory = Inventory.fromDTO(dto);
+    const inventory = fromDto(dto);
     inventory.attachService(this);
     return inventory;
   }

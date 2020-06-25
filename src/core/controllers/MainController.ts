@@ -1,4 +1,4 @@
-import { Order } from '../../entities/Order';
+import { Order } from '../../entities/static/Order';
 import { Client } from '../characters/Client';
 import { IScene } from '../scenes/IScene';
 import { AudioController } from './AudioController';

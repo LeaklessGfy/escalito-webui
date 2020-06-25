@@ -2,11 +2,16 @@ import { computed, observable } from 'mobx';
 import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
 
-import { IUserDTO } from './dto/UserDTO';
-import { Cocktail, CocktailKey, Cocktails } from './entities/Cocktail';
-import { Employee, EmployeeKey, Employees } from './entities/Employee';
+import { UserDto } from './dto/UserDTO';
 import { Inventory } from './entities/Inventory';
-import { Provider, ProviderKey, Providers } from './entities/Provider';
+import { Cocktail, CocktailKey } from './entities/static/Cocktail';
+import { Employee, EmployeeKey } from './entities/static/Employee';
+import { Ingredient, IngredientKey } from './entities/static/Ingredient';
+import { Provider, ProviderKey } from './entities/static/Provider';
+import { Cocktails } from './entities/values/Cocktails';
+import { Employees } from './entities/values/Employees';
+import { Ingredients } from './entities/values/Ingredients';
+import { Providers } from './entities/values/Providers';
 import { Service } from './remote/Service';
 
 export class Store {
@@ -14,12 +19,13 @@ export class Store {
   public ready: boolean;
 
   @observable
-  public user: IUserDTO;
+  public user: UserDto;
 
   @observable
   public inventory: Inventory;
 
   public readonly service: Service;
+  public readonly ingredients: Map<IngredientKey, Ingredient>;
   public readonly providers: Map<ProviderKey, Provider>;
   public readonly cocktails: Map<CocktailKey, Cocktail>;
   public readonly employees: Map<EmployeeKey, Employee>;
@@ -30,9 +36,10 @@ export class Store {
     this.inventory = new Inventory(0);
 
     this.service = new Service();
-    this.providers = Providers;
-    this.cocktails = Cocktails;
-    this.employees = Employees;
+    this.ingredients = Ingredients();
+    this.providers = Providers();
+    this.cocktails = Cocktails();
+    this.employees = Employees();
 
     this.service.subscribe(async user => {
       if (!this.ready) {
@@ -43,6 +50,11 @@ export class Store {
         this.inventory = await this.service.getInventory();
       }
     });
+  }
+
+  @computed
+  public get ingredientsArray() {
+    return Array.from(this.ingredients.values());
   }
 
   @computed

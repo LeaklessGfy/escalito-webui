@@ -1,30 +1,26 @@
-import {
-  Ingredient,
-  IngredientKey,
-  Ingredients
-} from '../../entities/Ingredient';
+import { Ingredient, IngredientKey } from '../../entities/static/Ingredient';
 import { IScene } from '../scenes/IScene';
 import { Point } from '../sprites/Point';
 import { SpriteKey } from '../sprites/SpriteKey';
 
 export class Bottle {
-  private readonly _sprite: Phaser.GameObjects.Sprite;
   private readonly _ingredient: Ingredient;
+  private readonly _sprite: Phaser.GameObjects.Sprite;
   private readonly _initialPosition: Point;
 
-  private _dayStock: number;
+  private _fullStock: number;
   private _currentStock: number;
 
   constructor(
-    sprite: Phaser.GameObjects.Sprite,
     ingredient: Ingredient,
+    sprite: Phaser.GameObjects.Sprite,
     stock: number
   ) {
-    this._sprite = sprite;
     this._ingredient = ingredient;
+    this._sprite = sprite;
     this._initialPosition = { x: sprite.x, y: sprite.y };
 
-    this._dayStock = stock;
+    this._fullStock = stock;
     this._currentStock = stock;
   }
 
@@ -44,6 +40,10 @@ export class Bottle {
     // stop particule system
   }
 
+  public charge() {
+    this._currentStock = this._fullStock;
+  }
+
   public static buildRum(scene: IScene): Bottle {
     const position = scene.settings.bottlePosition;
     const sprite = scene.add.sprite(
@@ -52,13 +52,14 @@ export class Bottle {
       SpriteKey.RumBottle
     );
 
-    const ingredient = Ingredients.get(IngredientKey.Rum);
+    const ingredient = scene.store.ingredients.get(IngredientKey.Rum);
     const stock = scene.inventory.getGlobalIngredientStock(IngredientKey.Rum);
+
     if (ingredient === undefined) {
       throw new Error('Ingredient is not defiend globally');
     }
 
-    const bottle = new Bottle(sprite, ingredient, stock);
+    const bottle = new Bottle(ingredient, sprite, stock);
     const glass = scene.settings.glassPosition;
 
     sprite.setInteractive();

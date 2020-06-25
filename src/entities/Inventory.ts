@@ -1,24 +1,29 @@
-import { action, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 
-import { IInventoryDTO } from '../dto/InventoryDTO';
 import { Service } from '../remote/Service';
-import { Cocktail, CocktailExtended, CocktailKey } from './Cocktail';
-import { Employee, EmployeeKey } from './Employee';
-import { IngredientExtended, IngredientKey } from './Ingredient';
-import { Provider, ProviderKey } from './Provider';
+import { CocktailExtended } from './dynamic/CocktailExtended';
+import { IngredientExtended } from './dynamic/IngredientExtended';
+import { Cocktail, CocktailKey } from './static/Cocktail';
+import { Employee, EmployeeKey } from './static/Employee';
+import { IngredientKey } from './static/Ingredient';
+import { ProviderKey } from './static/Provider';
+
+export type IngredientMapper = Map<
+  IngredientKey,
+  Map<ProviderKey, IngredientExtended>
+>;
+
+export type CocktailMapper = Map<CocktailKey, CocktailExtended>;
 
 export class Inventory {
   @observable
   private _cash: number;
 
   @observable
-  private readonly _ingredients: Map<
-    IngredientKey,
-    Map<ProviderKey, IngredientExtended>
-  >;
+  private readonly _ingredients: IngredientMapper;
 
   @observable
-  private readonly _cocktails: Map<CocktailKey, CocktailExtended>;
+  private readonly _cocktails: CocktailMapper;
 
   @observable
   private readonly _employees: Set<EmployeeKey>;
@@ -27,11 +32,8 @@ export class Inventory {
 
   constructor(
     cash: number,
-    ingredients: Map<
-      IngredientKey,
-      Map<ProviderKey, IngredientExtended>
-    > = new Map(),
-    cocktails: Map<CocktailKey, CocktailExtended> = new Map(),
+    ingredients: IngredientMapper = new Map(),
+    cocktails: CocktailMapper = new Map(),
     employees: Set<EmployeeKey> = new Set()
   ) {
     this._cash = cash;
@@ -44,10 +46,12 @@ export class Inventory {
     return this._cash;
   }
 
+  @computed
   public get cocktails(): CocktailExtended[] {
     return Array.from(this._cocktails.values());
   }
 
+  @computed
   public get ingredients(): IngredientExtended[] {
     const allValues: IngredientExtended[] = [];
     for (const providers of this._ingredients.values()) {
@@ -83,8 +87,11 @@ export class Inventory {
   public isIngredientDisabled(ingredient: IngredientExtended): boolean {
     return (
       this._cash <
-      ingredient.price *
-        this.getIngredientStock(ingredient.key, ingredient.providerKey) +
+      ingredient.provided.price *
+        this.getIngredientStock(
+          ingredient.provided.base.key,
+          ingredient.provided.providerKey
+        ) +
         1
     );
   }
@@ -104,14 +111,17 @@ export class Inventory {
       throw new Error('');
     }
 
-    ingredientExtended.stock++;
-    providers.set(providerKey, ingredientExtended);
+    const newIngredientExtended = new IngredientExtended(
+      ingredientExtended.provided,
+      ingredientExtended.stock + 1
+    );
+    providers.set(providerKey, newIngredientExtended);
 
     this._ingredients.set(ingredientKey, providers);
     this.$service?.addIngredient(
       ingredientKey,
       providerKey,
-      ingredientExtended.stock
+      newIngredientExtended.stock
     );
   }
 
@@ -130,9 +140,14 @@ export class Inventory {
       return;
     }
 
-    if (ingredientExtended.stock > 1) {
-      ingredientExtended.stock--;
-      providers.set(providerKey, ingredientExtended);
+    const newStock = ingredientExtended.stock - 1;
+
+    if (newStock > 0) {
+      const newIngredientExtended = new IngredientExtended(
+        ingredientExtended.provided,
+        newStock
+      );
+      providers.set(providerKey, newIngredientExtended);
     } else {
       providers.delete(providerKey);
     }
@@ -143,11 +158,7 @@ export class Inventory {
       this._ingredients.delete(ingredientKey);
     }
 
-    this.$service?.removeIngredient(
-      ingredientKey,
-      providerKey,
-      ingredientExtended.stock
-    );
+    this.$service?.removeIngredient(ingredientKey, providerKey, newStock);
   }
 
   public getCocktailPrice(cocktailKey: CocktailKey): number {
@@ -207,52 +218,5 @@ export class Inventory {
 
   public attachService(service: Service): void {
     this.$service = service;
-  }
-
-  public static fromDTO(dto: IInventoryDTO): Inventory {
-    const ingredients = new Map<
-      IngredientKey,
-      Map<ProviderKey, IngredientExtended>
-    >();
-
-    for (const ingredientDto of dto.ingredients) {
-      const ingredientKey = ingredientDto.ingredient;
-      const providerKey = ingredientDto.provider;
-      const stock = ingredientDto.stock;
-
-      const providers =
-        ingredients.get(ingredientKey) ??
-        new Map<ProviderKey, IngredientExtended>();
-
-      if (providers.has(providerKey)) {
-        throw new Error('Duplicate entry in providers ' + providerKey);
-      }
-
-      const ingredientExtended = Provider.buildIngredient(
-        ingredientKey,
-        providerKey,
-        stock
-      );
-
-      providers.set(providerKey, ingredientExtended);
-      ingredients.set(ingredientKey, providers);
-    }
-
-    const cocktails = new Map<CocktailKey, CocktailExtended>();
-    for (const cocktailDto of dto.cocktails) {
-      const cocktail = CocktailExtended.buildExtended(
-        cocktailDto.cocktail,
-        cocktailDto.price,
-        cocktailDto.hype
-      );
-      cocktails.set(cocktailDto.cocktail, cocktail);
-    }
-
-    const employees = new Set<EmployeeKey>();
-    for (const employee of dto.employees) {
-      employees.add(employee);
-    }
-
-    return new Inventory(dto.cash, ingredients, cocktails, employees);
   }
 }

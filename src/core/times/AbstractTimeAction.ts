@@ -1,4 +1,4 @@
-import { TriggerUnit } from '../../entities/TimeTrigger';
+import { TriggerUnit } from '../../entities/static/TimeTrigger';
 import { ClockController } from '../controllers/ClockController';
 import { ITimeAction } from './ITimeAction';
 

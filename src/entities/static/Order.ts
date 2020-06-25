@@ -1,4 +1,4 @@
-import { CocktailExtended } from './Cocktail';
+import { CocktailExtended } from '../dynamic/CocktailExtended';
 
 export class Order {
   private readonly _cocktail: CocktailExtended;
@@ -12,6 +12,6 @@ export class Order {
   }
 
   public get title() {
-    return this._cocktail.name;
+    return this._cocktail.base.name;
   }
 }

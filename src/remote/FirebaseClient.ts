@@ -3,12 +3,8 @@ import 'firebase/database';
 
 import firebase from 'firebase/app';
 
-import {
-  ICocktailDTO,
-  IIngredientDTO,
-  IInventoryDTO
-} from '../dto/InventoryDTO';
-import { IUserDTO, UserListener } from '../dto/UserDTO';
+import { CocktailDto, IngredientDto, InventoryDto } from '../dto/InventoryDTO';
+import { UserDto, UserListener } from '../dto/UserDTO';
 import { IClient } from './IClient';
 
 const CONFIG = {
@@ -24,7 +20,7 @@ const CONFIG = {
 export class FirebaseClient implements IClient {
   private readonly _app: firebase.app.App;
   private readonly _subscribers: UserListener[];
-  private _user: IUserDTO;
+  private _user: UserDto;
 
   constructor() {
     this._app = !firebase.apps.length
@@ -63,7 +59,7 @@ export class FirebaseClient implements IClient {
   }
 
   // FETCH
-  public async fetchInventory(): Promise<IInventoryDTO> {
+  public async fetchInventory(): Promise<InventoryDto> {
     return this.fetchValue(this.ref);
   }
 
@@ -72,14 +68,14 @@ export class FirebaseClient implements IClient {
     await this.writeValue(`${this.ref}/cash`, cash);
   }
 
-  public async updateIngredient(dto: IIngredientDTO): Promise<void> {
+  public async updateIngredient(dto: IngredientDto): Promise<void> {
     const key = dto.ingredient + '|' + dto.provider;
     const value = dto.stock > 0 ? dto : null;
     await this.writeValue(`${this.ref}/ingredients/${key}`, value);
   }
 
   public async updateCocktail(
-    dto: ICocktailDTO,
+    dto: CocktailDto,
     value: true | null
   ): Promise<void> {
     const key = dto.cocktail;

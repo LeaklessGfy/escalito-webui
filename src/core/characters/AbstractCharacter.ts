@@ -27,7 +27,6 @@ export abstract class AbstractCharacter {
     this._scene = scene;
     this._sprite = sprite;
     this._texture = texture;
-    console.log(this._sprite.texture);
   }
 
   public get position(): Point {

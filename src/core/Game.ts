@@ -1,9 +1,9 @@
 import * as Phaser from 'phaser';
 
-import { Inventory } from '../entities/Inventory';
+import { Store } from '../store';
 import { MainScene } from './scenes/MainScene';
 
-export const createGame = (canvas: HTMLCanvasElement, inventory: Inventory) =>
+export const createGame = (canvas: HTMLCanvasElement, store: Store) =>
   new Phaser.Game({
     type: Phaser.WEBGL,
     canvas: canvas,
@@ -25,5 +25,5 @@ export const createGame = (canvas: HTMLCanvasElement, inventory: Inventory) =>
         gravity: { y: window.innerHeight / 2 }
       }
     },
-    scene: [new MainScene(inventory)]
+    scene: [new MainScene(store)]
   });
