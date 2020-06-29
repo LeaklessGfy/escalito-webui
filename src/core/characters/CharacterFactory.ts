@@ -6,7 +6,7 @@ import { Client } from './Client';
 
 export class CharacterFactory {
   public buildBarmaid(scene: IScene): Barmaid {
-    const x = scene.settings.middle;
+    const x = scene.settings.middleWidth;
     const y = scene.settings.floor;
 
     const sprite = scene.add.sprite(x, y, SpriteKey.Barmaid);

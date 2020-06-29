@@ -16,7 +16,7 @@ export class ClockController implements IController {
     fontFamily: 'Arial Black',
     fontSize: '20px',
     fontStyle: 'bold',
-    backgroundColor: '#FFFFFF',
+    //backgroundColor: '#FFFFFF',
     padding: {
       x: 50,
       y: 10

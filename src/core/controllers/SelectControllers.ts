@@ -8,7 +8,7 @@ export class SelectController implements IController {
   public preload(scene: IScene): void {}
 
   public create(scene: IScene): void {
-    scene.input.setDefaultCursor('url(assets/cursor.basic.png), pointer');
+    //scene.input.setDefaultCursor('url(assets/cursor.basic.png), pointer');
   }
 
   public update(scene: IScene, delta: number): void {}
@@ -18,10 +18,10 @@ export class SelectController implements IController {
 
     sprite.setInteractive();
     sprite.on('pointerover', () => {
-      scene.input.setDefaultCursor('url(assets/cursor.hover.png), pointer');
+      scene.input.setDefaultCursor('pointer');
     });
     sprite.on('pointerout', () => {
-      scene.input.setDefaultCursor('url(assets/cursor.basic.png), pointer');
+      scene.input.setDefaultCursor('default');
     });
   }
 }

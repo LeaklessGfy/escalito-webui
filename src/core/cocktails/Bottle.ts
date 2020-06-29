@@ -1,11 +1,13 @@
 import { Ingredient, IngredientKey } from '../../entities/static/Ingredient';
+import { SelectController } from '../controllers/SelectControllers';
 import { IScene } from '../scenes/IScene';
 import { Point } from '../sprites/Point';
 import { SpriteKey } from '../sprites/SpriteKey';
 
 export class Bottle {
   private readonly _ingredient: Ingredient;
-  private readonly _sprite: Phaser.GameObjects.Sprite;
+  private readonly _sprite: Phaser.Physics.Matter.Sprite;
+  private readonly _body: Phaser.Physics.Arcade.Body;
   private readonly _initialPosition: Point;
 
   private _fullStock: number;
@@ -13,11 +15,12 @@ export class Bottle {
 
   constructor(
     ingredient: Ingredient,
-    sprite: Phaser.GameObjects.Sprite,
+    sprite: Phaser.Physics.Matter.Sprite,
     stock: number
   ) {
     this._ingredient = ingredient;
     this._sprite = sprite;
+    this._body = sprite.body as Phaser.Physics.Arcade.Body;
     this._initialPosition = { x: sprite.x, y: sprite.y };
 
     this._fullStock = stock;
@@ -45,12 +48,9 @@ export class Bottle {
   }
 
   public static buildRum(scene: IScene): Bottle {
-    const position = scene.settings.bottlePosition;
-    const sprite = scene.add.sprite(
-      position.x,
-      position.y,
-      SpriteKey.RumBottle
-    );
+    const { x, y } = scene.settings.bottlePosition;
+    const sprite = scene.matter.add.sprite(x, y, SpriteKey.RumBottle);
+    sprite.setIgnoreGravity(true);
 
     const ingredient = scene.store.ingredients.get(IngredientKey.Rum);
     const stock = scene.inventory.getGlobalIngredientStock(IngredientKey.Rum);
@@ -69,6 +69,11 @@ export class Bottle {
     sprite.on('pointerup', () => {
       bottle.turnOff();
     });
+
+    const selectCtr = scene.getController<SelectController>(
+      SelectController.KEY
+    );
+    selectCtr.addSelect(scene, sprite);
 
     return bottle;
   }

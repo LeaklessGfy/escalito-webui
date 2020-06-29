@@ -1,3 +1,5 @@
+import { Bottle } from '../cocktails/Bottle';
+import { Glass } from '../cocktails/Glass';
 import { IScene } from '../scenes/IScene';
 import { PositionKey } from '../sprites/PositionKey';
 import { SpriteKey } from '../sprites/SpriteKey';
@@ -11,10 +13,12 @@ export class BarController implements IController {
     scene.load.image(SpriteKey.Bar, 'assets/bar.png');
     scene.load.image(SpriteKey.BarTop, 'assets/bar.top.png');
     scene.load.image(SpriteKey.Door, 'assets/door.png');
+    scene.load.image(SpriteKey.RumBottle, 'assets/bottle.rum.png');
+    scene.load.image(SpriteKey.DefaultGlass, 'assets/glass.default.png');
   }
 
   public create(scene: IScene): void {
-    const x = scene.settings.middle;
+    const x = scene.settings.middleWidth;
     const y = scene.settings.floor;
     const spriteBar = scene.add.sprite(x, y, SpriteKey.Bar);
     spriteBar
@@ -28,6 +32,9 @@ export class BarController implements IController {
 
     const spriteDoor = scene.add.image(100, y - 25, SpriteKey.Door);
     scene.settings.addPosition(PositionKey.Door, spriteDoor);
+
+    Bottle.buildRum(scene);
+    Glass.buildDefault(scene);
 
     const selectCtr = scene.getController<SelectController>(
       SelectController.KEY

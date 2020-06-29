@@ -15,8 +15,12 @@ export class Settings {
     return this.scene?.scale.displaySize.height ?? 0;
   }
 
-  public get middle(): number {
+  public get middleWidth(): number {
     return this.width / 2;
+  }
+
+  public get middleHeight(): number {
+    return this.height / 2;
   }
 
   public get floor(): number {
@@ -24,12 +28,17 @@ export class Settings {
   }
 
   public get bottlePosition(): Point {
-    // calculate in function of scane height
-    return { x: 0, y: 0 };
+    return {
+      x: this.middleWidth + this.middleWidth / 2,
+      y: this.middleHeight - this.middleHeight / 2
+    };
   }
 
   public get glassPosition(): Point {
-    return { x: 0, y: 0 };
+    return {
+      x: this.middleWidth,
+      y: this.middleHeight - this.middleHeight / 2
+    };
   }
 
   public getPosition(key: PositionKey): Point {

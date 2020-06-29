@@ -30,7 +30,7 @@ export abstract class AbstractCharacter {
   }
 
   public get position(): Point {
-    return { x: this._sprite.x, y: this._sprite.y };
+    return this._sprite;
   }
 
   public set onLeave(listener: Function) {
