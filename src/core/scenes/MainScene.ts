@@ -1,10 +1,12 @@
 import { Inventory } from '../../entities/Inventory';
 import { Store } from '../../store';
 import { Settings } from '../Settings';
+import { AudioController } from '../controllers/AudioController';
 import { BarController } from '../controllers/BarController';
 import { CharacterController } from '../controllers/CharacterController';
 import { ClockController } from '../controllers/ClockController';
 import { IController } from '../controllers/IController';
+import { MainController } from '../controllers/MainController';
 import { SelectController } from '../controllers/SelectControllers';
 import { IScene } from './IScene';
 
@@ -24,6 +26,8 @@ export class MainScene extends Phaser.Scene implements IScene {
     this._controllers.set(CharacterController.KEY, new CharacterController());
     this._controllers.set(SelectController.KEY, new SelectController());
     this._controllers.set(ClockController.KEY, new ClockController());
+    this._controllers.set(AudioController.KEY, new AudioController());
+    this._controllers.set(MainController.KEY, new MainController());
   }
 
   public get store(): Store {

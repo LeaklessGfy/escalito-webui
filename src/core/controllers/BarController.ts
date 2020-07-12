@@ -101,4 +101,8 @@ export class BarController implements IController {
   public update(scene: IScene, delta: number): void {
     this._bottle?.update(scene);
   }
+
+  public get glass() {
+    return this._glass;
+  }
 }

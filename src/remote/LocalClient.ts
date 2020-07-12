@@ -1,5 +1,9 @@
-import { CocktailDto, IngredientDto, InventoryDto } from '../dto/InventoryDTO';
-import { UserDto, UserListener } from '../dto/UserDTO';
+import {
+  CocktailDto,
+  IngredientDto,
+  InventoryDto
+} from '../entities/dto/InventoryDTO';
+import { UserDto, UserListener } from '../entities/dto/UserDTO';
 import { IClient } from './IClient';
 
 export class LocalClient implements IClient {
@@ -93,6 +97,7 @@ export class LocalClient implements IClient {
   private async fetchValue<T>(key: string, defaultValue: T): Promise<T> {
     const str = localStorage.getItem(key);
     if (str === null) {
+      this.writeValue(key, defaultValue);
       return defaultValue;
     }
     return JSON.parse(str);

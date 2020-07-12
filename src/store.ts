@@ -2,8 +2,8 @@ import { computed, observable } from 'mobx';
 import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
 
-import { UserDto } from './dto/UserDTO';
 import { Inventory } from './entities/Inventory';
+import { UserDto } from './entities/dto/UserDTO';
 import { Cocktail, CocktailKey } from './entities/static/Cocktail';
 import { Employee, EmployeeKey } from './entities/static/Employee';
 import { Ingredient, IngredientKey } from './entities/static/Ingredient';

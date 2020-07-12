@@ -1,4 +1,4 @@
-import { UserDto } from '../dto/UserDTO';
+import { UserDto } from '../entities/dto/UserDTO';
 
 export const userMock: UserDto = {
   uid: '1',

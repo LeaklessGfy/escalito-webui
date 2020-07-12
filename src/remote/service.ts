@@ -1,6 +1,6 @@
-import { fromDto } from '../dto/InventoryDTO';
-import { UserListener } from '../dto/UserDTO';
 import { Inventory } from '../entities/Inventory';
+import { fromDto } from '../entities/dto/InventoryDTO';
+import { UserListener } from '../entities/dto/UserDTO';
 import { EmployeeKey } from '../entities/static/Employee';
 import { IngredientKey } from '../entities/static/Ingredient';
 import { ProviderKey } from '../entities/static/Provider';

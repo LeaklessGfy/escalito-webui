@@ -3,7 +3,8 @@ enum StateKey {
   Move,
   Wait,
   Leave,
-  Exhaust
+  Exhaust,
+  Served
 }
 
 export class State {
@@ -33,6 +34,10 @@ export class State {
     return this._states.has(StateKey.Exhaust);
   }
 
+  public get served() {
+    return this._states.has(StateKey.Served);
+  }
+
   public idle() {
     this._states.delete(StateKey.Move);
     this._states.add(StateKey.Idle);
@@ -60,5 +65,10 @@ export class State {
   public exhaust() {
     this._states.delete(StateKey.Wait);
     this._states.add(StateKey.Exhaust);
+  }
+
+  public serve() {
+    this._states.delete(StateKey.Wait);
+    this._states.add(StateKey.Served);
   }
 }

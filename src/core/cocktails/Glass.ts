@@ -12,8 +12,16 @@ export class Glass {
     this._recipe = new Map();
   }
 
+  public get sprite(): Phaser.GameObjects.Sprite {
+    return this._sprite;
+  }
+
   public get body(): Phaser.Physics.Arcade.Body {
     return this._sprite.body as Phaser.Physics.Arcade.Body;
+  }
+
+  public get recipe(): Map<IngredientKey, number> {
+    return this._recipe;
   }
 
   public addIngredient(ingredient: Ingredient) {
@@ -29,8 +37,12 @@ export class Glass {
       .setY(y - sprite.displayHeight / 2)
       .setInteractive()
       .setName('Glass')
-      .setGravity(-1);
-    (sprite.body as Phaser.Physics.Arcade.Body).allowGravity = false;
+      .setGravity(-1)
+      .setDepth(3);
+
+    const body = sprite.body as Phaser.Physics.Arcade.Body;
+    body.collideWorldBounds = true;
+    body.allowGravity = false;
 
     scene.input.setDraggable(sprite);
     sprite.on('drag', (p: any, x: number, y: number) => {

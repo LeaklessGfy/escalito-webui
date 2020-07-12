@@ -4,13 +4,12 @@ import { IController } from './IController';
 export class AudioController implements IController {
   public static readonly KEY = Symbol();
 
-  private readonly _scene: IScene;
-
-  constructor(scene: IScene) {
-    this._scene = scene;
-  }
+  private _scene?: IScene;
+  private _audioActivate: boolean = false;
 
   public preload(scene: IScene): void {
+    this._scene = scene;
+
     // scene.load.audio('background', 'assets/sound/background.mp3');
   }
 
@@ -21,14 +20,23 @@ export class AudioController implements IController {
   public update(scene: IScene, delta: number): void {}
 
   public playSuccess(): void {
-    this._scene.sound.play('success');
+    if (!this._audioActivate) {
+      return;
+    }
+    this._scene?.sound.play('success');
   }
 
   public playFailue(): void {
-    this._scene.sound.play('failure');
+    if (!this._audioActivate) {
+      return;
+    }
+    this._scene?.sound.play('failure');
   }
 
   public playLaught(): void {
-    this._scene.sound.play('laught');
+    if (!this._audioActivate) {
+      return;
+    }
+    this._scene?.sound.play('laught');
   }
 }

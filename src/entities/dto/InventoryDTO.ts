@@ -1,12 +1,12 @@
-import { Inventory } from '../entities/Inventory';
-import { CocktailExtended } from '../entities/dynamic/CocktailExtended';
-import { IngredientExtended } from '../entities/dynamic/IngredientExtended';
-import { CocktailKey } from '../entities/static/Cocktail';
-import { EmployeeKey } from '../entities/static/Employee';
-import { IngredientKey } from '../entities/static/Ingredient';
-import { ProviderKey } from '../entities/static/Provider';
-import { buildCocktailExtended } from '../entities/values/Cocktails';
-import { buildIngredientExtended } from '../entities/values/Ingredients';
+import { Inventory } from '../Inventory';
+import { CocktailExtended } from '../dynamic/CocktailExtended';
+import { IngredientExtended } from '../dynamic/IngredientExtended';
+import { CocktailKey } from '../static/Cocktail';
+import { EmployeeKey } from '../static/Employee';
+import { IngredientKey } from '../static/Ingredient';
+import { ProviderKey } from '../static/Provider';
+import { buildCocktailExtended } from '../values/Cocktails';
+import { buildIngredientExtended } from '../values/Ingredients';
 
 export interface IngredientDto {
   ingredient: number;

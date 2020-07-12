@@ -1,5 +1,9 @@
-import { CocktailDto, IngredientDto, InventoryDto } from '../dto/InventoryDTO';
-import { UserListener } from '../dto/UserDTO';
+import {
+  CocktailDto,
+  IngredientDto,
+  InventoryDto
+} from '../entities/dto/InventoryDTO';
+import { UserListener } from '../entities/dto/UserDTO';
 import { FirebaseClient } from './FirebaseClient';
 import { LocalClient } from './LocalClient';
 

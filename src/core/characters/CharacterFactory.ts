@@ -30,12 +30,16 @@ export class CharacterFactory {
     const x = 100;
     const y = scene.settings.floor;
 
-    const sprite = scene.add.sprite(x, y, SpriteKey.DefaultClient);
+    const sprite = scene.physics.add.sprite(x, y, SpriteKey.DefaultClient);
     sprite
       .setScale(2)
       .setY(sprite.y - 20)
       .setDepth(2)
       .setName('Client');
+
+    const body = sprite.body as Phaser.Physics.Arcade.Body;
+    body.collideWorldBounds = true;
+    body.allowGravity = false;
 
     const client = new Client(scene, sprite, SpriteKey.DefaultClient);
 

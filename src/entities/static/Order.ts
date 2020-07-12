@@ -14,4 +14,8 @@ export class Order {
   public get title() {
     return this._cocktail.base.name;
   }
+
+  public get recipe() {
+    return this._cocktail.base.recipe;
+  }
 }

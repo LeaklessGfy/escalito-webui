@@ -3,8 +3,12 @@ import 'firebase/database';
 
 import firebase from 'firebase/app';
 
-import { CocktailDto, IngredientDto, InventoryDto } from '../dto/InventoryDTO';
-import { UserDto, UserListener } from '../dto/UserDTO';
+import {
+  CocktailDto,
+  IngredientDto,
+  InventoryDto
+} from '../entities/dto/InventoryDTO';
+import { UserDto, UserListener } from '../entities/dto/UserDTO';
 import { IClient } from './IClient';
 
 const CONFIG = {
