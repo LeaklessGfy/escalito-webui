@@ -12,13 +12,12 @@ export class ClockController implements IController {
   private static readonly TO_DAYS = ClockController.TO_HOURS * 24;
 
   private static readonly STYLE: Phaser.Types.GameObjects.Text.TextStyle = {
-    color: '#00FF00',
+    color: '#FFFFFF',
     fontFamily: 'Arial Black',
-    fontSize: '20px',
-    fontStyle: 'bold',
+    fontSize: '15px',
     //backgroundColor: '#FFFFFF',
     padding: {
-      x: 50,
+      x: 15,
       y: 10
     }
   };
@@ -29,9 +28,10 @@ export class ClockController implements IController {
   public preload(scene: IScene): void {}
 
   public create(scene: IScene): void {
-    this._clock = scene.add.text(0, 0, '00:00', ClockController.STYLE);
-    /*.setOrigin(0, 1)
-      .setInteractive({ useHandCursor: true });*/
+    const x = scene.settings.width;
+
+    this._clock = scene.add.text(x, 0, '00:00', ClockController.STYLE);
+    this._clock.setX(x - this._clock.displayWidth);
   }
 
   public update(scene: IScene, delta: number): void {

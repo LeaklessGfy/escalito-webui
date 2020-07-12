@@ -19,8 +19,8 @@ export const createGame = (canvas: HTMLCanvasElement, store: Store) =>
       autoCenter: Phaser.Scale.CENTER_HORIZONTALLY
     },
     physics: {
-      default: 'matter',
-      matter: {
+      default: 'arcade',
+      arcade: {
         debug: true,
         gravity: { y: window.innerHeight / 2 }
       }

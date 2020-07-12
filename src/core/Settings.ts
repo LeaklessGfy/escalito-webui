@@ -30,14 +30,14 @@ export class Settings {
   public get bottlePosition(): Point {
     return {
       x: this.middleWidth + this.middleWidth / 2,
-      y: this.middleHeight - this.middleHeight / 2
+      y: this.middleHeight
     };
   }
 
   public get glassPosition(): Point {
     return {
       x: this.middleWidth,
-      y: this.middleHeight - this.middleHeight / 2
+      y: this.middleHeight
     };
   }
 

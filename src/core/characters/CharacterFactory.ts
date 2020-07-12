@@ -13,7 +13,8 @@ export class CharacterFactory {
     sprite
       .setScale(2)
       .setY(sprite.y - sprite.displayHeight / 2)
-      .setFlipX(true);
+      .setFlipX(true)
+      .setName('Barmaid');
 
     const barmaid = new Barmaid(scene, sprite, SpriteKey.Barmaid);
 
@@ -33,7 +34,8 @@ export class CharacterFactory {
     sprite
       .setScale(2)
       .setY(sprite.y - 20)
-      .setDepth(2);
+      .setDepth(2)
+      .setName('Client');
 
     const client = new Client(scene, sprite, SpriteKey.DefaultClient);
 
