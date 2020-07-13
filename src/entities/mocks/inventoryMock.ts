@@ -1,4 +1,4 @@
-import { InventoryDto } from '../entities/dto/InventoryDTO';
+import { InventoryDto } from '../dto/InventoryDTO';
 
 export const inventoryMock: InventoryDto = {
   cash: 100,

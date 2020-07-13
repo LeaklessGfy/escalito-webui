@@ -1,4 +1,5 @@
 import { Order } from '../../entities/static/Order';
+import { Store } from '../../store';
 import { Client } from '../characters/Client';
 import { IScene } from '../scenes/IScene';
 import { AudioController } from './AudioController';
@@ -17,6 +18,7 @@ export class MainController implements IController {
   private _positiveCombo: number = 0;
   private _negativeCombo: number = 0;
 
+  /** Interface **/
   public preload(scene: IScene): void {
     this._audioCtr = scene.getController<AudioController>(AudioController.KEY);
   }
@@ -25,6 +27,9 @@ export class MainController implements IController {
 
   public update(scene: IScene, delta: number): void {}
 
+  public daily(scene: IScene, store: Store, day: number): void {}
+
+  /** Custom **/
   public increment(client: Client, order: Order): number {
     return client.satisfied
       ? this.incrementSuccess(client, order)

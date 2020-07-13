@@ -8,8 +8,8 @@ export class TimeActionManager {
     this._actions.add(action);
   }
 
-  public tick(delay: number) {
-    this.currentTime += delay; // convert this as game clock ?
+  public tick(delta: number): void {
+    this.currentTime += delta; // convert this as game clock ?
 
     for (const action of this._actions) {
       if (action.isEnable(this.currentTime)) {

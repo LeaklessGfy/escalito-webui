@@ -11,6 +11,7 @@ export const ProviderNames: { [key in ProviderKey]: string } = {
 
 export class Provider {
   public readonly key: ProviderKey;
+  public readonly name: string;
   public readonly ingredients: Map<IngredientKey, IngredientProvided>;
 
   public constructor(
@@ -18,11 +19,8 @@ export class Provider {
     ingredients: Map<IngredientKey, IngredientProvided>
   ) {
     this.key = key;
+    this.name = ProviderNames[key];
     this.ingredients = ingredients;
-  }
-
-  public get name(): string {
-    return ProviderNames[this.key];
   }
 
   public get ingredientsArray(): IngredientProvided[] {

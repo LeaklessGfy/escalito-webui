@@ -37,8 +37,6 @@ export abstract class AbstractCharacter {
     this._onLeave = listener;
   }
 
-  public abstract behave(next: Point, bar: Point, spawn: Point): void;
-
   public update(delta: number): void {
     if (this._state.idling) {
       this.stepIdle();
@@ -91,7 +89,7 @@ export abstract class AbstractCharacter {
     return Math.abs(dst.x - this._sprite.x) < distance;
   }
 
-  public destroy() {
+  public destroy(): void {
     this._sprite.destroy();
   }
 

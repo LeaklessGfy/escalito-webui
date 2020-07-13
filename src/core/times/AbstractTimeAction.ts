@@ -17,12 +17,12 @@ export abstract class AbstractTimeAction implements ITimeAction {
     this._repetion = repetition;
   }
 
-  isEnable(currentTime: number): boolean {
+  public isEnable(currentTime: number): boolean {
     const shouldRepeat = this._repetion === -1 || this._repetion > 0;
-    return shouldRepeat && this.condition() && currentTime < this._nextTime;
+    return shouldRepeat && this.condition() && currentTime >= this._nextTime;
   }
 
-  trigger(currentTime: number): void {
+  public trigger(currentTime: number): void {
     this._nextTime = currentTime + this._overflow;
     this._repetion =
       this._repetion === -1 ? this._repetion : this._repetion - 1;

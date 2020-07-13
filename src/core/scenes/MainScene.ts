@@ -1,4 +1,4 @@
-import { Inventory } from '../../entities/Inventory';
+import { TriggerUnit } from '../../entities/static/TimeTrigger';
 import { Store } from '../../store';
 import { Settings } from '../Settings';
 import { AudioController } from '../controllers/AudioController';
@@ -8,19 +8,23 @@ import { ClockController } from '../controllers/ClockController';
 import { IController } from '../controllers/IController';
 import { MainController } from '../controllers/MainController';
 import { SelectController } from '../controllers/SelectControllers';
+import { DelegateTimeAction } from '../times/DelegateTimeAction';
+import { TimeActionManager } from '../times/TimeActionManager';
 import { IScene } from './IScene';
 
 export class MainScene extends Phaser.Scene implements IScene {
   private readonly _store: Store;
   private readonly _settings: Settings;
   private readonly _controllers: Map<Symbol, IController>;
+  private readonly _timeManager: TimeActionManager;
 
   constructor(store: Store) {
     super({ key: MainScene.name });
 
     this._store = store;
     this._settings = new Settings();
-    this._controllers = new Map();
+    this._controllers = new Map<Symbol, IController>();
+    this._timeManager = new TimeActionManager();
 
     this._controllers.set(BarController.KEY, new BarController());
     this._controllers.set(CharacterController.KEY, new CharacterController());
@@ -34,19 +38,28 @@ export class MainScene extends Phaser.Scene implements IScene {
     return this._store;
   }
 
-  public get inventory(): Inventory {
-    return this._store.inventory;
-  }
-
   public get settings(): Settings {
     return this._settings;
   }
 
   public preload(): void {
     this._settings.scene = this;
+
     for (const controller of this._controllers.values()) {
       controller.preload(this);
     }
+
+    this._timeManager.add(
+      new DelegateTimeAction(
+        1,
+        TriggerUnit.Day,
+        -1,
+        () => true,
+        () => {
+          this._controllers.forEach(c => c.daily(this, this._store, 1));
+        }
+      )
+    );
   }
 
   public create(): void {
@@ -59,6 +72,7 @@ export class MainScene extends Phaser.Scene implements IScene {
     for (const controller of this._controllers.values()) {
       controller.update(this, delta);
     }
+    this._timeManager.tick(delta);
   }
 
   public getController<T extends IController>(key: Symbol): T {

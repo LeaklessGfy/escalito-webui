@@ -6,6 +6,11 @@ export enum IngredientKey {
   Strawberry
 }
 
+export enum IngredientType {
+  Bottle,
+  Fruits
+}
+
 const IngredientNames: { [key in IngredientKey]: string } = {
   [IngredientKey.Rum]: 'Rum',
   [IngredientKey.Cola]: 'Cola',
@@ -22,20 +27,26 @@ const IngredientColors: { [key in IngredientKey]: number } = {
   [IngredientKey.Strawberry]: 0xff0000
 };
 
+const IngredientTypes: { [key in IngredientKey]: IngredientType } = {
+  [IngredientKey.Rum]: IngredientType.Bottle,
+  [IngredientKey.Cola]: IngredientType.Bottle,
+  [IngredientKey.Lemonade]: IngredientType.Bottle,
+  [IngredientKey.Lemon]: IngredientType.Fruits,
+  [IngredientKey.Strawberry]: IngredientType.Fruits
+};
+
 export class Ingredient {
   public readonly key: IngredientKey;
+  public readonly name: string;
   public readonly amount: number;
+  public readonly color: number;
+  public readonly type: IngredientType;
 
   public constructor(key: IngredientKey, amount: number) {
     this.key = key;
+    this.name = IngredientNames[key];
     this.amount = amount;
-  }
-
-  public get name(): string {
-    return IngredientNames[this.key];
-  }
-
-  public get color(): number {
-    return IngredientColors[this.key];
+    this.color = IngredientColors[key];
+    this.type = IngredientTypes[key];
   }
 }

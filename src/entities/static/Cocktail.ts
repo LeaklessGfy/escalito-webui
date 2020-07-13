@@ -13,6 +13,7 @@ export const CocktailNames: { [key in CocktailKey]: string } = {
 
 export class Cocktail {
   public readonly key: CocktailKey;
+  public readonly name: string;
   public readonly glassKey: GlassKey;
   public readonly recipe: Map<IngredientKey, number>;
 
@@ -22,12 +23,9 @@ export class Cocktail {
     recipe: Map<IngredientKey, number>
   ) {
     this.key = key;
+    this.name = CocktailNames[key];
     this.glassKey = glassKey;
     this.recipe = recipe;
-  }
-
-  public get name(): string {
-    return CocktailNames[this.key];
   }
 
   public get ingredients(): IngredientKey[] {

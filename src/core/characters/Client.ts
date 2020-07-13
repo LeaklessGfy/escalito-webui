@@ -5,8 +5,9 @@ import { MainController } from '../controllers/MainController';
 import { Point } from '../sprites/Point';
 import { TintHelper } from '../utils/TintHelper';
 import { AbstractCharacter } from './AbstractCharacter';
+import { IBehavioral } from './IBehavioral';
 
-export class Client extends AbstractCharacter {
+export class Client extends AbstractCharacter implements IBehavioral {
   private static readonly PATIENCE: number = 2000;
   private static readonly SATISFACTION_THRESHOLD: number = 20;
   private static readonly STYLE: Phaser.Types.GameObjects.Text.TextStyle = {
@@ -30,6 +31,8 @@ export class Client extends AbstractCharacter {
   private _onServe?: Function;
   private _onExhaust?: Function;
 
+  private _createOrder: () => Order | undefined = () => undefined;
+
   public get satisfaction(): number {
     return this._satisfaction;
   }
@@ -41,6 +44,10 @@ export class Client extends AbstractCharacter {
   public set satisfaction(satisfaction: number) {
     this._satisfaction = satisfaction;
     this._sprite.tint = TintHelper.getTint(satisfaction);
+  }
+
+  public set createOrder(createOrder: () => Order | undefined) {
+    this._createOrder = createOrder;
   }
 
   public update(delta: number) {
@@ -85,7 +92,7 @@ export class Client extends AbstractCharacter {
       throw new Error('Client has already order');
     }
 
-    this._order = this.createOrder();
+    this._order = this._createOrder();
 
     if (this._order === undefined) {
       return false;
@@ -165,17 +172,6 @@ export class Client extends AbstractCharacter {
     this._onServe = undefined;
     this._onExhaust?.();
     this._onExhaust = undefined;
-  }
-
-  private createOrder(): Order | undefined {
-    const { cocktails } = this._scene.inventory;
-
-    if (cocktails.length < 1) {
-      return undefined;
-    }
-
-    const cocktail = cocktails[0]; // select based from hype and maybe other factor depending on client
-    return new Order(cocktail);
   }
 
   private computeSatisfaction(glass?: Glass): number {

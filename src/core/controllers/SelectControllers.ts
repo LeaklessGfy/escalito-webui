@@ -1,14 +1,13 @@
+import { Store } from '../../store';
 import { IScene } from '../scenes/IScene';
 import { IController } from './IController';
 
 export class SelectController implements IController {
   public static readonly KEY = Symbol();
-
   private static readonly STYLE: Phaser.Types.GameObjects.Text.TextStyle = {
     color: '#FFFFFF',
     fontFamily: 'Arial Black',
     fontSize: '15px',
-    //backgroundColor: '#FFFFFF',
     padding: {
       x: 15,
       y: 10
@@ -19,6 +18,7 @@ export class SelectController implements IController {
 
   private _selectedText?: Phaser.GameObjects.Text;
 
+  /** Interface **/
   public preload(scene: IScene): void {}
 
   public create(scene: IScene): void {
@@ -28,6 +28,9 @@ export class SelectController implements IController {
 
   public update(scene: IScene, delta: number): void {}
 
+  public daily(scene: IScene, store: Store, day: number): void {}
+
+  /** Custom **/
   public addSelect(scene: IScene, sprite: Phaser.GameObjects.GameObject) {
     this._selectors.push(sprite);
 

@@ -1,0 +1,65 @@
+{
+  "textures": [
+    {
+      "image": "door.png",
+      "format": "RGBA8888",
+      "size": {
+        "w": 128,
+        "h": 128
+      },
+      "scale": 1,
+      "frames": [
+        {
+          "filename": "open.png",
+          "rotated": false,
+          "trimmed": false,
+          "sourceSize": {
+            "w": 53,
+            "h": 99
+          },
+          "spriteSourceSize": {
+            "x": 54,
+            "y": 0,
+            "w": 53,
+            "h": 99
+          },
+          "frame": {
+            "x": 54,
+            "y": 0,
+            "w": 53,
+            "h": 99
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "close.png",
+          "rotated": false,
+          "trimmed": true,
+          "sourceSize": {
+            "w": 53,
+            "h": 99
+          },
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 53,
+            "h": 99
+          },
+          "frame": {
+            "x": 0,
+            "y": 0,
+            "w": 53,
+            "h": 99
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      ]
+    }
+  ]
+}

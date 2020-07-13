@@ -24,15 +24,16 @@
     "build/*"
   ],
   "dependencies": {
-    "firebase": "^7.15.0",
+    "firebase": "^7.16.0",
     "mobx": "^5.15.4",
     "mobx-react-lite": "^2.0.7",
     "phaser": "^3.23.0",
-    "preact": "^10.3.1",
+    "preact": "^10.4.5",
     "preact-jsx-chai": "^3.0.0",
     "preact-markup": "^2.0.0",
-    "preact-render-to-string": "^5.1.4",
+    "preact-render-to-string": "^5.1.9",
     "preact-router": "^3.2.1",
+    "rxjs": "^6.6.0",
     "tailwindcss": "^1.4.6"
   },
   "devDependencies": {

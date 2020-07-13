@@ -1,3 +1,5 @@
+import { Order } from '../../entities/static/Order';
+import { Store } from '../../store';
 import { Barmaid } from '../characters/Barmaid';
 import { CharacterFactory } from '../characters/CharacterFactory';
 import { Client } from '../characters/Client';
@@ -22,6 +24,7 @@ export class CharacterController implements IController {
     this._leaving = [];
   }
 
+  /** Interface **/
   public preload(scene: IScene): void {
     scene.load.spritesheet(
       SpriteKey.Barmaid + '.' + AnimKey.Idle,
@@ -114,7 +117,7 @@ export class CharacterController implements IController {
     });*/
 
     this._barmaid = this._factory.buildBarmaid(scene);
-    this.createClient(scene);
+    // this.createClient(scene);
   }
 
   public update(scene: IScene, delta: number): void {
@@ -154,8 +157,22 @@ export class CharacterController implements IController {
     }
   }
 
+  public daily(scene: IScene, store: Store, day: number): void {}
+
+  /** Custom **/
   private createClient(scene: IScene) {
     const client = this._factory.buildClient(scene);
+
+    client.createOrder = () => {
+      const { cocktails } = scene.store.inventory;
+
+      if (cocktails.length < 1) {
+        return undefined;
+      }
+
+      const cocktail = cocktails[0]; // select based from hype and maybe other factor depending on client
+      return new Order(cocktail);
+    };
 
     client.onLeave = () => {
       this._clients.pop();

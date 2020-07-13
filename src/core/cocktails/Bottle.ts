@@ -1,16 +1,17 @@
-import { Ingredient, IngredientKey } from '../../entities/static/Ingredient';
+import { IngredientExtended } from '../../entities/dynamic/IngredientExtended';
 import { SelectController } from '../controllers/SelectControllers';
 import { IScene } from '../scenes/IScene';
 import { Point } from '../sprites/Point';
 import { SpriteKey } from '../sprites/SpriteKey';
+import { GameIngredient } from './GameIngredient';
 
-export class Bottle {
+export class Bottle implements GameIngredient {
   private readonly _sprite: Phaser.GameObjects.Sprite;
   private readonly _emitter: Phaser.GameObjects.Particles.ParticleEmitter & {
-    source?: Ingredient;
+    source?: IngredientExtended;
   };
 
-  private readonly _ingredient: Ingredient;
+  private readonly _ingredient: IngredientExtended;
   private readonly _initialPosition: Point;
 
   private _fullStock: number;
@@ -19,9 +20,8 @@ export class Bottle {
 
   constructor(
     sprite: Phaser.GameObjects.Sprite,
-    emitter: Phaser.GameObjects.Particles.ParticleEmitter,
-    ingredient: Ingredient,
-    stock: number
+    ingredient: IngredientExtended,
+    emitter: Phaser.GameObjects.Particles.ParticleEmitter
   ) {
     this._sprite = sprite;
     this._emitter = emitter;
@@ -29,8 +29,8 @@ export class Bottle {
     this._ingredient = ingredient;
     this._initialPosition = { x: sprite.x, y: sprite.y };
 
-    this._fullStock = stock;
-    this._currentStock = stock;
+    this._fullStock = ingredient.stock;
+    this._currentStock = ingredient.stock;
     this._isFlowing = false;
   }
 
@@ -45,7 +45,7 @@ export class Bottle {
     //if (this._currentStock > 0) {
     // play particule system
     this._emitter.start();
-    this._emitter.setTint(this._ingredient.color);
+    this._emitter.setTint(this._ingredient.provided.base.color);
     this._emitter.setPosition(position.x, y + 10);
     this._emitter.source = this._ingredient;
     //}
@@ -60,41 +60,32 @@ export class Bottle {
     this._emitter.source = undefined;
   }
 
-  public charge() {
+  public charge(): void {
     this._currentStock = this._fullStock;
   }
 
-  public update(scene: IScene) {
+  public update(scene: IScene): void {
     if (!scene.input.activePointer.isDown && this._isFlowing) {
       this.turnOff();
     }
   }
 
-  public static buildRum(
+  public static build(
     scene: IScene,
+    ingredient: IngredientExtended,
     emitter: Phaser.GameObjects.Particles.ParticleEmitter
   ): Bottle {
     const { x, y } = scene.settings.bottlePosition;
     const sprite = scene.add.sprite(x, y, SpriteKey.RumBottle);
-    sprite.setY(y - sprite.displayHeight / 2).setName('Rum');
+    const bottle = new Bottle(sprite, ingredient, emitter);
 
-    const ingredient = scene.store.ingredients.get(IngredientKey.Rum);
-    const stock = scene.inventory.getGlobalIngredientStock(IngredientKey.Rum);
-
-    if (ingredient === undefined) {
-      throw new Error('Ingredient is not defiend globally');
-    }
-
-    const bottle = new Bottle(sprite, emitter, ingredient, stock);
-    const position = {
-      x: scene.settings.middleWidth,
-      y: 0
-    };
-
-    sprite.setInteractive();
-    sprite.on('pointerdown', () => {
-      bottle.turnOn(position);
-    });
+    sprite
+      .setY(y - sprite.displayHeight / 2)
+      .setName(ingredient.provided.base.name)
+      .setInteractive()
+      .on('pointerdown', () => {
+        bottle.turnOn({ x: scene.settings.middleWidth, y: 0 });
+      });
 
     const selectCtr = scene.getController<SelectController>(
       SelectController.KEY

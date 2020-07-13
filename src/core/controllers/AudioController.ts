@@ -1,3 +1,4 @@
+import { Store } from '../../store';
 import { IScene } from '../scenes/IScene';
 import { IController } from './IController';
 
@@ -7,6 +8,7 @@ export class AudioController implements IController {
   private _scene?: IScene;
   private _audioActivate: boolean = false;
 
+  /** Interface **/
   public preload(scene: IScene): void {
     this._scene = scene;
 
@@ -19,6 +21,9 @@ export class AudioController implements IController {
 
   public update(scene: IScene, delta: number): void {}
 
+  public daily(scene: IScene, store: Store, day: number): void {}
+
+  /** Custom **/
   public playSuccess(): void {
     if (!this._audioActivate) {
       return;

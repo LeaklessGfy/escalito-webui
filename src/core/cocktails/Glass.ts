@@ -24,7 +24,7 @@ export class Glass {
     return this._recipe;
   }
 
-  public addIngredient(ingredient: Ingredient) {
+  public addIngredient(ingredient: Ingredient): void {
     const base = this._recipe.get(ingredient.key) ?? 0;
     this._recipe.set(ingredient.key, base + ingredient.amount);
   }

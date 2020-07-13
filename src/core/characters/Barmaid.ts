@@ -1,5 +1,3 @@
 import { AbstractCharacter } from './AbstractCharacter';
 
-export class Barmaid extends AbstractCharacter {
-  public behave(): void {}
-}
+export class Barmaid extends AbstractCharacter {}
