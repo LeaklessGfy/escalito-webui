@@ -1,11 +1,14 @@
-import { Inventory } from '../Inventory';
-import { CocktailExtended } from '../dynamic/CocktailExtended';
+import {
+  CocktailMapper,
+  EmployeeMapper,
+  IngredientMapper,
+  Inventory
+} from '../Inventory';
 import { IngredientExtended } from '../dynamic/IngredientExtended';
-import { CocktailKey } from '../static/Cocktail';
-import { EmployeeKey } from '../static/Employee';
-import { IngredientKey } from '../static/Ingredient';
+import { Employee } from '../static/Employee';
 import { ProviderKey } from '../static/Provider';
 import { buildCocktailExtended } from '../values/Cocktails';
+import { Employees } from '../values/Employees';
 import { buildIngredientExtended } from '../values/Ingredients';
 
 export interface IngredientDto {
@@ -27,13 +30,8 @@ export interface InventoryDto {
   employees: number[];
 }
 
-function extractIngredients(
-  dto: IngredientDto[]
-): Map<IngredientKey, Map<ProviderKey, IngredientExtended>> {
-  const ingredients = new Map<
-    IngredientKey,
-    Map<ProviderKey, IngredientExtended>
-  >();
+function extractIngredients(dto: IngredientDto[]): IngredientMapper {
+  const ingredients: IngredientMapper = new Map();
 
   for (const ingredientDto of dto) {
     const ingredientKey = ingredientDto.ingredient;
@@ -61,10 +59,8 @@ function extractIngredients(
   return ingredients;
 }
 
-function extractCocktails(
-  dto: CocktailDto[]
-): Map<CocktailKey, CocktailExtended> {
-  const cocktails = new Map<CocktailKey, CocktailExtended>();
+function extractCocktails(dto: CocktailDto[]): CocktailMapper {
+  const cocktails: CocktailMapper = new Map();
   for (const cocktailDto of dto) {
     const cocktail = buildCocktailExtended(
       cocktailDto.cocktail,
@@ -76,10 +72,11 @@ function extractCocktails(
   return cocktails;
 }
 
-function extractEmployees(dto: number[]): Set<EmployeeKey> {
-  const employees = new Set<EmployeeKey>();
+function extractEmployees(dto: number[]): EmployeeMapper {
+  const employees: EmployeeMapper = new Map();
+  const objects = Employees();
   for (const employee of dto) {
-    employees.add(employee);
+    employees.set(employee, objects.get(employee) as Employee);
   }
   return employees;
 }

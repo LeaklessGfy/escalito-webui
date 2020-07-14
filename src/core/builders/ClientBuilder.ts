@@ -26,6 +26,7 @@ export class ClientBuilder {
   public texture: SpriteKey = SpriteKey.DefaultClient;
   public patience: number = ClientBuilder.PATIENCE;
   public satisfactionThreshold: number = ClientBuilder.SATISFACTION_THRESHOLD;
+  public cash: number = 5;
 
   constructor(scene: IScene) {
     this._scene = scene;

@@ -65,7 +65,6 @@ export class MainScene extends Phaser.Scene implements IScene {
   public create(): void {
     for (const controller of this._controllers.values()) {
       controller.create(this);
-      controller.daily(this, this.store, 0);
     }
   }
 
@@ -74,6 +73,11 @@ export class MainScene extends Phaser.Scene implements IScene {
       controller.update(this, delta);
     }
     this._timeManager.update(delta);
+  }
+
+  public start() {
+    this.scene.resume();
+    this._controllers.forEach(ctr => ctr.daily(this, this.store, 0));
   }
 
   public getController<T extends IController>(key: Symbol): T {

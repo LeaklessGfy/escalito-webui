@@ -11,7 +11,7 @@ export enum IngredientType {
   Fruits
 }
 
-const IngredientNames: { [key in IngredientKey]: string } = {
+export const IngredientNames: { [key in IngredientKey]: string } = {
   [IngredientKey.Rum]: 'Rum',
   [IngredientKey.Cola]: 'Cola',
   [IngredientKey.Lemonade]: 'Lemonade',

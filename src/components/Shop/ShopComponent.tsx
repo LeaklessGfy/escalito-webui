@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { FunctionalComponent, h } from 'preact';
 import { useState } from 'preact/hooks';
 
-import { Provider } from '../../entities/Provider';
+import { Provider } from '../../entities/static/Provider';
 import { useStore } from '../../store';
 import IngredientComponent from './IngredientComponent';
 
@@ -37,23 +37,23 @@ const ShopComponent: FunctionalComponent = () => {
           {active &&
             active.ingredientsArray.map(ingredient => (
               <IngredientComponent
-                key={ingredient.key}
-                name={ingredient.name}
+                key={ingredient.base.key}
+                name={ingredient.base.name}
                 price={ingredient.price}
                 stock={inventory.getIngredientStock(
-                  ingredient.key,
+                  ingredient.base.key,
                   ingredient.providerKey
                 )}
                 disabled={inventory.isIngredientDisabled(ingredient)}
                 onAdd={() =>
                   inventory.addIngredient(
-                    ingredient.key,
+                    ingredient.base.key,
                     ingredient.providerKey
                   )
                 }
                 onRemove={() =>
                   inventory.removeIngredient(
-                    ingredient.key,
+                    ingredient.base.key,
                     ingredient.providerKey
                   )
                 }

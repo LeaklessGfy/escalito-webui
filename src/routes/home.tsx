@@ -19,9 +19,9 @@ const Home: FunctionalComponent = () => {
 
   return (
     <main>
-      {/*<ShopComponent />
+      <ShopComponent />
       <MenuComponent />
-      <HireComponent />*/}
+      <HireComponent />
       <GameComponent />
     </main>
   );

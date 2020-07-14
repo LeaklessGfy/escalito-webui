@@ -4,6 +4,7 @@ export enum SpriteKey {
   Door = 'door',
   Window = 'window',
   Barmaid = 'barmaid',
+  BodyGuard = 'body.guard',
   DefaultClient = 'client.default',
   RumBottle = 'bottle.rum',
   DefaultGlass = 'glass.default',

@@ -6,6 +6,7 @@ import { IngredientExtended } from './dynamic/IngredientExtended';
 import { Cocktail, CocktailKey } from './static/Cocktail';
 import { Employee, EmployeeKey } from './static/Employee';
 import { IngredientKey } from './static/Ingredient';
+import { IngredientProvided } from './static/IngredientProvided';
 import { ProviderKey } from './static/Provider';
 
 export type IngredientMapper = Map<
@@ -14,6 +15,8 @@ export type IngredientMapper = Map<
 >;
 
 export type CocktailMapper = Map<CocktailKey, CocktailExtended>;
+
+export type EmployeeMapper = Map<EmployeeKey, Employee>;
 
 export class Inventory {
   @observable
@@ -26,7 +29,7 @@ export class Inventory {
   private readonly _cocktails: CocktailMapper;
 
   @observable
-  private readonly _employees: Set<EmployeeKey>;
+  private readonly _employees: EmployeeMapper;
 
   private $service?: Service;
 
@@ -34,7 +37,7 @@ export class Inventory {
     cash: number,
     ingredients: IngredientMapper = new Map(),
     cocktails: CocktailMapper = new Map(),
-    employees: Set<EmployeeKey> = new Set()
+    employees: EmployeeMapper = new Map()
   ) {
     this._cash = cash;
     this._ingredients = ingredients;
@@ -62,6 +65,11 @@ export class Inventory {
     return allValues;
   }
 
+  @computed
+  public get employees(): Employee[] {
+    return Array.from(this._employees.values());
+  }
+
   public getGlobalIngredientStock(ingredientKey: IngredientKey): number {
     const providers = this._ingredients.get(ingredientKey);
     if (providers === undefined) {
@@ -84,14 +92,11 @@ export class Inventory {
     return providers.get(providerKey)?.stock ?? 0;
   }
 
-  public isIngredientDisabled(ingredient: IngredientExtended): boolean {
+  public isIngredientDisabled(ingredient: IngredientProvided): boolean {
     return (
       this._cash <
-      ingredient.provided.price *
-        this.getIngredientStock(
-          ingredient.provided.base.key,
-          ingredient.provided.providerKey
-        ) +
+      ingredient.price *
+        this.getIngredientStock(ingredient.base.key, ingredient.providerKey) +
         1
     );
   }
@@ -205,7 +210,7 @@ export class Inventory {
     }
 
     this._cash -= employee.price;
-    this._employees.add(employee.key);
+    this._employees.set(employee.key, employee);
     this.$service?.setCash(this._cash);
     this.$service?.addEmployee(employee.key);
   }

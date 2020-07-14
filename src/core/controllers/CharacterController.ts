@@ -1,6 +1,7 @@
 import { Store } from '../../store';
 import { BarmaidBuilder } from '../builders/BarmaidBuilder';
 import { ClientBuilder } from '../builders/ClientBuilder';
+import { EmployeeBuilder } from '../builders/EmployeeBuilder';
 import { Barmaid } from '../characters/Barmaid';
 import { Client } from '../characters/Client';
 import { IBehavioral } from '../characters/IBehavioral';
@@ -14,12 +15,14 @@ export class CharacterController implements IController {
 
   private readonly _visitors: IBehavioral[];
   private readonly _leaving: Client[];
+  private _employees: IBehavioral[];
 
   private _barmaid?: Barmaid;
 
   constructor() {
     this._visitors = [];
     this._leaving = [];
+    this._employees = [];
   }
 
   /** Interface **/
@@ -157,7 +160,18 @@ export class CharacterController implements IController {
     }
   }
 
-  public daily(scene: IScene, store: Store, day: number): void {}
+  public daily(scene: IScene, store: Store, day: number): void {
+    for (const former of this._employees) {
+      former.destroy();
+    }
+    this._employees = [];
+
+    const builder = new EmployeeBuilder(scene);
+    for (const employee of store.inventory.employees) {
+      const employeeGo = builder.build(employee.key);
+      this._employees.push(employeeGo);
+    }
+  }
 
   /** Custom **/
   private createClient(scene: IScene) {
