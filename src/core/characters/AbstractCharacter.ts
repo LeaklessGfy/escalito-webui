@@ -1,4 +1,3 @@
-import { IScene } from '../scenes/IScene';
 import { AnimKey } from '../sprites/AnimKey';
 import { Point } from '../sprites/Point';
 import { SpriteKey } from '../sprites/SpriteKey';
@@ -8,7 +7,6 @@ export abstract class AbstractCharacter {
   private static readonly SPEED: number = 2;
 
   protected readonly _state: State;
-  protected readonly _scene: IScene;
   protected readonly _sprite: Phaser.GameObjects.Sprite;
   private readonly _texture: SpriteKey;
 
@@ -18,13 +16,8 @@ export abstract class AbstractCharacter {
   private _onArrive?: Function;
   private _onLeave?: Function;
 
-  constructor(
-    scene: IScene,
-    sprite: Phaser.GameObjects.Sprite,
-    texture: SpriteKey
-  ) {
+  constructor(sprite: Phaser.GameObjects.Sprite, texture: SpriteKey) {
     this._state = new State();
-    this._scene = scene;
     this._sprite = sprite;
     this._texture = texture;
   }

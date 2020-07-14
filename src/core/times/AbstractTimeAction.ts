@@ -4,7 +4,7 @@ import { ITimeAction } from './ITimeAction';
 
 export abstract class AbstractTimeAction implements ITimeAction {
   private readonly _overflow: number;
-  private _nextTime: number;
+  private _delta: number;
   private _repetion: number;
 
   constructor(
@@ -13,17 +13,28 @@ export abstract class AbstractTimeAction implements ITimeAction {
     repetition: number = -1
   ) {
     this._overflow = ClockController.computeOverflow(triggerTime, triggerUnit);
-    this._nextTime = this._overflow;
+    this._delta = 0;
     this._repetion = repetition;
   }
 
-  public isEnable(currentTime: number): boolean {
+  public shouldTrigger(delta: number): boolean {
     const shouldRepeat = this._repetion === -1 || this._repetion > 0;
-    return shouldRepeat && this.condition() && currentTime >= this._nextTime;
+
+    if (!shouldRepeat) {
+      return false;
+    }
+
+    this._delta += delta;
+
+    if (this._delta < this._overflow) {
+      return false;
+    }
+
+    return this.condition();
   }
 
-  public trigger(currentTime: number): void {
-    this._nextTime = currentTime + this._overflow;
+  public trigger(): void {
+    this._delta = 0;
     this._repetion =
       this._repetion === -1 ? this._repetion : this._repetion - 1;
     this.action();

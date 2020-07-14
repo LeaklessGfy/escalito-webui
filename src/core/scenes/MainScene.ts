@@ -72,7 +72,7 @@ export class MainScene extends Phaser.Scene implements IScene {
     for (const controller of this._controllers.values()) {
       controller.update(this, delta);
     }
-    this._timeManager.tick(delta);
+    this._timeManager.update(delta);
   }
 
   public getController<T extends IController>(key: Symbol): T {

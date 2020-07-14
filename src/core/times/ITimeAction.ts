@@ -1,4 +1,4 @@
 export interface ITimeAction {
-  isEnable(currentTime: number): boolean;
-  trigger(currentTime: number): void;
+  shouldTrigger(delta: number): boolean;
+  trigger(): void;
 }

@@ -1,9 +1,6 @@
 import { Point } from './sprites/Point';
-import { PositionKey } from './sprites/PositionKey';
 
 export class Settings {
-  private readonly _bag: Map<PositionKey, Point> = new Map();
-
   public scene?: Phaser.Scene;
   public readonly floorHeight: number = 20;
 
@@ -41,15 +38,17 @@ export class Settings {
     };
   }
 
-  public getPosition(key: PositionKey): Point {
-    const position = this._bag.get(key);
-    if (position === undefined) {
-      throw new Error(`Position with key ${key} is undefined`);
-    }
-    return position;
+  public get barPosition(): Point {
+    return {
+      x: this.middleWidth,
+      y: this.floor
+    };
   }
 
-  public addPosition(key: PositionKey, position: Point): void {
-    this._bag.set(key, position);
+  public get spawnPosition(): Point {
+    return {
+      x: 100,
+      y: this.floor
+    };
   }
 }

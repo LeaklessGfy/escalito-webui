@@ -6,7 +6,6 @@ import {
 } from '../cocktails/GameIngredient';
 import { Glass } from '../cocktails/Glass';
 import { IScene } from '../scenes/IScene';
-import { PositionKey } from '../sprites/PositionKey';
 import { SpriteKey } from '../sprites/SpriteKey';
 import { IController } from './IController';
 import { SelectController } from './SelectControllers';
@@ -32,8 +31,8 @@ export class BarController implements IController {
   }
 
   public create(scene: IScene): void {
-    const x = scene.settings.middleWidth;
-    const y = scene.settings.floor;
+    const { x, y } = scene.settings.barPosition;
+    const xDoor = scene.settings.spawnPosition.x;
 
     const spriteBar = scene.add.sprite(x, y, SpriteKey.Bar);
     spriteBar
@@ -41,14 +40,12 @@ export class BarController implements IController {
       .setScale(0.8)
       .setDepth(1)
       .setName('Bar');
-    scene.settings.addPosition(PositionKey.Bar, spriteBar);
 
-    const spriteBarTop = scene.add.sprite(x, y - 80, SpriteKey.BarTop);
-    spriteBarTop.setScale(0.8);
+    const spriteBarTop = scene.add.sprite(x, y, SpriteKey.BarTop);
+    spriteBarTop.setY(y - 80).setScale(0.8);
 
-    const spriteDoor = scene.add.image(100, y, SpriteKey.Door, 'close.png');
+    const spriteDoor = scene.add.image(xDoor, y, SpriteKey.Door, 'close.png');
     spriteDoor.setY(y + 10 - spriteDoor.frame.height / 2).setName('Door');
-    scene.settings.addPosition(PositionKey.Door, spriteDoor);
 
     scene.add.rectangle(
       scene.settings.middleWidth,

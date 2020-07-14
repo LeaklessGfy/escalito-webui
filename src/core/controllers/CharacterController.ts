@@ -3,9 +3,9 @@ import { Store } from '../../store';
 import { Barmaid } from '../characters/Barmaid';
 import { CharacterFactory } from '../characters/CharacterFactory';
 import { Client } from '../characters/Client';
+import { IBehavioral } from '../characters/IBehavioral';
 import { IScene } from '../scenes/IScene';
 import { AnimKey } from '../sprites/AnimKey';
-import { PositionKey } from '../sprites/PositionKey';
 import { SpriteKey } from '../sprites/SpriteKey';
 import { IController } from './IController';
 
@@ -13,14 +13,14 @@ export class CharacterController implements IController {
   public static readonly KEY: Symbol = Symbol();
 
   private readonly _factory: CharacterFactory;
-  private readonly _clients: Client[];
+  private readonly _visitors: IBehavioral[];
   private readonly _leaving: Client[];
 
   private _barmaid?: Barmaid;
 
   constructor() {
     this._factory = new CharacterFactory();
-    this._clients = [];
+    this._visitors = [];
     this._leaving = [];
   }
 
@@ -121,31 +121,33 @@ export class CharacterController implements IController {
   }
 
   public update(scene: IScene, delta: number): void {
-    const c = this._clients;
-    const l = this._clients.length;
-    const barPosition = scene.settings.getPosition(PositionKey.Bar);
-    const spawnPosition = scene.settings.getPosition(PositionKey.Door);
+    const visitors = this._visitors;
+    const length = visitors.length;
 
     this._barmaid?.update(delta);
 
-    for (let i = 0; i < l; i++) {
-      const current = c[i];
-      let next = barPosition;
+    for (let i = 0; i < length; i++) {
+      const current = visitors[i];
+      let next = scene.settings.barPosition;
 
       // Has leader
-      if (i + 1 < l) {
-        next = c[i + 1].position;
+      if (i + 1 < length) {
+        next = visitors[i + 1].position;
       }
 
       current.update(delta);
-      current.behave(next, barPosition, spawnPosition);
+      current.behave(
+        next,
+        scene.settings.barPosition,
+        scene.settings.spawnPosition
+      );
     }
 
     let toRemove = 0;
     for (const leaving of this._leaving) {
       leaving.update(delta);
 
-      if (leaving.isNear(spawnPosition, 4)) {
+      if (leaving.isNear(scene.settings.spawnPosition, 4)) {
         leaving.destroy();
         toRemove++;
       }
@@ -175,10 +177,10 @@ export class CharacterController implements IController {
     };
 
     client.onLeave = () => {
-      this._clients.pop();
+      this._visitors.pop();
       this._leaving.push(client);
     };
 
-    this._clients.push(client);
+    this._visitors.push(client);
   }
 }
