@@ -15,10 +15,13 @@ export class BarController implements IController {
 
   private readonly _ingredients: GameIngredient[] = [];
 
+  private _door?: Phaser.GameObjects.Image;
   private _glass?: Glass;
   private _emitter?: Phaser.GameObjects.Particles.ParticleEmitter & {
     source?: Ingredient;
   };
+
+  public open: boolean = true;
 
   /** Interface **/
   public preload(scene: IScene): void {
@@ -44,8 +47,14 @@ export class BarController implements IController {
     const spriteBarTop = scene.add.sprite(x, y, SpriteKey.BarTop);
     spriteBarTop.setY(y - 80).setScale(0.8);
 
-    const spriteDoor = scene.add.image(xDoor, y, SpriteKey.Door, 'close.png');
-    spriteDoor.setY(y + 10 - spriteDoor.frame.height / 2).setName('Door');
+    this._door = scene.add.image(xDoor, y, SpriteKey.Door, 'open.png');
+    this._door
+      .setY(y + 10 - this._door.frame.height / 2)
+      .setInteractive()
+      .on('pointerdown', () => {
+        this.open = !this.open;
+      })
+      .setName('Door');
 
     scene.add.rectangle(
       scene.settings.middleWidth,
@@ -91,13 +100,29 @@ export class BarController implements IController {
     const selectCtr = scene.getController<SelectController>(
       SelectController.KEY
     );
-    selectCtr.addSelect(scene, spriteDoor);
+    selectCtr.addSelect(scene, this._door);
     selectCtr.addSelect(scene, spriteBar);
   }
 
   public update(scene: IScene, delta: number): void {
     for (const ingredient of this._ingredients) {
       ingredient.update(scene);
+    }
+
+    if (
+      this._door !== undefined &&
+      this.open &&
+      this._door.frame.name !== 'open.png'
+    ) {
+      this._door.setFrame('open.png');
+    }
+
+    if (
+      this._door !== undefined &&
+      !this.open &&
+      this._door.frame.name !== 'close.png'
+    ) {
+      this._door.setFrame('close.png');
     }
   }
 

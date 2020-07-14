@@ -1,7 +1,7 @@
-import { Order } from '../../entities/static/Order';
 import { Store } from '../../store';
+import { BarmaidBuilder } from '../builders/BarmaidBuilder';
+import { ClientBuilder } from '../builders/ClientBuilder';
 import { Barmaid } from '../characters/Barmaid';
-import { CharacterFactory } from '../characters/CharacterFactory';
 import { Client } from '../characters/Client';
 import { IBehavioral } from '../characters/IBehavioral';
 import { IScene } from '../scenes/IScene';
@@ -12,14 +12,12 @@ import { IController } from './IController';
 export class CharacterController implements IController {
   public static readonly KEY: Symbol = Symbol();
 
-  private readonly _factory: CharacterFactory;
   private readonly _visitors: IBehavioral[];
   private readonly _leaving: Client[];
 
   private _barmaid?: Barmaid;
 
   constructor() {
-    this._factory = new CharacterFactory();
     this._visitors = [];
     this._leaving = [];
   }
@@ -116,8 +114,8 @@ export class CharacterController implements IController {
       callback: () => {}
     });*/
 
-    this._barmaid = this._factory.buildBarmaid(scene);
-    // this.createClient(scene);
+    this._barmaid = new BarmaidBuilder(scene).build();
+    this.createClient(scene);
   }
 
   public update(scene: IScene, delta: number): void {
@@ -163,18 +161,7 @@ export class CharacterController implements IController {
 
   /** Custom **/
   private createClient(scene: IScene) {
-    const client = this._factory.buildClient(scene);
-
-    client.createOrder = () => {
-      const { cocktails } = scene.store.inventory;
-
-      if (cocktails.length < 1) {
-        return undefined;
-      }
-
-      const cocktail = cocktails[0]; // select based from hype and maybe other factor depending on client
-      return new Order(cocktail);
-    };
+    const client = new ClientBuilder(scene).build();
 
     client.onLeave = () => {
       this._visitors.pop();

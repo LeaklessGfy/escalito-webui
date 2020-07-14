@@ -65,6 +65,7 @@ export class MainScene extends Phaser.Scene implements IScene {
   public create(): void {
     for (const controller of this._controllers.values()) {
       controller.create(this);
+      controller.daily(this, this.store, 0);
     }
   }
 
