@@ -112,6 +112,9 @@ export class Client extends AbstractCharacter implements IBehavioral {
 
     this._orderText.setPosition(this._sprite.x, this._sprite.y);
     this._orderText.setText(this._order.title);
+    this._orderText.on('pointerdown', () => {
+      this._timeAwaited -= 1000;
+    });
     this._createCollider();
 
     return true;

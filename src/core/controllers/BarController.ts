@@ -97,6 +97,8 @@ export class BarController implements IController {
     const particle = scene.add.particles(SpriteKey.Square);
     this._emitter = particle.createEmitter(config);
 
+    console.log(this._emitter);
+
     const selectCtr = scene.getController<SelectController>(
       SelectController.KEY
     );
@@ -127,6 +129,7 @@ export class BarController implements IController {
   }
 
   public daily(scene: IScene, store: Store, day: number): void {
+    console.log('daily');
     for (const ingredient of store.inventory.ingredients) {
       this._ingredients.push(
         buildGameIngredient(scene, ingredient, this._emitter as any)

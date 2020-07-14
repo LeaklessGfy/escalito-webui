@@ -12,8 +12,8 @@ export class Bottle implements GameIngredient {
   };
 
   private readonly _ingredient: IngredientExtended;
-  private readonly _initialPosition: Point;
 
+  private _initialPosition?: Point;
   private _fullStock: number;
   private _currentStock: number;
   private _isFlowing: boolean;
@@ -27,7 +27,6 @@ export class Bottle implements GameIngredient {
     this._emitter = emitter;
 
     this._ingredient = ingredient;
-    this._initialPosition = { x: sprite.x, y: sprite.y };
 
     this._fullStock = ingredient.stock;
     this._currentStock = ingredient.stock;
@@ -35,6 +34,8 @@ export class Bottle implements GameIngredient {
   }
 
   public turnOn(position: Point): void {
+    this._initialPosition = { x: this._sprite.x, y: this._sprite.y };
+
     const x = position.x + this._sprite.displayHeight / 2;
     const y = position.y + this._sprite.displayWidth / 2;
 
@@ -53,7 +54,10 @@ export class Bottle implements GameIngredient {
 
   public turnOff(): void {
     this._sprite.setRotation(0);
-    this._sprite.setPosition(this._initialPosition.x, this._initialPosition.y);
+    this._sprite.setPosition(
+      this._initialPosition?.x,
+      this._initialPosition?.y
+    );
     this._isFlowing = false;
 
     this._emitter.stop();

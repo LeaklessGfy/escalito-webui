@@ -44,4 +44,11 @@ export class AudioController implements IController {
     }
     this._scene?.sound.play('laught');
   }
+
+  public playCash(): void {
+    if (!this._audioActivate) {
+      return;
+    }
+    this._scene?.sound.play('cash');
+  }
 }

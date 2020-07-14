@@ -63,11 +63,17 @@ export class ClientBuilder {
   }
 
   public get orderText(): Phaser.GameObjects.Text {
-    return this._scene.add
+    const text = this._scene.add
       .text(0, 0, '', ClientBuilder.STYLE)
       .setDepth(2)
-      .setInteractive()
-      .on('pointerdown', () => {});
+      .setInteractive();
+
+    const selectCtr = this._scene.getController<SelectController>(
+      SelectController.KEY
+    );
+    selectCtr.addSelect(this._scene, text);
+
+    return text;
   }
 
   public get createCollider(): Function {

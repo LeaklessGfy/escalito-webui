@@ -8,6 +8,7 @@ import { Employee, EmployeeKey } from './static/Employee';
 import { IngredientKey } from './static/Ingredient';
 import { IngredientProvided } from './static/IngredientProvided';
 import { ProviderKey } from './static/Provider';
+import { buildIngredientExtended } from './values/Ingredients';
 
 export type IngredientMapper = Map<
   IngredientKey,
@@ -70,6 +71,23 @@ export class Inventory {
     return Array.from(this._employees.values());
   }
 
+  public pay() {
+    const totalIngredients = this.ingredients.reduce(
+      (p, c) => p + c.provided.price,
+      0
+    );
+    const totalEmployees = this.employees.reduce((p, c) => p + c.salary, 0);
+
+    this._cash -= totalIngredients + totalEmployees;
+    this.$service?.setCash(this._cash);
+
+    return {
+      total: totalIngredients + totalEmployees,
+      totalIngredients,
+      totalEmployees
+    };
+  }
+
   public getGlobalIngredientStock(ingredientKey: IngredientKey): number {
     const providers = this._ingredients.get(ingredientKey);
     if (providers === undefined) {
@@ -109,11 +127,12 @@ export class Inventory {
     const providers =
       this._ingredients.get(ingredientKey) ??
       new Map<ProviderKey, IngredientExtended>();
-    const ingredientExtended = providers.get(providerKey);
+    const ingredientExtended =
+      providers.get(providerKey) ??
+      buildIngredientExtended(ingredientKey, providerKey, 0);
 
     if (ingredientExtended === undefined) {
-      // should create it or get it directly from arguments
-      throw new Error('');
+      throw new Error('Undefined ingredient extended');
     }
 
     const newIngredientExtended = new IngredientExtended(
