@@ -5,6 +5,7 @@ import { Bottle } from './Bottle';
 
 export interface GameIngredient {
   update(scene: IScene): void;
+  removeStock(nb: number): void;
 }
 
 export function buildGameIngredient(
@@ -15,9 +16,6 @@ export function buildGameIngredient(
   switch (ingredient.provided.base.type) {
     case IngredientType.Bottle:
       return Bottle.build(scene, ingredient, emitter);
-    case IngredientType.Fruits:
-      return {
-        update() {}
-      };
   }
+  throw new Error('Not defined game ingredient yet');
 }

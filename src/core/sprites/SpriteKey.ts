@@ -8,5 +8,6 @@ export enum SpriteKey {
   DefaultClient = 'client.default',
   RumBottle = 'bottle.rum',
   DefaultGlass = 'glass.default',
+  DefaultGlassMask = 'glass.default.mask',
   Square = 'square'
 }

@@ -1,4 +1,3 @@
-import { Ingredient } from '../../entities/static/Ingredient';
 import { Store } from '../../store';
 import {
   GameIngredient,
@@ -17,9 +16,7 @@ export class BarController implements IController {
 
   private _door?: Phaser.GameObjects.Image;
   private _glass?: Glass;
-  private _emitter?: Phaser.GameObjects.Particles.ParticleEmitter & {
-    source?: Ingredient;
-  };
+  private _emitter?: Phaser.GameObjects.Particles.ParticleEmitter;
 
   public open: boolean = true;
 
@@ -29,6 +26,10 @@ export class BarController implements IController {
     scene.load.image(SpriteKey.BarTop, 'assets/bar.top.png');
     scene.load.image(SpriteKey.RumBottle, 'assets/bottle.rum.png');
     scene.load.image(SpriteKey.DefaultGlass, 'assets/glass.default.png');
+    scene.load.image(
+      SpriteKey.DefaultGlassMask,
+      'assets/glass.default.mask.png'
+    );
     scene.load.image(SpriteKey.Square, 'assets/square.png');
     scene.load.multiatlas(SpriteKey.Door, 'assets/door.atlas.json', 'assets');
   }
@@ -67,37 +68,14 @@ export class BarController implements IController {
 
     this._glass = Glass.buildDefault(scene);
 
-    const config = {
+    const particle = scene.add.particles(SpriteKey.Square);
+    this._emitter = particle.createEmitter({
       x: scene.settings.middleWidth,
       y: 10,
       active: true,
       on: false,
-      gravityY: scene.settings.height,
-      deathZone: {
-        type: 'onEnter',
-        source: {
-          contains: (x: number, y: number) => {
-            if (
-              this._emitter?.source === undefined ||
-              this._glass === undefined
-            ) {
-              return false;
-            }
-
-            const hit = this._glass.body.hitTest(x, y);
-            if (hit) {
-              this._glass.addIngredient(this._emitter.source);
-            }
-            return hit;
-          }
-        }
-      }
-    };
-
-    const particle = scene.add.particles(SpriteKey.Square);
-    this._emitter = particle.createEmitter(config);
-
-    console.log(this._emitter);
+      gravityY: scene.settings.height
+    });
 
     const selectCtr = scene.getController<SelectController>(
       SelectController.KEY
