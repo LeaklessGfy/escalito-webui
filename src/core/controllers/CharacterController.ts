@@ -167,8 +167,8 @@ export class CharacterController implements IController {
     this._employees = [];
 
     const builder = new EmployeeBuilder(scene);
-    for (const employee of store.inventory.employees) {
-      const employeeGo = builder.build(employee.key);
+    for (const _ of store.inventory.employees) {
+      const employeeGo = builder.build();
       this._employees.push(employeeGo);
     }
   }

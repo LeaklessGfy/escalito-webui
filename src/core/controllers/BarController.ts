@@ -1,9 +1,10 @@
+import { GlassKey } from '../../entities/static/Glass';
 import { Store } from '../../store';
-import {
-  GameIngredient,
-  buildGameIngredient
-} from '../cocktails/GameIngredient';
+import { GlassBuilder } from '../builders/GlassBuilder';
+import { IngredientBuilder } from '../builders/IngredientBuilder';
 import { Glass } from '../cocktails/Glass';
+import { IIngredient } from '../cocktails/IIngredient';
+import { LiquidEmitter } from '../cocktails/LiquidEmitter';
 import { IScene } from '../scenes/IScene';
 import { SpriteKey } from '../sprites/SpriteKey';
 import { IController } from './IController';
@@ -12,7 +13,7 @@ import { SelectController } from './SelectControllers';
 export class BarController implements IController {
   public static readonly KEY: Symbol = Symbol();
 
-  private readonly _ingredients: GameIngredient[] = [];
+  private readonly _ingredients: IIngredient[] = [];
 
   private _door?: Phaser.GameObjects.Image;
   private _glass?: Glass;
@@ -66,8 +67,6 @@ export class BarController implements IController {
       1
     );
 
-    this._glass = Glass.buildDefault(scene);
-
     const particle = scene.add.particles(SpriteKey.Square);
     this._emitter = particle.createEmitter({
       x: scene.settings.middleWidth,
@@ -89,34 +88,46 @@ export class BarController implements IController {
       ingredient.update(scene);
     }
 
-    if (
-      this._door !== undefined &&
-      this.open &&
-      this._door.frame.name !== 'open.png'
-    ) {
-      this._door.setFrame('open.png');
+    if (this._door === undefined) {
+      return;
     }
 
-    if (
-      this._door !== undefined &&
-      !this.open &&
-      this._door.frame.name !== 'close.png'
-    ) {
+    if (this.open && this._door.frame.name !== 'open.png') {
+      this._door.setFrame('open.png');
+    } else if (!this.open && this._door.frame.name !== 'close.png') {
       this._door.setFrame('close.png');
     }
   }
 
   public daily(scene: IScene, store: Store, day: number): void {
-    console.log('daily');
+    const barCtr = scene.getController<BarController>(BarController.KEY);
+    const liquidEmitter = new LiquidEmitter(
+      barCtr,
+      this._emitter as Phaser.GameObjects.Particles.ParticleEmitter
+    );
+
     for (const ingredient of store.inventory.ingredients) {
-      this._ingredients.push(
-        buildGameIngredient(scene, ingredient, this._emitter as any)
-      );
+      const gameIngredient = new IngredientBuilder(
+        scene,
+        ingredient,
+        liquidEmitter
+      ).build();
+
+      this._ingredients.push(gameIngredient);
     }
   }
 
   /** Custom **/
-  public get glass() {
+  public get glass(): Glass | undefined {
     return this._glass;
+  }
+
+  public createGlass(scene: IScene, key: GlassKey): void {
+    this._glass = new GlassBuilder(scene).setGlassKey(key).build();
+  }
+
+  public destroyGlass() {
+    this._glass?.destroy();
+    this._glass = undefined;
   }
 }

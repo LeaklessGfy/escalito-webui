@@ -8,14 +8,15 @@ import { SpriteKey } from '../sprites/SpriteKey';
 export class EmployeeBuilder {
   private readonly _scene: IScene;
 
-  public key: EmployeeKey = EmployeeKey.BodyGuard;
+  private _key: EmployeeKey = EmployeeKey.BodyGuard;
+  private _sprite?: Phaser.GameObjects.Sprite;
 
   constructor(scene: IScene) {
     this._scene = scene;
   }
 
-  public get texture(): SpriteKey {
-    switch (this.key) {
+  public get spriteKey(): SpriteKey {
+    switch (this._key) {
       case EmployeeKey.BodyGuard:
         return SpriteKey.BodyGuard;
       default:
@@ -24,21 +25,28 @@ export class EmployeeBuilder {
   }
 
   public get sprite(): Phaser.GameObjects.Sprite {
+    if (this._sprite === undefined) {
+      throw new Error('Can not access sprite on un-build builder');
+    }
+    return this._sprite;
+  }
+
+  public build(): IBehavioral {
+    this.buildSprite();
+
+    return new BodyGuard(this);
+  }
+
+  private buildSprite() {
     const { x, y } = this._scene.settings.spawnPosition;
 
-    const sprite = this._scene.add.sprite(x, y, this.texture);
+    const sprite = this._scene.add.sprite(x, y, this.spriteKey);
 
     const selectCtr = this._scene.getController<SelectController>(
       SelectController.KEY
     );
     selectCtr.addSelect(this._scene, sprite);
 
-    return sprite;
-  }
-
-  public build(key: EmployeeKey): IBehavioral {
-    this.key = key;
-
-    return new BodyGuard(this);
+    this._sprite = sprite;
   }
 }

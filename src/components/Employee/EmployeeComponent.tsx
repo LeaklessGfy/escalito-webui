@@ -3,13 +3,13 @@ import { FunctionalComponent, h } from 'preact';
 
 import { useStore } from '../../store';
 
-const HireComponent: FunctionalComponent = () => {
+const EmployeeComponent: FunctionalComponent = () => {
   const { inventory, employeesArray } = useStore();
 
   return (
     <section class="card">
       <header class="card-header">
-        <h2 class="card-title">Hire</h2>
+        <h2 class="card-title">Employee</h2>
       </header>
 
       <div class="card-body">
@@ -42,4 +42,4 @@ const HireComponent: FunctionalComponent = () => {
   );
 };
 
-export default observer(HireComponent);
+export default observer(EmployeeComponent);

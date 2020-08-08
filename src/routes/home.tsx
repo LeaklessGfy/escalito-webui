@@ -2,8 +2,8 @@ import { observer } from 'mobx-react-lite';
 import { FunctionalComponent, h } from 'preact';
 import { route } from 'preact-router';
 
+import EmployeeComponent from '../components/Employee/EmployeeComponent';
 import GameComponent from '../components/Game/GameComponent';
-import HireComponent from '../components/Hire/HireComponent';
 import MenuComponent from '../components/Menu/MenuComponent';
 import ShopComponent from '../components/Shop/ShopComponent';
 import { useStore } from '../store';
@@ -21,7 +21,7 @@ const Home: FunctionalComponent = () => {
     <main>
       <ShopComponent />
       <MenuComponent />
-      <HireComponent />
+      <EmployeeComponent />
       <GameComponent />
     </main>
   );

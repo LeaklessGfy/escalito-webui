@@ -23,19 +23,105 @@ export class ClientBuilder {
 
   private readonly _scene: IScene;
 
-  public texture: SpriteKey = SpriteKey.DefaultClient;
-  public patience: number = ClientBuilder.PATIENCE;
-  public satisfactionThreshold: number = ClientBuilder.SATISFACTION_THRESHOLD;
-  public cash: number = 5;
+  private _spriteKey: SpriteKey = SpriteKey.DefaultClient;
+  private _sprite?: Phaser.GameObjects.Sprite;
+
+  private _waitingBox?: Phaser.GameObjects.Graphics;
+  private _waitingBar?: Phaser.GameObjects.Graphics;
+
+  private _orderText?: Phaser.GameObjects.Text;
+  private _createCollider?: Function;
+  private _createOrder?: Producer<Order | undefined>;
+  private _increment?: Function;
+
+  private _patience: number = ClientBuilder.PATIENCE;
+  private _satisfactionThreshold: number = ClientBuilder.SATISFACTION_THRESHOLD;
+  private _cash: number = 5;
 
   constructor(scene: IScene) {
     this._scene = scene;
   }
 
+  public get spriteKey(): SpriteKey {
+    return this._spriteKey;
+  }
+
   public get sprite(): Phaser.GameObjects.Sprite {
+    if (this._sprite === undefined) {
+      throw new Error('Can not access sprite on un-build builder');
+    }
+    return this._sprite;
+  }
+
+  public get waitingBox(): Phaser.GameObjects.Graphics {
+    if (this._waitingBox === undefined) {
+      throw new Error('Can not access waiting box on un-build builder');
+    }
+    return this._waitingBox;
+  }
+
+  public get waitingBar(): Phaser.GameObjects.Graphics {
+    if (this._waitingBar === undefined) {
+      throw new Error('Can not access waiting bar on un-build builder');
+    }
+    return this._waitingBar;
+  }
+
+  public get orderText(): Phaser.GameObjects.Text {
+    if (this._orderText === undefined) {
+      throw new Error('Can not access order text on un-build builder');
+    }
+    return this._orderText;
+  }
+
+  public get createCollider(): Function {
+    if (this._createCollider === undefined) {
+      throw new Error('Can not access create collider on un-build builder');
+    }
+    return this._createCollider;
+  }
+
+  public get createOrder(): Producer<Order | undefined> {
+    if (this._createOrder === undefined) {
+      throw new Error('Can not access create order on un-build builder');
+    }
+    return this._createOrder;
+  }
+
+  public get increment(): Function {
+    if (this._increment === undefined) {
+      throw new Error('Can not access increment on un-build builder');
+    }
+    return this._increment;
+  }
+
+  public get patience(): number {
+    return this._patience;
+  }
+
+  public get satisfactionThreshold(): number {
+    return this._satisfactionThreshold;
+  }
+
+  public get cash(): number {
+    return this._cash;
+  }
+
+  public build(): Client {
+    this.buildSprite();
+    this.buildWaiting();
+    this.buildOrderText();
+    this.buildCreateCollider();
+    this.buildCreateOrder();
+    this.buildIncrement();
+
+    return new Client(this);
+  }
+
+  private buildSprite() {
     const { x, y } = this._scene.settings.spawnPosition;
 
-    const sprite = this._scene.physics.add.sprite(x, y, this.texture);
+    const sprite = this._scene.physics.add.sprite(x, y, this._spriteKey);
     sprite
       .setScale(2)
       .setY(sprite.y - 20)
@@ -51,18 +137,15 @@ export class ClientBuilder {
     );
     selectCtr.addSelect(this._scene, sprite);
 
-    return sprite;
+    this._sprite = sprite;
   }
 
-  public get waitingBox(): Phaser.GameObjects.Graphics {
-    return this._scene.add.graphics().setDepth(2);
+  private buildWaiting() {
+    this._waitingBox = this._scene.add.graphics().setDepth(2);
+    this._waitingBar = this._scene.add.graphics().setDepth(3);
   }
 
-  public get waitingBar(): Phaser.GameObjects.Graphics {
-    return this._scene.add.graphics().setDepth(3);
-  }
-
-  public get orderText(): Phaser.GameObjects.Text {
+  private buildOrderText() {
     const text = this._scene.add
       .text(0, 0, '', ClientBuilder.STYLE)
       .setDepth(2)
@@ -73,13 +156,13 @@ export class ClientBuilder {
     );
     selectCtr.addSelect(this._scene, text);
 
-    return text;
+    this._orderText = text;
   }
 
-  public get createCollider(): Function {
+  private buildCreateCollider() {
     const scene = this._scene;
 
-    return function(this: Client) {
+    this._createCollider = function(this: Client) {
       const barCtr = scene.getController<BarController>(BarController.KEY);
 
       if (barCtr.glass === undefined) {
@@ -91,25 +174,17 @@ export class ClientBuilder {
         barCtr.glass.sprite,
         () => {
           this.serve(barCtr.glass);
+          barCtr.destroyGlass();
           collider.destroy();
         }
       );
     };
   }
 
-  public get increment(): Function {
+  private buildCreateOrder() {
     const scene = this._scene;
 
-    return function(this: Client) {
-      const mainCtr = scene.getController<MainController>(MainController.KEY);
-      mainCtr.increment(this, this.order);
-    };
-  }
-
-  public get createOrder(): Producer<Order | undefined> {
-    const scene = this._scene;
-
-    return function(this: Client) {
+    this._createOrder = function(this: Client) {
       const { cocktails } = scene.store.inventory;
 
       if (cocktails.length < 1) {
@@ -129,11 +204,20 @@ export class ClientBuilder {
         return undefined;
       }
 
+      scene
+        .getController<BarController>(BarController.KEY)
+        .createGlass(scene, cocktail.base.glassKey);
+
       return new Order(cocktail);
     };
   }
 
-  public build(): Client {
-    return new Client(this);
+  private buildIncrement() {
+    const scene = this._scene;
+
+    this._increment = function(this: Client) {
+      const mainCtr = scene.getController<MainController>(MainController.KEY);
+      mainCtr.increment(this, this.order);
+    };
   }
 }

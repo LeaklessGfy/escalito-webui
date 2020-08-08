@@ -63,14 +63,12 @@ export abstract class AbstractCharacter {
 
   public leaveTo(dst: Point): void {
     this._state.leave();
-    // waitingSlider.gameObject.SetActive(false);
     this._onLeave?.();
     this.moveTo(dst, 4);
   }
 
   public leaveToAsync(dst: Point): Promise<void> {
     this._state.leave();
-    // waitingSlider.gameObject.SetActive(false);
     this._onLeave?.();
     return this.moveToAsync(dst);
   }

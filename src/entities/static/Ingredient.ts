@@ -8,7 +8,7 @@ export enum IngredientKey {
 
 export enum IngredientType {
   Bottle,
-  Fruits
+  Fruit
 }
 
 export const IngredientNames: { [key in IngredientKey]: string } = {
@@ -31,8 +31,8 @@ const IngredientTypes: { [key in IngredientKey]: IngredientType } = {
   [IngredientKey.Rum]: IngredientType.Bottle,
   [IngredientKey.Cola]: IngredientType.Bottle,
   [IngredientKey.Lemonade]: IngredientType.Bottle,
-  [IngredientKey.Lemon]: IngredientType.Fruits,
-  [IngredientKey.Strawberry]: IngredientType.Fruits
+  [IngredientKey.Lemon]: IngredientType.Fruit,
+  [IngredientKey.Strawberry]: IngredientType.Fruit
 };
 
 export class Ingredient {

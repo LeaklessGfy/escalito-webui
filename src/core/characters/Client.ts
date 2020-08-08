@@ -22,12 +22,11 @@ export class Client extends AbstractCharacter implements IBehavioral {
   private _satisfaction: number;
   private _satisfactionThreshold: number;
   private _order?: Order;
-  private _onExhaust?: Function;
 
   private _waitingPos: Point = { x: 0, y: 0 };
 
   constructor(builder: ClientBuilder) {
-    super(builder.sprite, builder.texture);
+    super(builder.sprite, builder.spriteKey);
 
     this._waitingBox = builder.waitingBox;
     this._waitingBar = builder.waitingBar;
@@ -161,6 +160,8 @@ export class Client extends AbstractCharacter implements IBehavioral {
     this._increment();
     this._order = undefined;
     this._orderText.destroy();
+    this._waitingBox.clear().destroy();
+    this._waitingBar.clear().destroy();
   }
 
   private stepWait(delta: number): void {
@@ -188,10 +189,6 @@ export class Client extends AbstractCharacter implements IBehavioral {
     }
 
     this._state.exhaust();
-    this._onExhaust?.();
-    this._onExhaust = undefined;
-    this._waitingBox.clear().destroy();
-    this._waitingBar.clear().destroy();
   }
 
   private computeSatisfaction(glass?: Glass): number {

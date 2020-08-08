@@ -1,16 +1,14 @@
 import { IngredientExtended } from '../../entities/dynamic/IngredientExtended';
-import { BarController } from '../controllers/BarController';
-import { SelectController } from '../controllers/SelectControllers';
+import { BottleBuilder } from '../builders/BottleBuilder';
 import { IScene } from '../scenes/IScene';
 import { Point } from '../sprites/Point';
-import { SpriteKey } from '../sprites/SpriteKey';
-import { GameIngredient } from './GameIngredient';
+import { IEmitter } from './IEmitter';
+import { IIngredient } from './IIngredient';
 
-export class Bottle implements GameIngredient {
-  private readonly _sprite: Phaser.GameObjects.Sprite;
+export class Bottle implements IIngredient {
   private readonly _ingredient: IngredientExtended;
-  private readonly _emitter: Phaser.GameObjects.Particles.ParticleEmitter;
-  private readonly _barCtr: BarController;
+  private readonly _sprite: Phaser.GameObjects.Sprite;
+  private readonly _emitter: IEmitter;
 
   private _initialPosition?: Point;
   private _glassPosition?: Point;
@@ -18,19 +16,17 @@ export class Bottle implements GameIngredient {
   private _currentStock: number;
   private _isFlowing: boolean;
 
-  constructor(
-    sprite: Phaser.GameObjects.Sprite,
-    ingredient: IngredientExtended,
-    emitter: Phaser.GameObjects.Particles.ParticleEmitter,
-    barCtr: BarController
-  ) {
-    this._sprite = sprite;
-    this._ingredient = ingredient;
-    this._emitter = emitter;
-    this._barCtr = barCtr;
+  constructor(builder: BottleBuilder) {
+    this._ingredient = builder.ingredient;
+    this._sprite = builder.sprite;
+    this._emitter = builder.emitter;
 
-    this._currentStock = ingredient.stock;
+    this._currentStock = builder.ingredient.stock;
     this._isFlowing = false;
+
+    this._sprite.on('pointerdown', () => {
+      this.turnOn({ x: 0, y: 0 });
+    });
   }
 
   public turnOn(position: Point): void {
@@ -52,17 +48,9 @@ export class Bottle implements GameIngredient {
   }
 
   public update(scene: IScene): void {
-    const glass = this._barCtr.glass;
-
-    if (glass !== undefined) {
-      this._emitter.forEachAlive(p => {
-        if (glass.body.hitTest(p.x, p.y)) {
-          glass.addIngredient(this._ingredient.provided.base);
-          this.removeStock(1);
-          p.lifeCurrent = 0;
-        }
-      }, scene);
-    }
+    this._emitter.checkCollision(scene, this._ingredient, () => {
+      this.removeStock(1);
+    });
 
     if (this._isFlowing) {
       this.flow(scene);
@@ -91,16 +79,15 @@ export class Bottle implements GameIngredient {
     const hasArrived = this.moveTo(this._glassPosition);
 
     if (hasArrived) {
-      this._emitter.setTint(this._ingredient.provided.base.color);
-      this._emitter.setPosition(
-        this._glassPosition.x - this._sprite.displayHeight / 2,
-        this._glassPosition.y + 10
-      );
-      this._emitter.start();
+      const point = {
+        x: this._glassPosition.x - this._sprite.displayHeight / 2,
+        y: this._glassPosition.y + 10
+      };
+      this._emitter.start(this._ingredient, point);
     }
   }
 
-  private unflow(scene: IScene) {
+  private unflow(scene: IScene): void {
     if (this._initialPosition === undefined) {
       return;
     }
@@ -129,31 +116,5 @@ export class Bottle implements GameIngredient {
     }
 
     return move;
-  }
-
-  public static build(
-    scene: IScene,
-    ingredient: IngredientExtended,
-    emitter: Phaser.GameObjects.Particles.ParticleEmitter
-  ): Bottle {
-    const { x, y } = scene.settings.bottlePosition;
-    const sprite = scene.add.sprite(x, y, SpriteKey.RumBottle);
-    const barCtr = scene.getController<BarController>(BarController.KEY);
-    const bottle = new Bottle(sprite, ingredient, emitter, barCtr);
-
-    sprite
-      .setY(y - sprite.displayHeight / 2)
-      .setName(ingredient.provided.base.name)
-      .setInteractive()
-      .on('pointerdown', () => {
-        bottle.turnOn({ x: scene.settings.middleWidth, y: 0 });
-      });
-
-    const selectCtr = scene.getController<SelectController>(
-      SelectController.KEY
-    );
-    selectCtr.addSelect(scene, sprite);
-
-    return bottle;
   }
 }

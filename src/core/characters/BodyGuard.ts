@@ -5,7 +5,7 @@ import { IBehavioral } from './IBehavioral';
 
 export class BodyGuard extends AbstractCharacter implements IBehavioral {
   constructor(builder: EmployeeBuilder) {
-    super(builder.sprite, builder.texture);
+    super(builder.sprite, builder.spriteKey);
   }
 
   behave(next: Point, bar: Point, spawn: Point): void {}

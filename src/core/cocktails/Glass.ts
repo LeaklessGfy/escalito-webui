@@ -1,7 +1,5 @@
 import { Ingredient, IngredientKey } from '../../entities/static/Ingredient';
-import { SelectController } from '../controllers/SelectControllers';
-import { IScene } from '../scenes/IScene';
-import { SpriteKey } from '../sprites/SpriteKey';
+import { GlassBuilder } from '../builders/GlassBuilder';
 
 interface IngredientInfo {
   ingredient: Ingredient;
@@ -14,14 +12,10 @@ export class Glass {
   private readonly _graphics: Phaser.GameObjects.Graphics;
   private readonly _recipe: Map<IngredientKey, IngredientInfo>;
 
-  constructor(
-    sprite: Phaser.GameObjects.Sprite,
-    mask: Phaser.GameObjects.Sprite,
-    graphics: Phaser.GameObjects.Graphics
-  ) {
-    this._sprite = sprite;
-    this._mask = mask;
-    this._graphics = graphics;
+  constructor(builder: GlassBuilder) {
+    this._sprite = builder.sprite;
+    this._mask = builder.mask;
+    this._graphics = builder.graphics;
     this._recipe = new Map();
 
     this._sprite.on('drag', (p: any, x: number, y: number) => {
@@ -59,6 +53,12 @@ export class Glass {
     this.updateGraphics();
   }
 
+  public destroy() {
+    this._sprite.destroy();
+    this._mask.destroy();
+    this._graphics.clear().destroy();
+  }
+
   private updateGraphics() {
     this._graphics.clear();
     const { x, y } = this._sprite;
@@ -74,41 +74,5 @@ export class Glass {
       this._graphics.fillRect(bottomX, lastY - height, width, height);
       lastY -= height;
     }
-  }
-
-  public static buildDefault(scene: IScene): Glass {
-    const { x, y } = scene.settings.glassPosition;
-    const sprite = scene.physics.add.sprite(x, y, SpriteKey.DefaultGlass);
-    sprite
-      .setScale(0.5)
-      .setY(y - sprite.displayHeight / 2)
-      .setInteractive()
-      .setName('Glass')
-      .setGravity(-1)
-      .setDepth(3);
-
-    const body = sprite.body as Phaser.Physics.Arcade.Body;
-    body.collideWorldBounds = true;
-    body.allowGravity = false;
-
-    const mask = scene.make.sprite({
-      x: sprite.x,
-      y: sprite.y,
-      key: SpriteKey.DefaultGlassMask,
-      scale: 0.5,
-      add: false
-    });
-
-    const spriteMask = new Phaser.Display.Masks.BitmapMask(scene, mask);
-    const graphics = scene.add.graphics().setMask(spriteMask);
-
-    scene.input.setDraggable(sprite);
-
-    const selectCtr = scene.getController<SelectController>(
-      SelectController.KEY
-    );
-    selectCtr.addSelect(scene, sprite);
-
-    return new Glass(sprite, mask, graphics);
   }
 }
