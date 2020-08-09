@@ -1,5 +1,5 @@
+import { IPoint } from '../../entities/game/IPoint';
 import { AnimKey } from '../sprites/AnimKey';
-import { Point } from '../sprites/Point';
 import { SpriteKey } from '../sprites/SpriteKey';
 import { State } from './State';
 
@@ -10,7 +10,7 @@ export abstract class AbstractCharacter {
   protected readonly _sprite: Phaser.GameObjects.Sprite;
   private readonly _texture: SpriteKey;
 
-  private _dst?: Point;
+  private _dst?: IPoint;
   private _distance: number = 0;
 
   private _onArrive?: Function;
@@ -22,7 +22,7 @@ export abstract class AbstractCharacter {
     this._texture = texture;
   }
 
-  public get position(): Point {
+  public get position(): IPoint {
     return this._sprite;
   }
 
@@ -38,7 +38,7 @@ export abstract class AbstractCharacter {
     }
   }
 
-  public moveTo(dst: Point, distance: number = 0): void {
+  public moveTo(dst: IPoint, distance: number = 0): void {
     if (dst === this._dst) {
       return;
     }
@@ -52,7 +52,7 @@ export abstract class AbstractCharacter {
     }
   }
 
-  public moveToAsync(dst: Point, distance: number = 0): Promise<void> {
+  public moveToAsync(dst: IPoint, distance: number = 0): Promise<void> {
     this._onArrive?.(false);
     const promise = new Promise<void>(resolve => {
       this._onArrive = resolve;
@@ -61,19 +61,19 @@ export abstract class AbstractCharacter {
     return promise;
   }
 
-  public leaveTo(dst: Point): void {
+  public leaveTo(dst: IPoint): void {
     this._state.leave();
     this._onLeave?.();
     this.moveTo(dst, 4);
   }
 
-  public leaveToAsync(dst: Point): Promise<void> {
+  public leaveToAsync(dst: IPoint): Promise<void> {
     this._state.leave();
     this._onLeave?.();
     return this.moveToAsync(dst);
   }
 
-  public isNear(dst: Point | undefined, distance: number = 0): boolean {
+  public isNear(dst: IPoint | undefined, distance: number = 0): boolean {
     if (dst == null) {
       return false;
     }

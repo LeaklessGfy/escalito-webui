@@ -1,9 +1,9 @@
+import { IScene } from '../../entities/game/IScene';
 import { Order } from '../../entities/static/Order';
 import { Client } from '../characters/Client';
 import { BarController } from '../controllers/BarController';
 import { MainController } from '../controllers/MainController';
 import { SelectController } from '../controllers/SelectControllers';
-import { IScene } from '../scenes/IScene';
 import { Bar } from '../sprites/Bar';
 import { SpriteKey } from '../sprites/SpriteKey';
 import { Producer } from '../utils/Interfaces';
@@ -179,7 +179,7 @@ export class ClientBuilder {
     const scene = this._scene;
 
     this._createOrder = function(this: Client) {
-      const { cocktails } = scene.store.inventory;
+      const { cocktails } = scene.inventory.current;
 
       if (cocktails.length < 1) {
         return undefined;

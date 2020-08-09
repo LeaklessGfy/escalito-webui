@@ -3,7 +3,7 @@ import { FunctionalComponent, h } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 import { createGame } from '../../core/Game';
-import { IScene } from '../../core/scenes/IScene';
+import { IScene } from '../../entities/game/IScene';
 import { useStore } from '../../store';
 
 const GameComponent: FunctionalComponent = () => {

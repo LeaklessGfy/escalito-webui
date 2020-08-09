@@ -1,6 +1,7 @@
-import { Point } from './sprites/Point';
+import { IPoint } from '../entities/game/IPoint';
+import { ISettings } from '../entities/game/ISettings';
 
-export class Settings {
+export class Settings implements ISettings {
   public scene?: Phaser.Scene;
   public readonly floorHeight: number = 20;
 
@@ -24,28 +25,28 @@ export class Settings {
     return this.height - this.floorHeight;
   }
 
-  public get bottlePosition(): Point {
+  public get bottlePosition(): IPoint {
     return {
       x: this.middleWidth + this.middleWidth / 2,
       y: this.middleHeight
     };
   }
 
-  public get glassPosition(): Point {
+  public get glassPosition(): IPoint {
     return {
       x: this.middleWidth,
       y: this.middleHeight
     };
   }
 
-  public get barPosition(): Point {
+  public get barPosition(): IPoint {
     return {
       x: this.middleWidth,
       y: this.floor
     };
   }
 
-  public get spawnPosition(): Point {
+  public get spawnPosition(): IPoint {
     return {
       x: 100,
       y: this.floor

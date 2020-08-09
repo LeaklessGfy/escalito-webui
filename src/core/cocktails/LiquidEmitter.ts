@@ -1,8 +1,8 @@
 import { IngredientExtended } from '../../entities/dynamic/IngredientExtended';
+import { IEmitter } from '../../entities/game/IEmitter';
+import { IPoint } from '../../entities/game/IPoint';
+import { IScene } from '../../entities/game/IScene';
 import { BarController } from '../controllers/BarController';
-import { IScene } from '../scenes/IScene';
-import { Point } from '../sprites/Point';
-import { IEmitter } from './IEmitter';
 
 export class LiquidEmitter implements IEmitter {
   private readonly _barCtr: BarController;
@@ -18,7 +18,7 @@ export class LiquidEmitter implements IEmitter {
     this._emitter = emitter;
   }
 
-  public start(ingredient: IngredientExtended, point: Point): void {
+  public start(ingredient: IngredientExtended, point: IPoint): void {
     this._emitting = true;
     this._emitter.setTint(ingredient.provided.base.color);
     this._emitter.setPosition(point.x, point.y);

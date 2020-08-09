@@ -1,5 +1,5 @@
 import { Store } from '../../store';
-import { IScene } from '../scenes/IScene';
+import { IScene } from './IScene';
 
 export interface IController {
   preload(scene: IScene): void;

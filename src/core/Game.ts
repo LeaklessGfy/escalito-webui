@@ -1,7 +1,8 @@
 import * as Phaser from 'phaser';
 
+import { IScene } from '../entities/game/IScene';
 import { Store } from '../store';
-import { IScene } from './scenes/IScene';
+import { InventoryProxy } from './InventoryProxy';
 import { MainScene } from './scenes/MainScene';
 
 export function createGame(
@@ -9,7 +10,10 @@ export function createGame(
   store: Store
 ): Promise<IScene> {
   return new Promise(resolve => {
-    const scene = new MainScene(store);
+    const proxy = new InventoryProxy(store.inventory);
+    proxy.watch();
+
+    const scene = new MainScene(proxy);
     const game = new Phaser.Game({
       type: Phaser.WEBGL,
       canvas: canvas,

@@ -1,9 +1,9 @@
+import { IController } from '../../entities/game/IController';
+import { IScene } from '../../entities/game/IScene';
 import { Order } from '../../entities/static/Order';
 import { Store } from '../../store';
 import { Client } from '../characters/Client';
-import { IScene } from '../scenes/IScene';
 import { AudioController } from './AudioController';
-import { IController } from './IController';
 
 export class MainController implements IController {
   public static readonly KEY = Symbol();

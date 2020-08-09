@@ -1,12 +1,12 @@
+import { IBehavioral } from '../../entities/game/IBehavioral';
+import { IPoint } from '../../entities/game/IPoint';
 import { Order } from '../../entities/static/Order';
 import { ClientBuilder } from '../builders/ClientBuilder';
 import { Glass } from '../cocktails/Glass';
 import { Bar } from '../sprites/Bar';
-import { Point } from '../sprites/Point';
 import { Producer } from '../utils/Interfaces';
 import { TintHelper } from '../utils/TintHelper';
 import { AbstractCharacter } from './AbstractCharacter';
-import { IBehavioral } from './IBehavioral';
 
 export class Client extends AbstractCharacter implements IBehavioral {
   private static readonly WAITING_BAR_HEIGHT: number = 5;
@@ -23,7 +23,7 @@ export class Client extends AbstractCharacter implements IBehavioral {
   private _satisfactionThreshold: number;
   private _order?: Order;
 
-  private _waitingPos: Point = { x: 0, y: 0 };
+  private _waitingPos: IPoint = { x: 0, y: 0 };
 
   constructor(builder: ClientBuilder) {
     super(builder.sprite, builder.spriteKey);
@@ -67,7 +67,7 @@ export class Client extends AbstractCharacter implements IBehavioral {
     }
   }
 
-  public behave(next: Point, bar: Point, spawn: Point): void {
+  public behave(next: IPoint, bar: IPoint, spawn: IPoint): void {
     if (this._state.leaving) {
       throw new Error('Client should not behave while leaving');
     }

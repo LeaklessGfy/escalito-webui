@@ -1,19 +1,19 @@
+import { IController } from '../../entities/game/IController';
+import { IScene } from '../../entities/game/IScene';
+import { IngredientGameObject } from '../../entities/game/IngredientGameObject';
 import { GlassKey } from '../../entities/static/Glass';
 import { Store } from '../../store';
 import { GlassBuilder } from '../builders/GlassBuilder';
 import { IngredientBuilder } from '../builders/IngredientBuilder';
 import { Glass } from '../cocktails/Glass';
-import { IIngredient } from '../cocktails/IIngredient';
 import { LiquidEmitter } from '../cocktails/LiquidEmitter';
-import { IScene } from '../scenes/IScene';
 import { SpriteKey } from '../sprites/SpriteKey';
-import { IController } from './IController';
 import { SelectController } from './SelectControllers';
 
 export class BarController implements IController {
-  public static readonly KEY: Symbol = Symbol();
+  public static readonly KEY = Symbol();
 
-  private readonly _ingredients: IIngredient[] = [];
+  private readonly _ingredients: IngredientGameObject[] = [];
 
   private _door?: Phaser.GameObjects.Image;
   private _glass?: Glass;

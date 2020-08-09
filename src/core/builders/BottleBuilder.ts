@@ -1,10 +1,10 @@
 import { IngredientExtended } from '../../entities/dynamic/IngredientExtended';
+import { IEmitter } from '../../entities/game/IEmitter';
+import { IScene } from '../../entities/game/IScene';
 import { IngredientKey } from '../../entities/static/Ingredient';
 import { Bottle } from '../cocktails/Bottle';
-import { IEmitter } from '../cocktails/IEmitter';
 import { BarController } from '../controllers/BarController';
 import { SelectController } from '../controllers/SelectControllers';
-import { IScene } from '../scenes/IScene';
 import { Bar } from '../sprites/Bar';
 import { SpriteKey } from '../sprites/SpriteKey';
 

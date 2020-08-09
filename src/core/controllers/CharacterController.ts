@@ -1,17 +1,17 @@
+import { IBehavioral } from '../../entities/game/IBehavioral';
+import { IController } from '../../entities/game/IController';
+import { IScene } from '../../entities/game/IScene';
 import { Store } from '../../store';
 import { BarmaidBuilder } from '../builders/BarmaidBuilder';
 import { ClientBuilder } from '../builders/ClientBuilder';
 import { EmployeeBuilder } from '../builders/EmployeeBuilder';
 import { Barmaid } from '../characters/Barmaid';
 import { Client } from '../characters/Client';
-import { IBehavioral } from '../characters/IBehavioral';
-import { IScene } from '../scenes/IScene';
 import { AnimKey } from '../sprites/AnimKey';
 import { SpriteKey } from '../sprites/SpriteKey';
-import { IController } from './IController';
 
 export class CharacterController implements IController {
-  public static readonly KEY: Symbol = Symbol();
+  public static readonly KEY = Symbol();
 
   private readonly _visitors: IBehavioral[];
   private readonly _leaving: Client[];

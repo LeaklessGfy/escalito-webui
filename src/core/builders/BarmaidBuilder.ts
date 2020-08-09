@@ -1,6 +1,6 @@
+import { IScene } from '../../entities/game/IScene';
 import { Barmaid } from '../characters/Barmaid';
 import { SelectController } from '../controllers/SelectControllers';
-import { IScene } from '../scenes/IScene';
 import { SpriteKey } from '../sprites/SpriteKey';
 
 export class BarmaidBuilder {

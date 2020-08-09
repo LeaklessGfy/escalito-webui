@@ -1,11 +1,11 @@
+import { IDimension } from '../../entities/game/IDimension';
 import { TintHelper } from '../utils/TintHelper';
-import { Dimension } from './Dimension';
 
 export class Bar {
   private readonly _background: Phaser.GameObjects.Graphics;
   private readonly _foreground: Phaser.GameObjects.Graphics;
 
-  private _dimension: Dimension = {
+  private _dimension: IDimension = {
     x: 0,
     y: 0,
     width: 0,
@@ -20,7 +20,7 @@ export class Bar {
     this._foreground = foreground;
   }
 
-  public show(dimension: Dimension) {
+  public show(dimension: IDimension) {
     this._dimension = dimension;
     this.fillBackground();
     this.fillForeground(100);

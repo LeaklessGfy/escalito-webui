@@ -24,7 +24,7 @@ export class Inventory {
   private _cash: number;
 
   @observable
-  private readonly _ingredients: IngredientMapper;
+  public readonly _ingredients: IngredientMapper;
 
   @observable
   private readonly _cocktails: CocktailMapper;

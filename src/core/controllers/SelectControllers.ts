@@ -1,6 +1,6 @@
+import { IController } from '../../entities/game/IController';
+import { IScene } from '../../entities/game/IScene';
 import { Store } from '../../store';
-import { IScene } from '../scenes/IScene';
-import { IController } from './IController';
 
 export class SelectController implements IController {
   public static readonly KEY = Symbol();

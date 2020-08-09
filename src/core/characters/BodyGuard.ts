@@ -1,12 +1,12 @@
+import { IBehavioral } from '../../entities/game/IBehavioral';
+import { IPoint } from '../../entities/game/IPoint';
 import { EmployeeBuilder } from '../builders/EmployeeBuilder';
-import { Point } from '../sprites/Point';
 import { AbstractCharacter } from './AbstractCharacter';
-import { IBehavioral } from './IBehavioral';
 
 export class BodyGuard extends AbstractCharacter implements IBehavioral {
   constructor(builder: EmployeeBuilder) {
     super(builder.sprite, builder.spriteKey);
   }
 
-  behave(next: Point, bar: Point, spawn: Point): void {}
+  behave(next: IPoint, bar: IPoint, spawn: IPoint): void {}
 }

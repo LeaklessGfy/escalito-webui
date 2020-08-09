@@ -1,12 +1,12 @@
 import { IngredientExtended } from '../../entities/dynamic/IngredientExtended';
+import { IEmitter } from '../../entities/game/IEmitter';
+import { IPoint } from '../../entities/game/IPoint';
+import { IScene } from '../../entities/game/IScene';
+import { IngredientGameObject } from '../../entities/game/IngredientGameObject';
 import { BottleBuilder } from '../builders/BottleBuilder';
-import { IScene } from '../scenes/IScene';
 import { Bar } from '../sprites/Bar';
-import { Point } from '../sprites/Point';
-import { IEmitter } from './IEmitter';
-import { IIngredient } from './IIngredient';
 
-export class Bottle implements IIngredient {
+export class Bottle implements IngredientGameObject {
   private static readonly STOCK_BAR_HEIGHT: number = 5;
 
   private readonly _ingredient: IngredientExtended;
@@ -14,8 +14,8 @@ export class Bottle implements IIngredient {
   private readonly _emitter: IEmitter;
   private readonly _stockBar: Bar;
 
-  private _initialPosition?: Point;
-  private _glassPosition?: Point;
+  private _initialPosition?: IPoint;
+  private _glassPosition?: IPoint;
 
   private _currentStock: number;
   private _isFlowing: boolean;
@@ -41,7 +41,7 @@ export class Bottle implements IIngredient {
     });
   }
 
-  public turnOn(position: Point): void {
+  public turnOn(position: IPoint): void {
     this._isFlowing = true;
     this._initialPosition = { x: this._sprite.x, y: this._sprite.y };
     this._glassPosition = {
@@ -117,7 +117,7 @@ export class Bottle implements IIngredient {
     this.moveTo(this._initialPosition);
   }
 
-  private moveTo(point: Point): boolean {
+  private moveTo(point: IPoint): boolean {
     const { x, y } = this._sprite;
     let move = false;
 

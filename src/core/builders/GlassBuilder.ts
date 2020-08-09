@@ -1,7 +1,7 @@
+import { IScene } from '../../entities/game/IScene';
 import { GlassKey } from '../../entities/static/Glass';
 import { Glass } from '../cocktails/Glass';
 import { SelectController } from '../controllers/SelectControllers';
-import { IScene } from '../scenes/IScene';
 import { SpriteKey } from '../sprites/SpriteKey';
 
 export class GlassBuilder {
