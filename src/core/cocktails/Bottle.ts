@@ -1,14 +1,18 @@
 import { IngredientExtended } from '../../entities/dynamic/IngredientExtended';
 import { BottleBuilder } from '../builders/BottleBuilder';
 import { IScene } from '../scenes/IScene';
+import { Bar } from '../sprites/Bar';
 import { Point } from '../sprites/Point';
 import { IEmitter } from './IEmitter';
 import { IIngredient } from './IIngredient';
 
 export class Bottle implements IIngredient {
+  private static readonly STOCK_BAR_HEIGHT: number = 5;
+
   private readonly _ingredient: IngredientExtended;
   private readonly _sprite: Phaser.GameObjects.Sprite;
   private readonly _emitter: IEmitter;
+  private readonly _stockBar: Bar;
 
   private _initialPosition?: Point;
   private _glassPosition?: Point;
@@ -20,12 +24,20 @@ export class Bottle implements IIngredient {
     this._ingredient = builder.ingredient;
     this._sprite = builder.sprite;
     this._emitter = builder.emitter;
+    this._stockBar = builder.stockBar;
 
     this._currentStock = builder.ingredient.stock;
     this._isFlowing = false;
 
     this._sprite.on('pointerdown', () => {
       this.turnOn({ x: 0, y: 0 });
+    });
+
+    this._stockBar.show({
+      x: this._sprite.x,
+      y: this._sprite.y,
+      width: this._sprite.width,
+      height: Bottle.STOCK_BAR_HEIGHT
     });
   }
 
@@ -52,6 +64,10 @@ export class Bottle implements IIngredient {
       this.removeStock(1);
     });
 
+    if (this._emitter.isEmitting()) {
+      this.removeStock(0.01);
+    }
+
     if (this._isFlowing) {
       this.flow(scene);
     } else {
@@ -60,7 +76,9 @@ export class Bottle implements IIngredient {
   }
 
   public removeStock(nb: number): void {
-    this._currentStock -= 1;
+    this._currentStock -= nb;
+    const percent = (this._currentStock / this._ingredient.stock) * 100;
+    this._stockBar.update(percent);
   }
 
   private flow(scene: IScene) {
@@ -78,7 +96,7 @@ export class Bottle implements IIngredient {
 
     const hasArrived = this.moveTo(this._glassPosition);
 
-    if (hasArrived) {
+    if (!hasArrived) {
       const point = {
         x: this._glassPosition.x - this._sprite.displayHeight / 2,
         y: this._glassPosition.y + 10

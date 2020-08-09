@@ -8,6 +8,8 @@ export class LiquidEmitter implements IEmitter {
   private readonly _barCtr: BarController;
   private readonly _emitter: Phaser.GameObjects.Particles.ParticleEmitter;
 
+  private _emitting: boolean = false;
+
   constructor(
     barCtr: BarController,
     emitter: Phaser.GameObjects.Particles.ParticleEmitter
@@ -16,17 +18,19 @@ export class LiquidEmitter implements IEmitter {
     this._emitter = emitter;
   }
 
-  start(ingredient: IngredientExtended, point: Point): void {
+  public start(ingredient: IngredientExtended, point: Point): void {
+    this._emitting = true;
     this._emitter.setTint(ingredient.provided.base.color);
     this._emitter.setPosition(point.x, point.y);
     this._emitter.start();
   }
 
-  stop(): void {
+  public stop(): void {
+    this._emitting = false;
     this._emitter.stop();
   }
 
-  checkCollision(
+  public checkCollision(
     scene: IScene,
     ingredient: IngredientExtended,
     callback: Function
@@ -44,5 +48,9 @@ export class LiquidEmitter implements IEmitter {
         callback();
       }
     }, scene);
+  }
+
+  public isEmitting(): boolean {
+    return this._emitting;
   }
 }

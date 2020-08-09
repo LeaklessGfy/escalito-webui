@@ -10,4 +10,5 @@ export interface IEmitter {
     ingredient: IngredientExtended,
     callback: Function
   ): void;
+  isEmitting(): boolean;
 }

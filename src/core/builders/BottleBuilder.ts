@@ -5,6 +5,7 @@ import { IEmitter } from '../cocktails/IEmitter';
 import { BarController } from '../controllers/BarController';
 import { SelectController } from '../controllers/SelectControllers';
 import { IScene } from '../scenes/IScene';
+import { Bar } from '../sprites/Bar';
 import { SpriteKey } from '../sprites/SpriteKey';
 
 export const IngredientToSprite: { [key in IngredientKey]: SpriteKey } = {
@@ -21,6 +22,7 @@ export class BottleBuilder {
   private readonly _emitter: IEmitter;
 
   private _sprite?: Phaser.GameObjects.Sprite;
+  private _stockBar?: Bar;
 
   constructor(
     scene: IScene,
@@ -39,6 +41,13 @@ export class BottleBuilder {
     return this._sprite;
   }
 
+  public get stockBar(): Bar {
+    if (this._stockBar === undefined) {
+      throw new Error('Can not access stock bar on un-build builder');
+    }
+    return this._stockBar;
+  }
+
   public get ingredient(): IngredientExtended {
     return this._ingredient;
   }
@@ -53,6 +62,7 @@ export class BottleBuilder {
 
   public build(): Bottle {
     this.buildSprite();
+    this.buildStockBar();
 
     return new Bottle(this);
   }
@@ -76,5 +86,12 @@ export class BottleBuilder {
     ctr.addSelect(this._scene, sprite);
 
     this._sprite = sprite;
+  }
+
+  private buildStockBar() {
+    const background = this._scene.add.graphics().setDepth(2);
+    const foreground = this._scene.add.graphics().setDepth(3);
+
+    this._stockBar = new Bar(background, foreground);
   }
 }

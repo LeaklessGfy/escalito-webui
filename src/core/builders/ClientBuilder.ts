@@ -4,6 +4,7 @@ import { BarController } from '../controllers/BarController';
 import { MainController } from '../controllers/MainController';
 import { SelectController } from '../controllers/SelectControllers';
 import { IScene } from '../scenes/IScene';
+import { Bar } from '../sprites/Bar';
 import { SpriteKey } from '../sprites/SpriteKey';
 import { Producer } from '../utils/Interfaces';
 
@@ -25,9 +26,7 @@ export class ClientBuilder {
 
   private _spriteKey: SpriteKey = SpriteKey.DefaultClient;
   private _sprite?: Phaser.GameObjects.Sprite;
-
-  private _waitingBox?: Phaser.GameObjects.Graphics;
-  private _waitingBar?: Phaser.GameObjects.Graphics;
+  private _waitingBar?: Bar;
 
   private _orderText?: Phaser.GameObjects.Text;
   private _createCollider?: Function;
@@ -53,14 +52,7 @@ export class ClientBuilder {
     return this._sprite;
   }
 
-  public get waitingBox(): Phaser.GameObjects.Graphics {
-    if (this._waitingBox === undefined) {
-      throw new Error('Can not access waiting box on un-build builder');
-    }
-    return this._waitingBox;
-  }
-
-  public get waitingBar(): Phaser.GameObjects.Graphics {
+  public get waitingBar(): Bar {
     if (this._waitingBar === undefined) {
       throw new Error('Can not access waiting bar on un-build builder');
     }
@@ -109,7 +101,7 @@ export class ClientBuilder {
 
   public build(): Client {
     this.buildSprite();
-    this.buildWaiting();
+    this.buildWaitingBar();
     this.buildOrderText();
     this.buildCreateCollider();
     this.buildCreateOrder();
@@ -140,9 +132,11 @@ export class ClientBuilder {
     this._sprite = sprite;
   }
 
-  private buildWaiting() {
-    this._waitingBox = this._scene.add.graphics().setDepth(2);
-    this._waitingBar = this._scene.add.graphics().setDepth(3);
+  private buildWaitingBar() {
+    const background = this._scene.add.graphics().setDepth(2);
+    const foreground = this._scene.add.graphics().setDepth(3);
+
+    this._waitingBar = new Bar(background, foreground);
   }
 
   private buildOrderText() {

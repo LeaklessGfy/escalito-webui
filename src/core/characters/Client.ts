@@ -1,6 +1,7 @@
 import { Order } from '../../entities/static/Order';
 import { ClientBuilder } from '../builders/ClientBuilder';
 import { Glass } from '../cocktails/Glass';
+import { Bar } from '../sprites/Bar';
 import { Point } from '../sprites/Point';
 import { Producer } from '../utils/Interfaces';
 import { TintHelper } from '../utils/TintHelper';
@@ -8,10 +9,9 @@ import { AbstractCharacter } from './AbstractCharacter';
 import { IBehavioral } from './IBehavioral';
 
 export class Client extends AbstractCharacter implements IBehavioral {
-  private static readonly WAITING_BOX_HEIGHT: number = 5;
+  private static readonly WAITING_BAR_HEIGHT: number = 5;
 
-  private readonly _waitingBox: Phaser.GameObjects.Graphics;
-  private readonly _waitingBar: Phaser.GameObjects.Graphics;
+  private readonly _waitingBar: Bar;
   private readonly _orderText: Phaser.GameObjects.Text;
   private readonly _createCollider: Function;
   private readonly _increment: Function;
@@ -28,7 +28,6 @@ export class Client extends AbstractCharacter implements IBehavioral {
   constructor(builder: ClientBuilder) {
     super(builder.sprite, builder.spriteKey);
 
-    this._waitingBox = builder.waitingBox;
     this._waitingBar = builder.waitingBar;
     this._orderText = builder.orderText;
     this._createCollider = builder.createCollider;
@@ -133,21 +132,12 @@ export class Client extends AbstractCharacter implements IBehavioral {
       y: y + this._sprite.displayHeight / 2
     };
 
-    this._waitingBox.fillStyle(0xffffff, 1);
-    this._waitingBox.fillRect(
-      this._waitingPos.x,
-      this._waitingPos.y,
-      this._sprite.displayWidth,
-      Client.WAITING_BOX_HEIGHT
-    );
-
-    this._waitingBar.fillStyle(TintHelper.getTint(100), 1);
-    this._waitingBar.fillRect(
-      this._waitingPos.x,
-      this._waitingPos.y,
-      this._sprite.displayWidth,
-      Client.WAITING_BOX_HEIGHT
-    );
+    this._waitingBar.show({
+      x: this._waitingPos.x,
+      y: this._waitingPos.y,
+      width: this._sprite.displayWidth,
+      height: Client.WAITING_BAR_HEIGHT
+    });
   }
 
   public serve(glass?: Glass) {
@@ -160,8 +150,7 @@ export class Client extends AbstractCharacter implements IBehavioral {
     this._increment();
     this._order = undefined;
     this._orderText.destroy();
-    this._waitingBox.clear().destroy();
-    this._waitingBar.clear().destroy();
+    this._waitingBar.destroy();
   }
 
   private stepWait(delta: number): void {
@@ -172,17 +161,7 @@ export class Client extends AbstractCharacter implements IBehavioral {
     }
 
     const percent = 100 - (this._timeAwaited / this._patience) * 100;
-    const color = TintHelper.getTint(percent);
-    const width = (percent / 100) * this._sprite.displayWidth;
-
-    this._waitingBar.clear();
-    this._waitingBar.fillStyle(color, 1);
-    this._waitingBar.fillRect(
-      this._waitingPos.x,
-      this._waitingPos.y,
-      width,
-      Client.WAITING_BOX_HEIGHT
-    );
+    this._waitingBar.update(percent);
 
     if (this._timeAwaited < this._patience) {
       return;
