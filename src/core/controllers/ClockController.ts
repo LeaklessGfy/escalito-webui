@@ -1,7 +1,6 @@
 import { IController } from '../../entities/game/IController';
 import { IScene } from '../../entities/game/IScene';
 import { TriggerUnit } from '../../entities/static/TimeTrigger';
-import { Store } from '../../store';
 
 export class ClockController implements IController {
   public static readonly KEY = Symbol();
@@ -43,8 +42,6 @@ export class ClockController implements IController {
 
     this._clock?.setText(text);
   }
-
-  public daily(scene: IScene, store: Store, day: number): void {}
 
   /** Custom **/
   public get seconds(): number {

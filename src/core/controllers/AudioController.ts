@@ -1,6 +1,5 @@
 import { IController } from '../../entities/game/IController';
 import { IScene } from '../../entities/game/IScene';
-import { Store } from '../../store';
 
 export class AudioController implements IController {
   public static readonly KEY = Symbol();
@@ -20,8 +19,6 @@ export class AudioController implements IController {
   }
 
   public update(scene: IScene, delta: number): void {}
-
-  public daily(scene: IScene, store: Store, day: number): void {}
 
   /** Custom **/
   public playSuccess(): void {

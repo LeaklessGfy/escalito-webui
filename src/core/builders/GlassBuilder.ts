@@ -71,8 +71,6 @@ export class GlassBuilder {
       .setGravity(-1)
       .setDepth(3);
 
-    console.log(sprite.originX);
-
     const body = sprite.body as Phaser.Physics.Arcade.Body;
     body.collideWorldBounds = true;
     body.allowGravity = false;

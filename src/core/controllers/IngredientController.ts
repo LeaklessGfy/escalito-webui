@@ -4,7 +4,6 @@ import { IEmitter } from '../../entities/game/IEmitter';
 import { IScene } from '../../entities/game/IScene';
 import { IngredientGameObject } from '../../entities/game/IngredientGameObject';
 import { IngredientKey } from '../../entities/static/Ingredient';
-import { Store } from '../../store';
 import { IngredientBuilder } from '../builders/IngredientBuilder';
 import { LiquidEmitter } from '../cocktails/LiquidEmitter';
 import { SpriteKey } from '../sprites/SpriteKey';
@@ -60,14 +59,11 @@ export class IngredientController implements IController {
     }
   }
 
-  public daily(scene: IScene, store: Store, day: number): void {}
-
   private createOrUpdateIngredient(
     scene: IScene,
     emitter: IEmitter,
     ingredient: IngredientExtended
   ) {
-    console.log(ingredient);
     if (!this._ingredients.has(ingredient.provided.base.key)) {
       return this.createIngredient(scene, emitter, ingredient);
     }

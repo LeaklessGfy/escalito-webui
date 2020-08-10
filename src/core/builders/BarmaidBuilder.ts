@@ -40,8 +40,6 @@ export class BarmaidBuilder {
       .setFlipX(true)
       .setName('Barmaid');
 
-    console.log(sprite.originX);
-
     const selectCtr = this._scene.getController<SelectController>(
       SelectController.KEY
     );

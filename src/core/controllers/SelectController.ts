@@ -1,6 +1,5 @@
 import { IController } from '../../entities/game/IController';
 import { IScene } from '../../entities/game/IScene';
-import { Store } from '../../store';
 
 export class SelectController implements IController {
   public static readonly KEY = Symbol();
@@ -27,8 +26,6 @@ export class SelectController implements IController {
   }
 
   public update(scene: IScene, delta: number): void {}
-
-  public daily(scene: IScene, store: Store, day: number): void {}
 
   /** Custom **/
   public addSelect(scene: IScene, sprite: Phaser.GameObjects.GameObject) {

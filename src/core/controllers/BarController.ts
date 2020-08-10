@@ -1,7 +1,6 @@
 import { IController } from '../../entities/game/IController';
 import { IScene } from '../../entities/game/IScene';
 import { GlassKey } from '../../entities/static/Glass';
-import { Store } from '../../store';
 import { GlassBuilder } from '../builders/GlassBuilder';
 import { Glass } from '../cocktails/Glass';
 import { SpriteKey } from '../sprites/SpriteKey';
@@ -78,8 +77,6 @@ export class BarController implements IController {
       this._door.setFrame('close.png');
     }
   }
-
-  public daily(scene: IScene, store: Store, day: number): void {}
 
   /** Custom **/
   public get glass(): Glass | undefined {

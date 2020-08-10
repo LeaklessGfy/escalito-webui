@@ -16,7 +16,7 @@ export declare type Change<T> =
       newValue: T;
     }
   | {
-      type: 'remove';
+      type: 'remove' | 'delete';
       oldValue: T;
     };
 

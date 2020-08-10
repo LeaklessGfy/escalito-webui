@@ -88,10 +88,6 @@ export class MainScene extends Phaser.Scene implements IScene {
 
   public start() {
     this.scene.resume();
-    const emitter = this.events.on('create', () => {
-      // this._controllers.forEach(ctr => ctr.daily(this, this.store, 0));
-      emitter.off('ready');
-    });
   }
 
   public getController<T extends IController>(key: Symbol): T {

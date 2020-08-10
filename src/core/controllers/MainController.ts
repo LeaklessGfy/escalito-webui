@@ -1,7 +1,6 @@
 import { IController } from '../../entities/game/IController';
 import { IScene } from '../../entities/game/IScene';
 import { Order } from '../../entities/static/Order';
-import { Store } from '../../store';
 import { Client } from '../characters/Client';
 import { AudioController } from './AudioController';
 
@@ -26,16 +25,6 @@ export class MainController implements IController {
   public create(scene: IScene): void {}
 
   public update(scene: IScene, delta: number): void {}
-
-  public daily(scene: IScene, store: Store, day: number): void {
-    /*const report = store.inventory.pay();
-
-    if (report.total > 0) {
-      const notif = scene.add.text(0, 0, '- ' + report.total + '$');
-      this._audioCtr?.playCash();
-      setTimeout(() => notif.destroy(), 2000);
-    }*/
-  }
 
   /** Custom **/
   public increment(client: Client, order: Order): number {

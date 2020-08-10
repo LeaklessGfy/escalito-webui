@@ -2,14 +2,13 @@ import { IBehavioral } from '../../entities/game/IBehavioral';
 import { IController } from '../../entities/game/IController';
 import { IScene } from '../../entities/game/IScene';
 import { EmployeeKey } from '../../entities/static/Employee';
-import { Store } from '../../store';
 import { BarmaidBuilder } from '../builders/BarmaidBuilder';
 import { ClientBuilder } from '../builders/ClientBuilder';
 import { EmployeeBuilder } from '../builders/EmployeeBuilder';
 import { Barmaid } from '../characters/Barmaid';
 import { Client } from '../characters/Client';
-import { AnimKey } from '../sprites/AnimKey';
-import { SpriteKey } from '../sprites/SpriteKey';
+import { BarController } from './BarController';
+import { SubCharacterController } from './SubCharacterController';
 
 export class CharacterController implements IController {
   public static readonly KEY = Symbol();
@@ -28,89 +27,11 @@ export class CharacterController implements IController {
 
   /** Interface **/
   public preload(scene: IScene): void {
-    scene.load.spritesheet(
-      SpriteKey.Barmaid + '.' + AnimKey.Idle,
-      'assets/barmaid.idle.png',
-      {
-        frameWidth: 19,
-        frameHeight: 34
-      }
-    );
-    scene.load.spritesheet(
-      SpriteKey.Barmaid + '.' + AnimKey.Move,
-      'assets/barmaid.move.png',
-      {
-        frameWidth: 21,
-        frameHeight: 33
-      }
-    );
-    scene.load.spritesheet(
-      SpriteKey.DefaultClient + '.' + AnimKey.Idle,
-      'assets/client1.idle.png',
-      {
-        frameWidth: 32,
-        frameHeight: 28
-      }
-    );
-    scene.load.spritesheet(
-      SpriteKey.DefaultClient + '.' + AnimKey.Move,
-      'assets/client1.move.png',
-      {
-        frameWidth: 32,
-        frameHeight: 32
-      }
-    );
+    SubCharacterController.preload(scene);
   }
 
   public create(scene: IScene): void {
-    scene.anims.create({
-      key: SpriteKey.Barmaid + '.' + AnimKey.Idle,
-      frames: scene.anims.generateFrameNumbers(
-        SpriteKey.Barmaid + '.' + AnimKey.Idle,
-        {
-          start: 0,
-          end: 11
-        }
-      ),
-      frameRate: 10,
-      repeat: -1
-    });
-    scene.anims.create({
-      key: SpriteKey.Barmaid + '.' + AnimKey.Move,
-      frames: scene.anims.generateFrameNumbers(
-        SpriteKey.Barmaid + '.' + AnimKey.Move,
-        {
-          start: 0,
-          end: 11
-        }
-      ),
-      frameRate: 10,
-      repeat: -1
-    });
-    scene.anims.create({
-      key: SpriteKey.DefaultClient + '.' + AnimKey.Idle,
-      frames: scene.anims.generateFrameNumbers(
-        SpriteKey.DefaultClient + '.' + AnimKey.Idle,
-        {
-          start: 0,
-          end: 7
-        }
-      ),
-      frameRate: 5,
-      repeat: -1
-    });
-    scene.anims.create({
-      key: SpriteKey.DefaultClient + '.' + AnimKey.Move,
-      frames: scene.anims.generateFrameNumbers(
-        SpriteKey.DefaultClient + '.' + AnimKey.Move,
-        {
-          start: 0,
-          end: 7
-        }
-      ),
-      frameRate: 7,
-      repeat: -1
-    });
+    SubCharacterController.create(scene);
 
     /*scene.time.addEvent({
       delay: 3000,
@@ -119,7 +40,7 @@ export class CharacterController implements IController {
     });*/
 
     this._barmaid = new BarmaidBuilder(scene).build();
-    this.createClient(scene);
+    //this.createClient(scene);
 
     scene.inventory.employees$.subscribe(change => {
       if (change === undefined) {
@@ -135,11 +56,13 @@ export class CharacterController implements IController {
           }
           break;
         case 'remove':
+        case 'delete':
           const gameObject = this._employees.get(change.oldValue.key);
           if (gameObject === undefined) {
-            throw new Error();
+            throw new Error('Can not remove unexisting employee');
           }
           gameObject.destroy();
+          this._employees.delete(change.oldValue.key);
           break;
       }
     });
@@ -184,8 +107,6 @@ export class CharacterController implements IController {
     }
   }
 
-  public daily(scene: IScene, store: Store, day: number): void {}
-
   /** Custom **/
   private createClient(scene: IScene) {
     const client = new ClientBuilder(scene).build();
@@ -193,6 +114,7 @@ export class CharacterController implements IController {
     client.onLeave = () => {
       this._visitors.pop();
       this._leaving.push(client);
+      scene.getController<BarController>(BarController.KEY).destroyGlass();
     };
 
     this._visitors.push(client);
