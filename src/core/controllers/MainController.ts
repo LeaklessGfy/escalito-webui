@@ -28,13 +28,13 @@ export class MainController implements IController {
   public update(scene: IScene, delta: number): void {}
 
   public daily(scene: IScene, store: Store, day: number): void {
-    const report = store.inventory.pay();
+    /*const report = store.inventory.pay();
 
     if (report.total > 0) {
       const notif = scene.add.text(0, 0, '- ' + report.total + '$');
       this._audioCtr?.playCash();
       setTimeout(() => notif.destroy(), 2000);
-    }
+    }*/
   }
 
   /** Custom **/

@@ -2,7 +2,7 @@ import { IBehavioral } from '../../entities/game/IBehavioral';
 import { IScene } from '../../entities/game/IScene';
 import { EmployeeKey } from '../../entities/static/Employee';
 import { BodyGuard } from '../characters/BodyGuard';
-import { SelectController } from '../controllers/SelectControllers';
+import { SelectController } from '../controllers/SelectController';
 import { SpriteKey } from '../sprites/SpriteKey';
 
 export class EmployeeBuilder {

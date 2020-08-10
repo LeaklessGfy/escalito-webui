@@ -22,7 +22,7 @@ export class Store {
   public user: UserDto;
 
   @observable
-  public inventory: Inventory;
+  public inventory?: Inventory;
 
   public readonly service: Service;
   public readonly ingredients: Map<IngredientKey, Ingredient>;
@@ -33,7 +33,6 @@ export class Store {
   constructor() {
     this.ready = false;
     this.user = null;
-    this.inventory = new Inventory(0);
 
     this.service = new Service();
     this.ingredients = Ingredients();
@@ -41,15 +40,7 @@ export class Store {
     this.cocktails = Cocktails();
     this.employees = Employees();
 
-    this.service.subscribe(async user => {
-      if (!this.ready) {
-        this.ready = true;
-      }
-      this.user = user;
-      if (user) {
-        this.inventory = await this.service.getInventory();
-      }
-    });
+    this.service.subscribe(this.init.bind(this));
   }
 
   @computed
@@ -70,6 +61,16 @@ export class Store {
   @computed
   public get employeesArray(): Employee[] {
     return Array.from(this.employees.values());
+  }
+
+  private async init(user: UserDto) {
+    if (!this.ready) {
+      this.ready = true;
+    }
+    this.user = user;
+    if (user) {
+      this.inventory = await this.service.getInventory();
+    }
   }
 }
 

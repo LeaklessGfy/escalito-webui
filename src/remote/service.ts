@@ -27,9 +27,7 @@ export class Service {
 
   public async getInventory(): Promise<Inventory> {
     const dto = await this._client.fetchInventory();
-    const inventory = fromDto(dto);
-    inventory.attachService(this);
-    return inventory;
+    return fromDto(this, dto);
   }
 
   public async setCash(cash: number): Promise<void> {

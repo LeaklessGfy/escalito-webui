@@ -1,3 +1,4 @@
+import { Service } from '../../remote/Service';
 import {
   CocktailMapper,
   EmployeeMapper,
@@ -81,10 +82,11 @@ function extractEmployees(dto: number[]): EmployeeMapper {
   return employees;
 }
 
-export function fromDto(dto: InventoryDto): Inventory {
+export function fromDto(service: Service, dto: InventoryDto): Inventory {
+  const cash = dto.cash;
   const ingredients = extractIngredients(dto.ingredients);
   const cocktails = extractCocktails(dto.cocktails);
   const employees = extractEmployees(dto.employees);
 
-  return new Inventory(dto.cash, ingredients, cocktails, employees);
+  return new Inventory(service, cash, ingredients, cocktails, employees);
 }

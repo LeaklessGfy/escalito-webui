@@ -1,7 +1,7 @@
-import { IngredientExtended } from '../../entities/dynamic/IngredientExtended';
 import { IEmitter } from '../../entities/game/IEmitter';
 import { IPoint } from '../../entities/game/IPoint';
 import { IScene } from '../../entities/game/IScene';
+import { Ingredient } from '../../entities/static/Ingredient';
 import { BarController } from '../controllers/BarController';
 
 export class LiquidEmitter implements IEmitter {
@@ -18,9 +18,9 @@ export class LiquidEmitter implements IEmitter {
     this._emitter = emitter;
   }
 
-  public start(ingredient: IngredientExtended, point: IPoint): void {
+  public start(ingredient: Ingredient, point: IPoint): void {
     this._emitting = true;
-    this._emitter.setTint(ingredient.provided.base.color);
+    this._emitter.setTint(ingredient.color);
     this._emitter.setPosition(point.x, point.y);
     this._emitter.start();
   }
@@ -30,11 +30,7 @@ export class LiquidEmitter implements IEmitter {
     this._emitter.stop();
   }
 
-  public checkCollision(
-    scene: IScene,
-    ingredient: IngredientExtended,
-    callback: Function
-  ): void {
+  public checkCollision(scene: IScene, ingredient: Ingredient): void {
     const glass = this._barCtr.glass;
 
     if (glass === undefined) {
@@ -44,8 +40,7 @@ export class LiquidEmitter implements IEmitter {
     this._emitter.forEachAlive(p => {
       if (glass.body.hitTest(p.x, p.y)) {
         p.lifeCurrent = 0;
-        glass.addIngredient(ingredient.provided.base);
-        callback();
+        glass.addIngredient(ingredient);
       }
     }, scene);
   }

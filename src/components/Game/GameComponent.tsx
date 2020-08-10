@@ -7,7 +7,7 @@ import { IScene } from '../../entities/game/IScene';
 import { useStore } from '../../store';
 
 const GameComponent: FunctionalComponent = () => {
-  const store = useStore();
+  const { inventory } = useStore();
   const ref = useRef<HTMLCanvasElement>();
   const [scene, setScene] = useState<IScene | undefined>(undefined);
   const [started, setStarted] = useState(false);
@@ -20,10 +20,10 @@ const GameComponent: FunctionalComponent = () => {
   };
 
   useEffect(() => {
-    if (ref.current && store.ready) {
-      createGame(ref.current, store).then(scene => setScene(scene));
+    if (ref.current && inventory !== undefined) {
+      createGame(ref.current, inventory).then(scene => setScene(scene));
     }
-  }, [ref, store]);
+  }, [ref, inventory]);
 
   return (
     <section class="text-center">
@@ -34,6 +34,7 @@ const GameComponent: FunctionalComponent = () => {
       >
         Start
       </button>
+
       <canvas ref={ref} />
     </section>
   );

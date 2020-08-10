@@ -4,7 +4,7 @@ import { IScene } from '../../entities/game/IScene';
 import { IngredientKey } from '../../entities/static/Ingredient';
 import { Bottle } from '../cocktails/Bottle';
 import { BarController } from '../controllers/BarController';
-import { SelectController } from '../controllers/SelectControllers';
+import { SelectController } from '../controllers/SelectController';
 import { Bar } from '../sprites/Bar';
 import { SpriteKey } from '../sprites/SpriteKey';
 
@@ -18,20 +18,20 @@ export const IngredientToSprite: { [key in IngredientKey]: SpriteKey } = {
 
 export class BottleBuilder {
   private readonly _scene: IScene;
-  private readonly _ingredient: IngredientExtended;
   private readonly _emitter: IEmitter;
+  private readonly _ingredient: IngredientExtended;
 
   private _sprite?: Phaser.GameObjects.Sprite;
   private _stockBar?: Bar;
 
   constructor(
     scene: IScene,
-    ingredient: IngredientExtended,
-    emitter: IEmitter
+    emitter: IEmitter,
+    ingredient: IngredientExtended
   ) {
     this._scene = scene;
-    this._ingredient = ingredient;
     this._emitter = emitter;
+    this._ingredient = ingredient;
   }
 
   public get sprite(): Phaser.GameObjects.Sprite {

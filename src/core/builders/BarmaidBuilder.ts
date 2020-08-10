@@ -1,6 +1,6 @@
 import { IScene } from '../../entities/game/IScene';
 import { Barmaid } from '../characters/Barmaid';
-import { SelectController } from '../controllers/SelectControllers';
+import { SelectController } from '../controllers/SelectController';
 import { SpriteKey } from '../sprites/SpriteKey';
 
 export class BarmaidBuilder {
@@ -39,6 +39,8 @@ export class BarmaidBuilder {
       .setY(sprite.y - sprite.displayHeight / 2)
       .setFlipX(true)
       .setName('Barmaid');
+
+    console.log(sprite.originX);
 
     const selectCtr = this._scene.getController<SelectController>(
       SelectController.KEY

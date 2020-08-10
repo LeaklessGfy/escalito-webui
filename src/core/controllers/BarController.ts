@@ -1,23 +1,17 @@
 import { IController } from '../../entities/game/IController';
 import { IScene } from '../../entities/game/IScene';
-import { IngredientGameObject } from '../../entities/game/IngredientGameObject';
 import { GlassKey } from '../../entities/static/Glass';
 import { Store } from '../../store';
 import { GlassBuilder } from '../builders/GlassBuilder';
-import { IngredientBuilder } from '../builders/IngredientBuilder';
 import { Glass } from '../cocktails/Glass';
-import { LiquidEmitter } from '../cocktails/LiquidEmitter';
 import { SpriteKey } from '../sprites/SpriteKey';
-import { SelectController } from './SelectControllers';
+import { SelectController } from './SelectController';
 
 export class BarController implements IController {
   public static readonly KEY = Symbol();
 
-  private readonly _ingredients: IngredientGameObject[] = [];
-
   private _door?: Phaser.GameObjects.Image;
   private _glass?: Glass;
-  private _emitter?: Phaser.GameObjects.Particles.ParticleEmitter;
 
   public open: boolean = true;
 
@@ -25,7 +19,6 @@ export class BarController implements IController {
   public preload(scene: IScene): void {
     scene.load.image(SpriteKey.Bar, 'assets/bar.png');
     scene.load.image(SpriteKey.BarTop, 'assets/bar.top.png');
-    scene.load.image(SpriteKey.RumBottle, 'assets/bottle.rum.png');
     scene.load.image(SpriteKey.DefaultGlass, 'assets/glass.default.png');
     scene.load.image(
       SpriteKey.DefaultGlassMask,
@@ -67,15 +60,6 @@ export class BarController implements IController {
       1
     );
 
-    const particle = scene.add.particles(SpriteKey.Square);
-    this._emitter = particle.createEmitter({
-      x: scene.settings.middleWidth,
-      y: 10,
-      active: true,
-      on: false,
-      gravityY: scene.settings.height
-    });
-
     const selectCtr = scene.getController<SelectController>(
       SelectController.KEY
     );
@@ -84,10 +68,6 @@ export class BarController implements IController {
   }
 
   public update(scene: IScene, delta: number): void {
-    for (const ingredient of this._ingredients) {
-      ingredient.update(scene);
-    }
-
     if (this._door === undefined) {
       return;
     }
@@ -99,23 +79,7 @@ export class BarController implements IController {
     }
   }
 
-  public daily(scene: IScene, store: Store, day: number): void {
-    const barCtr = scene.getController<BarController>(BarController.KEY);
-    const liquidEmitter = new LiquidEmitter(
-      barCtr,
-      this._emitter as Phaser.GameObjects.Particles.ParticleEmitter
-    );
-
-    for (const ingredient of store.inventory.ingredients) {
-      const gameIngredient = new IngredientBuilder(
-        scene,
-        ingredient,
-        liquidEmitter
-      ).build();
-
-      this._ingredients.push(gameIngredient);
-    }
-  }
+  public daily(scene: IScene, store: Store, day: number): void {}
 
   /** Custom **/
   public get glass(): Glass | undefined {

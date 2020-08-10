@@ -8,17 +8,17 @@ import { FruitBuilder } from './FruitBuilder';
 
 export class IngredientBuilder {
   private readonly _scene: IScene;
-  private readonly _ingredient: IngredientExtended;
   private readonly _emitter: IEmitter;
+  private readonly _ingredient: IngredientExtended;
 
   constructor(
     scene: IScene,
-    ingredient: IngredientExtended,
-    emitter: IEmitter
+    emitter: IEmitter,
+    ingredient: IngredientExtended
   ) {
     this._scene = scene;
-    this._ingredient = ingredient;
     this._emitter = emitter;
+    this._ingredient = ingredient;
   }
 
   public build(): IngredientGameObject {
@@ -26,14 +26,14 @@ export class IngredientBuilder {
       case IngredientType.Bottle:
         return new BottleBuilder(
           this._scene,
-          this._ingredient,
-          this._emitter
+          this._emitter,
+          this._ingredient
         ).build();
       case IngredientType.Fruit:
         return new FruitBuilder(
           this._scene,
-          this._ingredient,
-          this._emitter
+          this._emitter,
+          this._ingredient
         ).build();
     }
   }

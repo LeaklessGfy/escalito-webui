@@ -1,17 +1,28 @@
-import { observe } from 'mobx';
+import { IObjectDidChange, observe } from 'mobx';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { Inventory } from '../entities/Inventory';
+import { IngredientExtended } from '../entities/dynamic/IngredientExtended';
 import {
   CashChange,
+  CocktailChange,
+  EmployeeChange,
   IInventory,
   IngredientChange
 } from '../entities/game/IInventory';
-import { Consumer } from './utils/Interfaces';
+import { ProviderKey } from '../entities/static/Provider';
 
 export class InventoryProxy implements IInventory {
   private readonly _inventory: Inventory;
-  private readonly _cashWatchers: Consumer<CashChange>[] = [];
-  private readonly _ingredientWatchers: Consumer<IngredientChange>[] = [];
+
+  private readonly _cash$: Subject<CashChange> = new Subject();
+  private readonly _ingredients$ = new BehaviorSubject<
+    IngredientChange | undefined
+  >(undefined);
+  private readonly _cocktails$: Subject<CocktailChange> = new Subject();
+  private readonly _employees$ = new BehaviorSubject<
+    EmployeeChange | undefined
+  >(undefined);
 
   constructor(inventory: Inventory) {
     this._inventory = inventory;
@@ -21,30 +32,125 @@ export class InventoryProxy implements IInventory {
     return this._inventory;
   }
 
-  public pushIngredients(change: IngredientChange) {}
-
-  public watchCash(watcher: Consumer<CashChange>): void {
-    this._cashWatchers.push(watcher);
+  public get cash$(): Observable<CashChange> {
+    return this._cash$.asObservable();
   }
 
-  public watchIngredients(watcher: Consumer<IngredientChange>): void {
-    this._ingredientWatchers.push(watcher);
+  public get ingredients$(): Observable<IngredientChange | undefined> {
+    return this._ingredients$.asObservable();
+  }
+
+  public get cocktails$(): Observable<CocktailChange> {
+    return this._cocktails$.asObservable();
+  }
+
+  public get employees$(): Observable<EmployeeChange | undefined> {
+    return this._employees$;
   }
 
   public watch() {
-    observe(this._inventory.cash, change => {
-      this._cashWatchers.forEach(watcher => watcher(change));
+    observe(
+      this._inventory.cash$,
+      change => {
+        console.log('- Cash', change);
+        this._cash$.next(change);
+      },
+      true
+    );
+
+    observe(this._inventory.ingredients$, change => {
+      console.log('- Ingredients', change);
+      switch (change.type) {
+        case 'add':
+          // add observe on provider (new value)
+          return this.addIngredient(change);
+        case 'update':
+          // will never happen
+          return this.updateIngredient(change);
+        case 'remove':
+          // dispose observe (old value)
+          return this.removeIngredient(change);
+      }
     });
 
-    this._inventory._ingredients.forEach(providers => {
+    observe(this._inventory.cocktails$, change => {
+      console.log('- Cocktail', change);
+      this._cocktails$.next(change);
+    });
+
+    observe(this._inventory.employees$, change => {
+      console.log('- Employee', change);
+      this._employees$.next(change);
+    });
+
+    // For each nested providers, add observe
+    for (const providers of this._inventory.ingredients$.values()) {
+      for (const ingredient of providers.values()) {
+        this._ingredients$.next({
+          type: 'add',
+          newValue: ingredient
+        });
+      }
+
       observe(providers, change => {
-        console.log(change);
+        console.log('- Providers', change);
+        return this.updateIngredient(change);
       });
-    });
+    }
 
-    observe(this._inventory._ingredients, change => {
-      console.log(change);
-      // this._ingredientWatchers.forEach(watcher => watcher(change));
+    for (const employee of this._inventory.employees) {
+      this._employees$.next({
+        type: 'add',
+        newValue: employee
+      });
+    }
+  }
+
+  private addIngredient(change: IObjectDidChange): void {
+    if (change.type !== 'add') {
+      throw new Error('Wrong change type, expect add');
+    }
+
+    const providers: Map<ProviderKey, IngredientExtended> = change.newValue;
+    const ingredient = providers.get(0);
+
+    if (ingredient === undefined) {
+      throw new Error('Can not find provider in providers map');
+    }
+
+    this._ingredients$.next({
+      type: 'add',
+      newValue: ingredient
+    });
+  }
+
+  private updateIngredient(change: IObjectDidChange): void {
+    if (change.type !== 'update') {
+      throw new Error('Wrong change type, expect update');
+    }
+
+    this._ingredients$.next({
+      type: 'update',
+      newValue: change.newValue,
+      oldValue: change.oldValue
+    });
+  }
+
+  private removeIngredient(change: IObjectDidChange): void {
+    if (change.type !== 'remove') {
+      throw new Error('Wrong change type, expect remove');
+    }
+
+    const providers: Map<ProviderKey, IngredientExtended> = change.object;
+    const ingredient = providers.get(change.name as number);
+
+    if (ingredient === undefined) {
+      throw new Error('Can not find provider in providers map');
+    }
+
+    this._ingredients$.next({
+      type: 'remove',
+      oldValue: change.oldValue
     });
   }
 }

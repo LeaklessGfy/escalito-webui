@@ -1,4 +1,5 @@
 import { action, computed, observable } from 'mobx';
+import { IObservableValue } from 'mobx/lib/internal';
 
 import { Service } from '../remote/Service';
 import { CocktailExtended } from './dynamic/CocktailExtended';
@@ -14,51 +15,50 @@ export type IngredientMapper = Map<
   IngredientKey,
   Map<ProviderKey, IngredientExtended>
 >;
-
 export type CocktailMapper = Map<CocktailKey, CocktailExtended>;
-
 export type EmployeeMapper = Map<EmployeeKey, Employee>;
 
 export class Inventory {
-  @observable
-  private _cash: number;
+  private readonly $service: Service;
+
+  public cash$: IObservableValue<number>;
 
   @observable
-  public readonly _ingredients: IngredientMapper;
+  public readonly ingredients$: IngredientMapper;
 
   @observable
-  private readonly _cocktails: CocktailMapper;
+  public readonly cocktails$: CocktailMapper;
 
   @observable
-  private readonly _employees: EmployeeMapper;
-
-  private $service?: Service;
+  public readonly employees$: EmployeeMapper;
 
   constructor(
+    service: Service,
     cash: number,
     ingredients: IngredientMapper = new Map(),
     cocktails: CocktailMapper = new Map(),
     employees: EmployeeMapper = new Map()
   ) {
-    this._cash = cash;
-    this._ingredients = ingredients;
-    this._cocktails = cocktails;
-    this._employees = employees;
+    this.$service = service;
+    this.cash$ = observable.box(cash);
+    this.ingredients$ = ingredients;
+    this.cocktails$ = cocktails;
+    this.employees$ = employees;
   }
 
   public get cash(): number {
-    return this._cash;
+    return this.cash$.get();
   }
 
   @computed
   public get cocktails(): CocktailExtended[] {
-    return Array.from(this._cocktails.values());
+    return Array.from(this.cocktails$.values());
   }
 
   @computed
   public get ingredients(): IngredientExtended[] {
     const allValues: IngredientExtended[] = [];
-    for (const providers of this._ingredients.values()) {
+    for (const providers of this.ingredients$.values()) {
       for (const ingredient of providers.values()) {
         allValues.push(ingredient);
       }
@@ -68,28 +68,11 @@ export class Inventory {
 
   @computed
   public get employees(): Employee[] {
-    return Array.from(this._employees.values());
-  }
-
-  public pay() {
-    const totalIngredients = this.ingredients.reduce(
-      (p, c) => p + c.provided.price,
-      0
-    );
-    const totalEmployees = this.employees.reduce((p, c) => p + c.salary, 0);
-
-    this._cash -= totalIngredients + totalEmployees;
-    this.$service?.setCash(this._cash);
-
-    return {
-      total: totalIngredients + totalEmployees,
-      totalIngredients,
-      totalEmployees
-    };
+    return Array.from(this.employees$.values());
   }
 
   public getGlobalIngredientStock(ingredientKey: IngredientKey): number {
-    const providers = this._ingredients.get(ingredientKey);
+    const providers = this.ingredients$.get(ingredientKey);
     if (providers === undefined) {
       return 0;
     }
@@ -103,7 +86,7 @@ export class Inventory {
     ingredientKey: IngredientKey,
     providerKey: ProviderKey
   ): number {
-    const providers = this._ingredients.get(ingredientKey);
+    const providers = this.ingredients$.get(ingredientKey);
     if (providers === undefined) {
       return 0;
     }
@@ -111,12 +94,7 @@ export class Inventory {
   }
 
   public isIngredientDisabled(ingredient: IngredientProvided): boolean {
-    return (
-      this._cash <
-      ingredient.price *
-        this.getIngredientStock(ingredient.base.key, ingredient.providerKey) +
-        1
-    );
+    return this.cash$.get() < ingredient.price;
   }
 
   @action
@@ -125,28 +103,32 @@ export class Inventory {
     providerKey: ProviderKey
   ): void {
     const providers =
-      this._ingredients.get(ingredientKey) ??
+      this.ingredients$.get(ingredientKey) ??
       new Map<ProviderKey, IngredientExtended>();
     const ingredientExtended =
       providers.get(providerKey) ??
       buildIngredientExtended(ingredientKey, providerKey, 0);
 
-    if (ingredientExtended === undefined) {
-      throw new Error('Undefined ingredient extended');
+    if (this.cash$.get() < ingredientExtended.provided.price) {
+      throw new Error('Can not buy ingredient, too expensive');
     }
 
     const newIngredientExtended = new IngredientExtended(
       ingredientExtended.provided,
-      ingredientExtended.stock + 1
+      ingredientExtended.stock + ingredientExtended.provided.base.amount
     );
     providers.set(providerKey, newIngredientExtended);
 
-    this._ingredients.set(ingredientKey, providers);
-    this.$service?.addIngredient(
+    this.ingredients$.set(ingredientKey, providers);
+    this.$service.addIngredient(
       ingredientKey,
       providerKey,
       newIngredientExtended.stock
     );
+
+    const newCash = this.cash$.get() - ingredientExtended.provided.price;
+    this.cash$.set(newCash);
+    this.$service.setCash(newCash);
   }
 
   @action
@@ -154,7 +136,7 @@ export class Inventory {
     ingredientKey: IngredientKey,
     providerKey: ProviderKey
   ): void {
-    const providers = this._ingredients.get(ingredientKey);
+    const providers = this.ingredients$.get(ingredientKey);
     if (providers === undefined) {
       return;
     }
@@ -164,7 +146,8 @@ export class Inventory {
       return;
     }
 
-    const newStock = ingredientExtended.stock - 1;
+    const newStock =
+      ingredientExtended.stock - ingredientExtended.provided.base.amount;
 
     if (newStock > 0) {
       const newIngredientExtended = new IngredientExtended(
@@ -177,27 +160,27 @@ export class Inventory {
     }
 
     if (providers.size > 0) {
-      this._ingredients.set(ingredientKey, providers);
+      this.ingredients$.set(ingredientKey, providers);
     } else {
-      this._ingredients.delete(ingredientKey);
+      this.ingredients$.delete(ingredientKey);
     }
 
-    this.$service?.removeIngredient(ingredientKey, providerKey, newStock);
+    this.$service.removeIngredient(ingredientKey, providerKey, newStock);
   }
 
   public getCocktailPrice(cocktailKey: CocktailKey): number {
-    return this._cocktails.get(cocktailKey)?.price ?? 0;
+    return this.cocktails$.get(cocktailKey)?.price ?? 0;
   }
 
   public hasCocktail(cocktailKey: CocktailKey): boolean {
-    return this._cocktails.has(cocktailKey);
+    return this.cocktails$.has(cocktailKey);
   }
 
   public isCocktailDisabled(cocktail: Cocktail): boolean {
     const ingredients = cocktail.ingredients;
 
     for (const ingredient of ingredients) {
-      if (!this._ingredients.has(ingredient)) {
+      if (!this.ingredients$.has(ingredient)) {
         return true;
       }
     }
@@ -210,37 +193,36 @@ export class Inventory {
     if (this.isCocktailDisabled(cocktail)) {
       return;
     }
-    this._cocktails.set(cocktail.key, new CocktailExtended(cocktail, 0, 0));
+    this.cocktails$.set(cocktail.key, new CocktailExtended(cocktail, 0, 0));
   }
 
   @action
   public removeCocktail(cocktailKey: CocktailKey): void {
-    this._cocktails.delete(cocktailKey);
+    this.cocktails$.delete(cocktailKey);
   }
 
   public hasEmployee(employeeKey: EmployeeKey): boolean {
-    return this._employees.has(employeeKey);
+    return this.employees$.has(employeeKey);
   }
 
   @action
   public addEmployee(employee: Employee): void {
-    if (this._cash < employee.price) {
+    const cash = this.cash$.get();
+
+    if (cash < employee.price) {
       return;
     }
 
-    this._cash -= employee.price;
-    this._employees.set(employee.key, employee);
-    this.$service?.setCash(this._cash);
-    this.$service?.addEmployee(employee.key);
+    const newCash = cash - employee.price;
+    this.cash$.set(newCash);
+    this.employees$.set(employee.key, employee);
+    this.$service.setCash(newCash);
+    this.$service.addEmployee(employee.key);
   }
 
   @action
   public removeEmployee(employeeKey: EmployeeKey): void {
-    this._employees.delete(employeeKey);
-    this.$service?.removeEmployee(employeeKey);
-  }
-
-  public attachService(service: Service): void {
-    this.$service = service;
+    this.employees$.delete(employeeKey);
+    this.$service.removeEmployee(employeeKey);
   }
 }

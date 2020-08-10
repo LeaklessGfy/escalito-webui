@@ -6,6 +6,10 @@ import { useStore } from '../../store';
 const EmployeeComponent: FunctionalComponent = () => {
   const { inventory, employeesArray } = useStore();
 
+  if (inventory === undefined) {
+    return <div />;
+  }
+
   return (
     <section class="card">
       <header class="card-header">

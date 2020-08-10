@@ -7,6 +7,10 @@ import CocktailComponent from './CocktailComponent';
 const MenuComponent: FunctionalComponent = () => {
   const { inventory, cocktailsArray } = useStore();
 
+  if (inventory === undefined) {
+    return <div />;
+  }
+
   return (
     <section class="card">
       <header class="card-header">

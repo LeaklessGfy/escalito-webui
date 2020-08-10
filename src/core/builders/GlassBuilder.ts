@@ -1,7 +1,7 @@
 import { IScene } from '../../entities/game/IScene';
 import { GlassKey } from '../../entities/static/Glass';
 import { Glass } from '../cocktails/Glass';
-import { SelectController } from '../controllers/SelectControllers';
+import { SelectController } from '../controllers/SelectController';
 import { SpriteKey } from '../sprites/SpriteKey';
 
 export class GlassBuilder {
@@ -70,6 +70,8 @@ export class GlassBuilder {
       .setName('Glass')
       .setGravity(-1)
       .setDepth(3);
+
+    console.log(sprite.originX);
 
     const body = sprite.body as Phaser.Physics.Arcade.Body;
     body.collideWorldBounds = true;

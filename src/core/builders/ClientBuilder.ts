@@ -3,7 +3,7 @@ import { Order } from '../../entities/static/Order';
 import { Client } from '../characters/Client';
 import { BarController } from '../controllers/BarController';
 import { MainController } from '../controllers/MainController';
-import { SelectController } from '../controllers/SelectControllers';
+import { SelectController } from '../controllers/SelectController';
 import { Bar } from '../sprites/Bar';
 import { SpriteKey } from '../sprites/SpriteKey';
 import { Producer } from '../utils/Interfaces';

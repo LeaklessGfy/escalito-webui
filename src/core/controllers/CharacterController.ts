@@ -1,6 +1,7 @@
 import { IBehavioral } from '../../entities/game/IBehavioral';
 import { IController } from '../../entities/game/IController';
 import { IScene } from '../../entities/game/IScene';
+import { EmployeeKey } from '../../entities/static/Employee';
 import { Store } from '../../store';
 import { BarmaidBuilder } from '../builders/BarmaidBuilder';
 import { ClientBuilder } from '../builders/ClientBuilder';
@@ -15,14 +16,14 @@ export class CharacterController implements IController {
 
   private readonly _visitors: IBehavioral[];
   private readonly _leaving: Client[];
-  private _employees: IBehavioral[];
+  private readonly _employees: Map<EmployeeKey, IBehavioral>;
 
   private _barmaid?: Barmaid;
 
   constructor() {
     this._visitors = [];
     this._leaving = [];
-    this._employees = [];
+    this._employees = new Map();
   }
 
   /** Interface **/
@@ -119,6 +120,29 @@ export class CharacterController implements IController {
 
     this._barmaid = new BarmaidBuilder(scene).build();
     this.createClient(scene);
+
+    scene.inventory.employees$.subscribe(change => {
+      if (change === undefined) {
+        return;
+      }
+
+      switch (change.type) {
+        case 'add':
+        case 'update':
+          if (!this._employees.has(change.newValue.key)) {
+            const gameObject = new EmployeeBuilder(scene).build();
+            this._employees.set(change.newValue.key, gameObject);
+          }
+          break;
+        case 'remove':
+          const gameObject = this._employees.get(change.oldValue.key);
+          if (gameObject === undefined) {
+            throw new Error();
+          }
+          gameObject.destroy();
+          break;
+      }
+    });
   }
 
   public update(scene: IScene, delta: number): void {
@@ -160,18 +184,7 @@ export class CharacterController implements IController {
     }
   }
 
-  public daily(scene: IScene, store: Store, day: number): void {
-    for (const former of this._employees) {
-      former.destroy();
-    }
-    this._employees = [];
-
-    const builder = new EmployeeBuilder(scene);
-    for (const _ of store.inventory.employees) {
-      const employeeGo = builder.build();
-      this._employees.push(employeeGo);
-    }
-  }
+  public daily(scene: IScene, store: Store, day: number): void {}
 
   /** Custom **/
   private createClient(scene: IScene) {

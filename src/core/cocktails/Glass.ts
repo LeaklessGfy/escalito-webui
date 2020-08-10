@@ -18,7 +18,7 @@ export class Glass {
     this._graphics = builder.graphics;
     this._recipe = new Map();
 
-    this._sprite.on('drag', (p: any, x: number, y: number) => {
+    this._sprite.on('drag', (_: any, x: number, y: number) => {
       this._sprite.x = x;
       this._sprite.y = y;
       this._mask.x = x;

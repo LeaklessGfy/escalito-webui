@@ -61,7 +61,7 @@ export class LocalClient implements IClient {
       []
     );
     const filters = ingredients.filter(
-      i => i.ingredient !== dto.ingredient && i.provider !== dto.provider
+      i => i.ingredient !== dto.ingredient || i.provider !== dto.provider
     );
     if (dto.stock > 0) {
       filters.push(dto);

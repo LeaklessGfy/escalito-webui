@@ -4,11 +4,15 @@ import { useState } from 'preact/hooks';
 
 import { Provider } from '../../entities/static/Provider';
 import { useStore } from '../../store';
-import IngredientComponent from './IngredientComponent';
+import IngredientComponent from './IngredientBuyComponent';
 
 const ShopComponent: FunctionalComponent = () => {
   const { inventory, providersArray } = useStore();
   const [active, setActive] = useState<Provider | undefined>(providersArray[0]);
+
+  if (inventory === undefined) {
+    return <div />;
+  }
 
   return (
     <section class="card">
@@ -39,20 +43,10 @@ const ShopComponent: FunctionalComponent = () => {
               <IngredientComponent
                 key={ingredient.base.key}
                 name={ingredient.base.name}
-                price={ingredient.price}
-                stock={inventory.getIngredientStock(
-                  ingredient.base.key,
-                  ingredient.providerKey
-                )}
                 disabled={inventory.isIngredientDisabled(ingredient)}
-                onAdd={() =>
+                actionName={'Buy ' + ingredient.price + '$'}
+                onAction={() =>
                   inventory.addIngredient(
-                    ingredient.base.key,
-                    ingredient.providerKey
-                  )
-                }
-                onRemove={() =>
-                  inventory.removeIngredient(
                     ingredient.base.key,
                     ingredient.providerKey
                   )

@@ -48,7 +48,7 @@ export class Settings implements ISettings {
 
   public get spawnPosition(): IPoint {
     return {
-      x: 100,
+      x: this.width * 0.07,
       y: this.floor
     };
   }

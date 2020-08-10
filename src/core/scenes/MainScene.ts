@@ -10,7 +10,7 @@ import { CharacterController } from '../controllers/CharacterController';
 import { ClockController } from '../controllers/ClockController';
 import { IngredientController } from '../controllers/IngredientController';
 import { MainController } from '../controllers/MainController';
-import { SelectController } from '../controllers/SelectControllers';
+import { SelectController } from '../controllers/SelectController';
 import { DelegateTimeAction } from '../times/DelegateTimeAction';
 import { TimeActionManager } from '../times/TimeActionManager';
 
@@ -66,6 +66,14 @@ export class MainScene extends Phaser.Scene implements IScene {
   }
 
   public create(): void {
+    window.addEventListener('resize', () => {
+      const width = this.sys.canvas.parentElement?.clientWidth ?? 300;
+      const height = 300;
+      this.scale.resize(width, height);
+
+      // call rescale on controllers ?
+    });
+
     for (const controller of this._controllers.values()) {
       controller.create(this);
     }

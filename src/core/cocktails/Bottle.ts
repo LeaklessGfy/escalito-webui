@@ -1,32 +1,41 @@
-import { IngredientExtended } from '../../entities/dynamic/IngredientExtended';
 import { IEmitter } from '../../entities/game/IEmitter';
 import { IPoint } from '../../entities/game/IPoint';
 import { IScene } from '../../entities/game/IScene';
 import { IngredientGameObject } from '../../entities/game/IngredientGameObject';
+import { Ingredient } from '../../entities/static/Ingredient';
+import { IngredientProvided } from '../../entities/static/IngredientProvided';
+import { ProviderKey } from '../../entities/static/Provider';
 import { BottleBuilder } from '../builders/BottleBuilder';
 import { Bar } from '../sprites/Bar';
+
+interface ProviderInfo {
+  provided: IngredientProvided;
+  stock: number;
+}
 
 export class Bottle implements IngredientGameObject {
   private static readonly STOCK_BAR_HEIGHT: number = 5;
 
-  private readonly _ingredient: IngredientExtended;
+  private readonly _ingredient: Ingredient;
   private readonly _sprite: Phaser.GameObjects.Sprite;
   private readonly _emitter: IEmitter;
   private readonly _stockBar: Bar;
+  private readonly _providers: Map<ProviderKey, ProviderInfo>;
 
   private _initialPosition?: IPoint;
   private _glassPosition?: IPoint;
 
-  private _currentStock: number;
+  private _currentAmount: number;
   private _isFlowing: boolean;
 
   constructor(builder: BottleBuilder) {
-    this._ingredient = builder.ingredient;
+    this._ingredient = builder.ingredient.provided.base;
     this._sprite = builder.sprite;
     this._emitter = builder.emitter;
     this._stockBar = builder.stockBar;
+    this._providers = new Map();
 
-    this._currentStock = builder.ingredient.stock;
+    this._currentAmount = builder.ingredient.provided.base.amount;
     this._isFlowing = false;
 
     this._sprite.on('pointerdown', () => {
@@ -38,6 +47,11 @@ export class Bottle implements IngredientGameObject {
       y: this._sprite.y,
       width: this._sprite.width,
       height: Bottle.STOCK_BAR_HEIGHT
+    });
+
+    this._providers.set(builder.ingredient.provided.providerKey, {
+      provided: builder.ingredient.provided,
+      stock: 1
     });
   }
 
@@ -55,17 +69,12 @@ export class Bottle implements IngredientGameObject {
     this._emitter.stop();
   }
 
-  public charge(): void {
-    this._currentStock = this._ingredient.stock;
-  }
-
   public update(scene: IScene): void {
-    this._emitter.checkCollision(scene, this._ingredient, () => {
-      this.removeStock(1);
-    });
+    this._emitter.checkCollision(scene, this._ingredient);
 
     if (this._emitter.isEmitting()) {
-      this.removeStock(0.01);
+      this._currentAmount -= 1;
+      this.updateStockBar();
     }
 
     if (this._isFlowing) {
@@ -75,10 +84,72 @@ export class Bottle implements IngredientGameObject {
     }
   }
 
-  public removeStock(nb: number): void {
-    this._currentStock -= nb;
-    const percent = (this._currentStock / this._ingredient.stock) * 100;
-    this._stockBar.update(percent);
+  public addProvided(ingredient: IngredientProvided): void {
+    if (ingredient.base !== this._ingredient) {
+      throw new Error(
+        'Can not add provided ingredient on different ingredient'
+      );
+    }
+
+    this._currentAmount += this._ingredient.amount;
+    // calculate quality average etc ...
+
+    const info = this._providers.get(ingredient.providerKey) ?? {
+      provided: ingredient,
+      stock: 0
+    };
+    info.stock += 1;
+    this._providers.set(ingredient.providerKey, info);
+
+    this.updateStockBar();
+  }
+
+  public removeProvided(ingredient: IngredientProvided): void {
+    if (ingredient.base !== this._ingredient) {
+      throw new Error(
+        'Can not remove provided ingredient on different ingredient'
+      );
+    }
+
+    const info = this._providers.get(ingredient.providerKey);
+
+    if (info === undefined) {
+      throw new Error('Can not remove unexisting provided ingredient');
+    }
+
+    const total = this.getTotal();
+    const defaultAmount = this._ingredient.amount;
+    const totalAmount = defaultAmount * total;
+    const currentAmount = this._currentAmount;
+    const providerPercent = info.stock / total;
+
+    const diffTotalAmount = totalAmount - currentAmount;
+    const diffPercentAmount = diffTotalAmount * providerPercent;
+
+    const nextPercentAmount = currentAmount - currentAmount * providerPercent;
+    const nextAmount = nextPercentAmount + diffPercentAmount;
+
+    this._currentAmount = nextAmount;
+
+    this._providers.delete(ingredient.providerKey);
+
+    this.updateStockBar();
+  }
+
+  public shouldDestroy(): boolean {
+    return this.getTotal() < 1;
+  }
+
+  public destroy(): void {
+    this._sprite.destroy();
+    this._stockBar.destroy();
+  }
+
+  private getTotal(): number {
+    return Array.from(this._providers.values()).reduce(
+      (p, c) => p + c.stock,
+      0
+    );
   }
 
   private flow(scene: IScene) {
@@ -94,9 +165,7 @@ export class Bottle implements IngredientGameObject {
       this._sprite.angle -= 5;
     }
 
-    const hasArrived = this.moveTo(this._glassPosition);
-
-    if (!hasArrived) {
+    if (this.moveTo(this._glassPosition)) {
       const point = {
         x: this._glassPosition.x - this._sprite.displayHeight / 2,
         y: this._glassPosition.y + 10
@@ -119,20 +188,25 @@ export class Bottle implements IngredientGameObject {
 
   private moveTo(point: IPoint): boolean {
     const { x, y } = this._sprite;
-    let move = false;
+    let move = true;
 
     if (Math.abs(x - point.x) > 2) {
       const dirX = point.x < x ? -1 : 1;
       this._sprite.setX(x + 5 * dirX);
-      move = true;
+      move = false;
     }
 
     if (Math.abs(y - point.y) > 1) {
       const dirY = point.y < y ? -1 : 1;
       this._sprite.setY(y + 2 * dirY);
-      move = true;
+      move = false;
     }
 
     return move;
+  }
+
+  private updateStockBar() {
+    const percent = (this._currentAmount / this.getTotal()) * 100;
+    this._stockBar.update(percent);
   }
 }

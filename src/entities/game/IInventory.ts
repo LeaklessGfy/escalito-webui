@@ -1,35 +1,41 @@
-import { Consumer } from '../../core/utils/Interfaces';
-import { Inventory } from '../Inventory';
-import { IngredientExtended } from '../dynamic/IngredientExtended';
-import { IngredientKey } from '../static/Ingredient';
+import { Observable } from 'rxjs';
 
-export declare type Change<K, T> =
+import { Inventory } from '../Inventory';
+import { CocktailExtended } from '../dynamic/CocktailExtended';
+import { IngredientExtended } from '../dynamic/IngredientExtended';
+import { Employee } from '../static/Employee';
+
+export declare type Change<T> =
   | {
-      name: K;
       type: 'add';
       newValue: T;
     }
   | {
-      name: K;
       type: 'update';
       oldValue: T;
       newValue: T;
     }
   | {
-      name: K;
       type: 'remove';
       oldValue: T;
     };
 
-export declare type CashChange = Change<any, number>;
-export declare type IngredientChange = Change<
-  IngredientKey,
-  IngredientExtended
->;
+export declare type CashChange = {
+  type: 'update';
+  newValue: number | undefined;
+  oldValue: number | undefined;
+};
+
+export declare type IngredientChange = Change<IngredientExtended>;
+
+export declare type CocktailChange = Change<CocktailExtended>;
+
+export declare type EmployeeChange = Change<Employee>;
 
 export interface IInventory {
   readonly current: Readonly<Inventory>;
-
-  watchCash(watcher: Consumer<CashChange>): void;
-  watchIngredients(watcher: Consumer<IngredientChange>): void;
+  readonly cash$: Observable<CashChange>;
+  readonly ingredients$: Observable<IngredientChange | undefined>;
+  readonly cocktails$: Observable<CocktailChange>;
+  readonly employees$: Observable<EmployeeChange | undefined>;
 }
