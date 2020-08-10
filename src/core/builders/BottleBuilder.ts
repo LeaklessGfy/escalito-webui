@@ -1,5 +1,6 @@
 import { IngredientExtended } from '../../entities/dynamic/IngredientExtended';
 import { IEmitter } from '../../entities/game/IEmitter';
+import { IPoint } from '../../entities/game/IPoint';
 import { IScene } from '../../entities/game/IScene';
 import { IngredientKey } from '../../entities/static/Ingredient';
 import { Bottle } from '../cocktails/Bottle';
@@ -58,6 +59,10 @@ export class BottleBuilder {
 
   public get barCtr(): BarController {
     return this._scene.getController<BarController>(BarController.KEY);
+  }
+
+  public get glassPosition(): IPoint {
+    return this._scene.settings.glassPosition;
   }
 
   public build(): Bottle {

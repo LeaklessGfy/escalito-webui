@@ -6,11 +6,11 @@ import { Providers } from './Providers';
 export function buildIngredient(key: IngredientKey): Ingredient {
   switch (key) {
     case IngredientKey.Rum:
-      return new Ingredient(IngredientKey.Rum, 1);
+      return new Ingredient(IngredientKey.Rum, 1000);
     case IngredientKey.Cola:
-      return new Ingredient(IngredientKey.Cola, 1);
+      return new Ingredient(IngredientKey.Cola, 1000);
     case IngredientKey.Lemonade:
-      return new Ingredient(IngredientKey.Lemonade, 1);
+      return new Ingredient(IngredientKey.Lemonade, 1000);
     case IngredientKey.Lemon:
       return new Ingredient(IngredientKey.Lemon, 1);
     case IngredientKey.Strawberry:

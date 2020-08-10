@@ -21,9 +21,8 @@ export class Bottle implements IngredientGameObject {
   private readonly _emitter: IEmitter;
   private readonly _stockBar: Bar;
   private readonly _providers: Map<ProviderKey, ProviderInfo>;
-
-  private _initialPosition?: IPoint;
-  private _glassPosition?: IPoint;
+  private readonly _initialPosition: IPoint;
+  private readonly _glassPosition: IPoint;
 
   private _currentAmount: number;
   private _isFlowing: boolean;
@@ -34,34 +33,35 @@ export class Bottle implements IngredientGameObject {
     this._emitter = builder.emitter;
     this._stockBar = builder.stockBar;
     this._providers = new Map();
+    this._initialPosition = { x: this._sprite.x, y: this._sprite.y };
+    this._glassPosition = {
+      x: builder.glassPosition.x + this._sprite.displayHeight / 2,
+      y: builder.glassPosition.y - this._sprite.displayWidth * 2
+    };
 
-    this._currentAmount = builder.ingredient.provided.base.amount;
+    this._currentAmount =
+      builder.ingredient.provided.base.amount * builder.ingredient.stock;
     this._isFlowing = false;
 
     this._sprite.on('pointerdown', () => {
-      this.turnOn({ x: 0, y: 0 });
+      this.turnOn();
     });
 
     this._stockBar.show({
-      x: this._sprite.x,
-      y: this._sprite.y,
+      x: this._sprite.x - this._sprite.displayWidth / 2,
+      y: this._sprite.y + this._sprite.displayHeight / 2.5,
       width: this._sprite.width,
       height: Bottle.STOCK_BAR_HEIGHT
     });
 
     this._providers.set(builder.ingredient.provided.providerKey, {
       provided: builder.ingredient.provided,
-      stock: 1
+      stock: builder.ingredient.stock
     });
   }
 
-  public turnOn(position: IPoint): void {
+  public turnOn(): void {
     this._isFlowing = true;
-    this._initialPosition = { x: this._sprite.x, y: this._sprite.y };
-    this._glassPosition = {
-      x: position.x + this._sprite.displayHeight / 2,
-      y: position.y + this._sprite.displayWidth / 1.2
-    };
   }
 
   public turnOff(): void {
@@ -78,9 +78,13 @@ export class Bottle implements IngredientGameObject {
     }
 
     if (this._isFlowing) {
-      this.flow(scene);
+      if (!scene.input.activePointer.isDown) {
+        return this.turnOff();
+      }
+
+      this.flow();
     } else {
-      this.unflow(scene);
+      this.unflow();
     }
   }
 
@@ -152,15 +156,7 @@ export class Bottle implements IngredientGameObject {
     );
   }
 
-  private flow(scene: IScene) {
-    if (!scene.input.activePointer.isDown) {
-      return this.turnOff();
-    }
-
-    if (this._glassPosition === undefined) {
-      return;
-    }
-
+  private flow(): void {
     if (this._sprite.angle > -80) {
       this._sprite.angle -= 5;
     }
@@ -174,11 +170,7 @@ export class Bottle implements IngredientGameObject {
     }
   }
 
-  private unflow(scene: IScene): void {
-    if (this._initialPosition === undefined) {
-      return;
-    }
-
+  private unflow(): void {
     if (this._sprite.angle < 0) {
       this._sprite.angle += 5;
     }
@@ -190,7 +182,7 @@ export class Bottle implements IngredientGameObject {
     const { x, y } = this._sprite;
     let move = true;
 
-    if (Math.abs(x - point.x) > 2) {
+    if (Math.abs(x - point.x) > 3) {
       const dirX = point.x < x ? -1 : 1;
       this._sprite.setX(x + 5 * dirX);
       move = false;
@@ -206,7 +198,8 @@ export class Bottle implements IngredientGameObject {
   }
 
   private updateStockBar() {
-    const percent = (this._currentAmount / this.getTotal()) * 100;
+    const total = this.getTotal() * this._ingredient.amount;
+    const percent = (this._currentAmount / total) * 100;
     this._stockBar.update(percent);
   }
 }
