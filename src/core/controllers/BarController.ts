@@ -10,6 +10,7 @@ export class BarController implements IController {
   public static readonly KEY = Symbol();
 
   private _glass?: Glass;
+  private _block?: Phaser.GameObjects.GameObject;
   private _open: boolean = true;
 
   /** Interface **/
@@ -18,7 +19,8 @@ export class BarController implements IController {
   }
 
   public create(scene: IScene): void {
-    const { spriteDoor, spriteBar } = BarControllerHelper.create(scene);
+    const { spriteDoor, spriteBar, block } = BarControllerHelper.create(scene);
+    this._block = block;
 
     spriteDoor.on('pointerdown', () => {
       this._open = !this._open;
@@ -51,6 +53,9 @@ export class BarController implements IController {
 
   public createGlass(scene: IScene, key: GlassKey): void {
     this._glass = new GlassBuilder(scene).setGlassKey(key).build();
+    if (this._block !== undefined) {
+      this._glass.addCollider(scene, this._block, false);
+    }
   }
 
   public destroyGlass() {

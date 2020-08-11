@@ -38,7 +38,7 @@ export class LiquidEmitter implements IEmitter {
     }
 
     this._emitter.forEachAlive(p => {
-      if (glass.body.hitTest(p.x, p.y)) {
+      if (glass.hasHit(p)) {
         p.lifeCurrent = 0;
         glass.addIngredient(ingredient);
       }

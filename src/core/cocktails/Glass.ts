@@ -1,3 +1,5 @@
+import { IPoint } from '../../entities/game/IPoint';
+import { IScene } from '../../entities/game/IScene';
 import { Ingredient, IngredientKey } from '../../entities/static/Ingredient';
 import { GlassBuilder } from '../builders/GlassBuilder';
 
@@ -19,19 +21,20 @@ export class Glass {
     this._recipe = new Map();
 
     this._sprite.on('drag', (_: any, x: number, y: number) => {
+      this.body.setAllowGravity(false);
       this._sprite.x = x;
       this._sprite.y = y;
       this._mask.x = x;
       this._mask.y = y;
       this.updateGraphics();
     });
+
+    this._sprite.on('dragend', () => {
+      this.body.setAllowGravity(true);
+    });
   }
 
-  public get sprite(): Phaser.GameObjects.Sprite {
-    return this._sprite;
-  }
-
-  public get body(): Phaser.Physics.Arcade.Body {
+  private get body(): Phaser.Physics.Arcade.Body {
     return this._sprite.body as Phaser.Physics.Arcade.Body;
   }
 
@@ -51,6 +54,22 @@ export class Glass {
     base.stock += ingredient.amount;
     this._recipe.set(ingredient.key, base);
     this.updateGraphics();
+  }
+
+  public addCollider(
+    scene: IScene,
+    go: Phaser.GameObjects.GameObject,
+    destroy: boolean,
+    callback: ((g: Glass) => void) | undefined = undefined
+  ) {
+    const collider = scene.physics.add.collider(this._sprite, go, () => {
+      callback?.(this);
+      destroy && collider.destroy();
+    });
+  }
+
+  public hasHit(point: IPoint) {
+    return this.body.hitTest(point.x, point.y);
   }
 
   public destroy(): void {

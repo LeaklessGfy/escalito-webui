@@ -68,12 +68,12 @@ export class GlassBuilder {
       .setY(y - sprite.displayHeight / 2)
       .setInteractive()
       .setName('Glass')
-      .setGravity(-1)
+      .setGravity(0, -1)
       .setDepth(3);
 
-    const body = sprite.body as Phaser.Physics.Arcade.Body;
-    body.collideWorldBounds = true;
-    body.allowGravity = false;
+    (sprite.body as Phaser.Physics.Arcade.Body)
+      .setCollideWorldBounds(true)
+      .setAllowGravity(true);
 
     this._scene.input.setDraggable(sprite);
 

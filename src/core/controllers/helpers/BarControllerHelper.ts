@@ -57,7 +57,7 @@ export class BarControllerHelper {
       .setInteractive()
       .setName('Door');
 
-    scene.add.rectangle(mid.x, mid.y, dim.x, 5, 0xffffff, 1);
+    const block = scene.add.rectangle(mid.x, mid.y, dim.x, 5, 0xffffff, 1);
     scene.add.rectangle(
       mid.x,
       dim.y - floorHeight / 2,
@@ -67,12 +67,18 @@ export class BarControllerHelper {
       1
     );
 
+    scene.physics.add.existing(block);
+    (block.body as Phaser.Physics.Arcade.Body)
+      .setImmovable(true)
+      .setAllowGravity(false);
+
     return {
       spriteWall,
       spriteWood,
       spriteBar,
       spriteBarTop,
-      spriteDoor
+      spriteDoor,
+      block
     };
   }
 }

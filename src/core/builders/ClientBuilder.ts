@@ -163,15 +163,10 @@ export class ClientBuilder {
         throw new Error('Glass is undefined');
       }
 
-      const collider = scene.physics.add.collider(
-        this._sprite,
-        barCtr.glass.sprite,
-        () => {
-          this.serve(barCtr.glass);
-          barCtr.destroyGlass();
-          collider.destroy();
-        }
-      );
+      barCtr.glass.addCollider(scene, this._sprite, true, () => {
+        this.serve(barCtr.glass);
+        barCtr.destroyGlass();
+      });
     };
   }
 
