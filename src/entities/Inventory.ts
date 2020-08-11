@@ -113,10 +113,8 @@ export class Inventory {
       throw new Error('Can not buy ingredient, too expensive');
     }
 
-    const newIngredientExtended = new IngredientExtended(
-      ingredientExtended.provided,
-      ingredientExtended.stock + ingredientExtended.provided.base.amount
-    );
+    const newStock = ingredientExtended.stock + 1;
+    const newIngredientExtended = ingredientExtended.clone(newStock);
     providers.set(providerKey, newIngredientExtended);
 
     this.ingredients$.set(ingredientKey, providers);
@@ -146,14 +144,10 @@ export class Inventory {
       return;
     }
 
-    const newStock =
-      ingredientExtended.stock - ingredientExtended.provided.base.amount;
+    const newStock = ingredientExtended.stock - 1;
 
     if (newStock > 0) {
-      const newIngredientExtended = new IngredientExtended(
-        ingredientExtended.provided,
-        newStock
-      );
+      const newIngredientExtended = ingredientExtended.clone(newStock);
       providers.set(providerKey, newIngredientExtended);
     } else {
       providers.delete(providerKey);

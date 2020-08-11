@@ -77,7 +77,7 @@ export class GlassBuilder {
 
     this._scene.input.setDraggable(sprite);
 
-    this._mask = this._scene.make.sprite({
+    const mask = this._scene.make.sprite({
       x: sprite.x,
       y: sprite.y,
       key: this.maskSpriteKey,
@@ -91,6 +91,7 @@ export class GlassBuilder {
     selectCtr.addSelect(this._scene, sprite);
 
     this._sprite = sprite;
+    this._mask = mask;
   }
 
   private buildGraphics() {

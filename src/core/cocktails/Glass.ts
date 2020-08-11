@@ -24,8 +24,6 @@ export class Glass {
       this.body.setAllowGravity(false);
       this._sprite.x = x;
       this._sprite.y = y;
-      this._mask.x = x;
-      this._mask.y = y;
       this.updateGraphics();
     });
 
@@ -46,12 +44,19 @@ export class Glass {
     return map;
   }
 
+  public update() {
+    const { x, y } = this._mask;
+    if (x !== this._sprite.x || y !== this._sprite.y) {
+      this.updateGraphics();
+    }
+  }
+
   public addIngredient(ingredient: Ingredient): void {
     const base = this._recipe.get(ingredient.key) ?? {
       ingredient,
       stock: 0
     };
-    base.stock += ingredient.amount;
+    base.stock += 1;
     this._recipe.set(ingredient.key, base);
     this.updateGraphics();
   }
@@ -75,7 +80,7 @@ export class Glass {
   public destroy(): void {
     this._sprite.destroy();
     this._mask.destroy();
-    this._graphics.clear().destroy();
+    this._graphics.destroy();
   }
 
   private updateGraphics() {
@@ -83,6 +88,7 @@ export class Glass {
     const { x, y } = this._sprite;
     const bottomX = x - this._sprite.displayWidth / 2;
     const bottomY = y + this._sprite.displayHeight / 2;
+    this._mask.setPosition(x, y);
 
     let lastY = bottomY;
     for (const [_, info] of this._recipe.entries()) {

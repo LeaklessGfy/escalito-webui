@@ -38,7 +38,9 @@ export class BarController implements IController {
     selectCtr.addSelect(scene, spriteBar);
   }
 
-  public update(scene: IScene, delta: number): void {}
+  public update(scene: IScene, delta: number): void {
+    this._glass?.update();
+  }
 
   public rescale(): void {}
 
