@@ -25,37 +25,56 @@ export class BarController implements IController {
     );
     scene.load.image(SpriteKey.Square, 'assets/square.png');
     scene.load.multiatlas(SpriteKey.Door, 'assets/door.atlas.json', 'assets');
+    scene.load.image(SpriteKey.Wall, 'assets/wall.green.png');
+    scene.load.image(SpriteKey.Wood, 'assets/wood.png');
   }
 
   public create(scene: IScene): void {
-    const { x, y } = scene.settings.barPosition;
-    const xDoor = scene.settings.spawnPosition.x;
+    const dim = scene.settings.dimension;
+    const mid = scene.settings.middleDimension;
+    const spawn = scene.settings.spawn;
+    const floorHeight = scene.settings.floorHeight;
 
-    const spriteBar = scene.add.sprite(x, y, SpriteKey.Bar);
+    const spriteWall = scene.add.tileSprite(
+      0,
+      mid.y,
+      1950,
+      300,
+      SpriteKey.Wall
+    );
+    spriteWall.setY(mid.y + spriteWall.displayHeight / 2);
+
+    const spriteWood = scene.add.tileSprite(0, dim.y, 1950, 48, SpriteKey.Wood);
+    spriteWood.setY(dim.y - spriteWood.displayHeight / 2 - floorHeight);
+
+    const spriteBar = scene.add.sprite(mid.x, dim.y, SpriteKey.Bar);
     spriteBar
-      .setY(y - 10)
       .setScale(0.8)
+      .setY(dim.y - spriteBar.displayHeight / 2 - floorHeight)
       .setDepth(1)
       .setName('Bar');
 
-    const spriteBarTop = scene.add.sprite(x, y, SpriteKey.BarTop);
-    spriteBarTop.setY(y - 80).setScale(0.8);
+    const spriteBarTop = scene.add.sprite(mid.x, dim.y, SpriteKey.BarTop);
+    spriteBarTop
+      .setScale(0.8)
+      .setY(spriteBar.y - spriteBar.displayHeight * 1.7);
 
-    this._door = scene.add.image(xDoor, y, SpriteKey.Door, 'open.png');
+    this._door = scene.add.image(spawn.x, spawn.y, SpriteKey.Door, 'open.png');
     this._door
-      .setY(y + 10 - this._door.frame.height / 2)
+      .setY(spawn.y - this._door.frame.height / 2)
       .setInteractive()
       .on('pointerdown', () => {
         this.open = !this.open;
       })
       .setName('Door');
 
+    scene.add.rectangle(mid.x, mid.y, dim.x, 5, 0xffffff, 1);
     scene.add.rectangle(
-      scene.settings.middleWidth,
-      scene.settings.middleHeight,
-      scene.settings.width,
-      5,
-      0xffffff,
+      mid.x,
+      dim.y - floorHeight / 2,
+      dim.x,
+      floorHeight,
+      0x000000,
       1
     );
 

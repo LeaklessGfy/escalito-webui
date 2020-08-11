@@ -38,7 +38,7 @@ export class EmployeeBuilder {
   }
 
   private buildSprite() {
-    const { x, y } = this._scene.settings.spawnPosition;
+    const { x, y } = this._scene.settings.spawn;
 
     const sprite = this._scene.add.sprite(x, y, this.spriteKey);
 

@@ -111,12 +111,12 @@ export class ClientBuilder {
   }
 
   private buildSprite() {
-    const { x, y } = this._scene.settings.spawnPosition;
+    const { x, y } = this._scene.settings.spawn;
 
     const sprite = this._scene.physics.add.sprite(x, y, this._spriteKey);
     sprite
       .setScale(2)
-      .setY(sprite.y - 20)
+      .setY(sprite.y - sprite.displayHeight / 2)
       .setDepth(2)
       .setName('Client');
 

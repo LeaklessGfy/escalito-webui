@@ -61,7 +61,7 @@ export class GlassBuilder {
   }
 
   private buildSprite() {
-    const { x, y } = this._scene.settings.glassPosition;
+    const { x, y } = this._scene.settings.middleDimension;
     const sprite = this._scene.physics.add.sprite(x, y, this.spriteKey);
     sprite
       .setScale(0.5)

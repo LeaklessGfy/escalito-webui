@@ -3,7 +3,7 @@ import { ISettings } from '../entities/game/ISettings';
 
 export class Settings implements ISettings {
   public scene?: Phaser.Scene;
-  public readonly floorHeight: number = 20;
+  public readonly floorHeight: number = 10;
 
   public get width(): number {
     return this.scene?.scale.displaySize.width ?? 0;
@@ -21,35 +21,25 @@ export class Settings implements ISettings {
     return this.height / 2;
   }
 
-  public get floor(): number {
-    return this.height - this.floorHeight;
+  public get dimension(): IPoint {
+    return { x: this.width, y: this.height };
   }
 
-  public get bottlePosition(): IPoint {
+  public get middleDimension(): IPoint {
+    return { x: this.middleWidth, y: this.middleHeight };
+  }
+
+  public get bottle(): IPoint {
     return {
       x: this.middleWidth + this.middleWidth / 2,
       y: this.middleHeight
     };
   }
 
-  public get glassPosition(): IPoint {
-    return {
-      x: this.middleWidth,
-      y: this.middleHeight
-    };
-  }
-
-  public get barPosition(): IPoint {
-    return {
-      x: this.middleWidth,
-      y: this.floor
-    };
-  }
-
-  public get spawnPosition(): IPoint {
+  public get spawn(): IPoint {
     return {
       x: this.width * 0.07,
-      y: this.floor
+      y: this.height - this.floorHeight
     };
   }
 }

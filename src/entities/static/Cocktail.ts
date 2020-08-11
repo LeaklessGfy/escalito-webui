@@ -13,8 +13,8 @@ export const CocktailNames: { [key in CocktailKey]: string } = {
 
 export class Cocktail {
   public readonly key: CocktailKey;
-  public readonly name: string;
   public readonly glassKey: GlassKey;
+  public readonly name: string;
   public readonly recipe: Map<IngredientKey, number>;
 
   constructor(
@@ -23,8 +23,8 @@ export class Cocktail {
     recipe: Map<IngredientKey, number>
   ) {
     this.key = key;
-    this.name = CocktailNames[key];
     this.glassKey = glassKey;
+    this.name = CocktailNames[key];
     this.recipe = recipe;
   }
 

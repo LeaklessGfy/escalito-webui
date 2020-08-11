@@ -40,7 +40,7 @@ export class CharacterController implements IController {
     });*/
 
     this._barmaid = new BarmaidBuilder(scene).build();
-    //this.createClient(scene);
+    this.createClient(scene);
 
     scene.inventory.employees$.subscribe(change => {
       if (change === undefined) {
@@ -76,7 +76,7 @@ export class CharacterController implements IController {
 
     for (let i = 0; i < length; i++) {
       const current = visitors[i];
-      let next = scene.settings.barPosition;
+      let next = scene.settings.middleDimension;
 
       // Has leader
       if (i + 1 < length) {
@@ -86,8 +86,8 @@ export class CharacterController implements IController {
       current.update(delta);
       current.behave(
         next,
-        scene.settings.barPosition,
-        scene.settings.spawnPosition
+        scene.settings.middleDimension,
+        scene.settings.spawn
       );
     }
 
@@ -95,7 +95,7 @@ export class CharacterController implements IController {
     for (const leaving of this._leaving) {
       leaving.update(delta);
 
-      if (leaving.isNear(scene.settings.spawnPosition, 4)) {
+      if (leaving.isNear(scene.settings.spawn, 4)) {
         leaving.destroy();
         toRemove++;
       }

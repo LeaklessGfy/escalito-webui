@@ -62,7 +62,7 @@ export class BottleBuilder {
   }
 
   public get glassPosition(): IPoint {
-    return this._scene.settings.glassPosition;
+    return this._scene.settings.middleDimension;
   }
 
   public build(): Bottle {
@@ -73,7 +73,7 @@ export class BottleBuilder {
   }
 
   private buildSprite() {
-    const { x, y } = this._scene.settings.bottlePosition;
+    const { x, y } = this._scene.settings.bottle;
     const sprite = this._scene.add.sprite(
       x,
       y,

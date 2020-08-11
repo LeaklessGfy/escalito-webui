@@ -31,12 +31,14 @@ export class BarmaidBuilder {
   }
 
   private buildSprite() {
-    const { x, y } = this._scene.settings.barPosition;
+    const settings = this._scene.settings;
+    const x = settings.middleWidth;
+    const y = settings.height - settings.floorHeight;
 
     const sprite = this._scene.add.sprite(x, y, this._spriteKey);
     sprite
       .setScale(2)
-      .setY(sprite.y - sprite.displayHeight / 2)
+      .setY(sprite.y - sprite.displayHeight / 1.5)
       .setFlipX(true)
       .setName('Barmaid');
 

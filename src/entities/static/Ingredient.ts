@@ -35,18 +35,23 @@ const IngredientTypes: { [key in IngredientKey]: IngredientType } = {
   [IngredientKey.Strawberry]: IngredientType.Fruit
 };
 
+const IngredientAmounts: { [key in IngredientType]: number } = {
+  [IngredientType.Bottle]: 500,
+  [IngredientType.Fruit]: 1
+};
+
 export class Ingredient {
   public readonly key: IngredientKey;
-  public readonly name: string;
-  public readonly amount: number;
-  public readonly color: number;
   public readonly type: IngredientType;
+  public readonly name: string;
+  public readonly color: number;
+  public readonly amount: number;
 
-  public constructor(key: IngredientKey, amount: number) {
+  public constructor(key: IngredientKey) {
     this.key = key;
-    this.name = IngredientNames[key];
-    this.amount = amount;
-    this.color = IngredientColors[key];
     this.type = IngredientTypes[key];
+    this.name = IngredientNames[key];
+    this.color = IngredientColors[key];
+    this.amount = IngredientAmounts[this.type];
   }
 }
