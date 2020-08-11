@@ -12,7 +12,7 @@ export class Bar {
     height: 0
   };
 
-  constructor(
+  public constructor(
     background: Phaser.GameObjects.Graphics,
     foreground: Phaser.GameObjects.Graphics
   ) {
@@ -20,22 +20,22 @@ export class Bar {
     this._foreground = foreground;
   }
 
-  public show(dimension: IDimension) {
+  public show(dimension: IDimension): void {
     this._dimension = dimension;
     this.fillBackground();
     this.fillForeground(100);
   }
 
-  public update(percent: number) {
+  public update(percent: number): void {
     this.fillForeground(Math.max(0, percent));
   }
 
-  public hide() {
+  public hide(): void {
     this._background.clear();
     this._foreground.clear();
   }
 
-  public destroy() {
+  public destroy(): void {
     this._background.destroy();
     this._foreground.destroy();
   }

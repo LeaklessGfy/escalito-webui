@@ -5,7 +5,7 @@ export class DelegateTimeAction extends AbstractTimeAction {
   private readonly _condition: () => boolean;
   private readonly _action: () => void;
 
-  constructor(
+  public constructor(
     triggerTime: number,
     triggerUnit: TriggerUnit,
     repetition: number,

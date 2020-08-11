@@ -9,7 +9,7 @@ import { SpriteKey } from '../sprites/SpriteKey';
 import { Producer } from '../utils/Interfaces';
 
 export class ClientBuilder {
-  private static readonly PATIENCE: number = 2000;
+  private static readonly PATIENCE: number = 20000;
   private static readonly SATISFACTION_THRESHOLD: number = 20;
   private static readonly STYLE: Phaser.Types.GameObjects.Text.TextStyle = {
     color: '#FFF',
@@ -37,7 +37,7 @@ export class ClientBuilder {
   private _satisfactionThreshold: number = ClientBuilder.SATISFACTION_THRESHOLD;
   private _cash: number = 5;
 
-  constructor(scene: IScene) {
+  public constructor(scene: IScene) {
     this._scene = scene;
   }
 

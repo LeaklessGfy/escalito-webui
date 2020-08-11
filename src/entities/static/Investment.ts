@@ -7,7 +7,7 @@ export class Investment {
   public readonly trigger: TimeTrigger;
   public readonly requirements: Set<string>;
 
-  constructor(
+  public constructor(
     name: string,
     amount: number,
     penalty: number,

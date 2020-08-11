@@ -12,7 +12,7 @@ export class GlassBuilder {
   private _mask?: Phaser.GameObjects.Sprite;
   private _graphics?: Phaser.GameObjects.Graphics;
 
-  constructor(scene: IScene) {
+  public constructor(scene: IScene) {
     this._scene = scene;
   }
 

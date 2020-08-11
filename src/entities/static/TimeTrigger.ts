@@ -4,7 +4,8 @@ export enum TriggerUnit {
   Hour,
   Minute,
   Second,
-  MilliSecond
+  MilliSecond,
+  Real
 }
 
 export class TimeTrigger {
@@ -12,7 +13,7 @@ export class TimeTrigger {
   public readonly triggerUnit: TriggerUnit;
   public readonly triggerRepetition: number;
 
-  constructor(
+  public constructor(
     triggerTime: number,
     triggerUnit: TriggerUnit,
     triggerRepetition: number = -1

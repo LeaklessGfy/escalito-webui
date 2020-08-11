@@ -24,9 +24,10 @@ const CONFIG = {
 export class FirebaseClient implements IClient {
   private readonly _app: firebase.app.App;
   private readonly _subscribers: UserListener[];
+
   private _user: UserDto;
 
-  constructor() {
+  public constructor() {
     this._app = !firebase.apps.length
       ? firebase.initializeApp(CONFIG)
       : firebase.app();

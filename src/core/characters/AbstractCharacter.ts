@@ -16,14 +16,14 @@ export abstract class AbstractCharacter {
   private _onArrive?: Function;
   private _onLeave?: Function;
 
-  constructor(sprite: Phaser.GameObjects.Sprite, texture: SpriteKey) {
+  public constructor(sprite: Phaser.GameObjects.Sprite, texture: SpriteKey) {
     this._state = new State();
     this._sprite = sprite;
     this._texture = texture;
   }
 
   public get position(): IPoint {
-    return this._sprite;
+    return { x: this._sprite.x, y: this._sprite.y };
   }
 
   public set onLeave(listener: Function) {

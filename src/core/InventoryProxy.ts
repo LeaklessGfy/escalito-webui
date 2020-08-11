@@ -24,7 +24,7 @@ export class InventoryProxy implements IInventory {
     EmployeeChange | undefined
   >(undefined);
 
-  constructor(inventory: Inventory) {
+  public constructor(inventory: Inventory) {
     this._inventory = inventory;
   }
 

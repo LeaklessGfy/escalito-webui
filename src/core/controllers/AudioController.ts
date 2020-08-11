@@ -4,12 +4,12 @@ import { IScene } from '../../entities/game/IScene';
 export class AudioController implements IController {
   public static readonly KEY = Symbol();
 
-  private _scene?: IScene;
-  private _audioActivate: boolean = false;
+  private _manager?: Phaser.Sound.BaseSoundManager;
+  private _active: boolean = false;
 
   /** Interface **/
   public preload(scene: IScene): void {
-    this._scene = scene;
+    this._manager = scene.sound;
 
     // scene.load.audio('background', 'assets/sound/background.mp3');
   }
@@ -20,32 +20,22 @@ export class AudioController implements IController {
 
   public update(scene: IScene, delta: number): void {}
 
+  public rescale(): void {}
+
   /** Custom **/
   public playSuccess(): void {
-    if (!this._audioActivate) {
-      return;
-    }
-    this._scene?.sound.play('success');
+    this._active && this._manager?.play('success');
   }
 
   public playFailue(): void {
-    if (!this._audioActivate) {
-      return;
-    }
-    this._scene?.sound.play('failure');
+    this._active && this._manager?.play('failure');
   }
 
   public playLaught(): void {
-    if (!this._audioActivate) {
-      return;
-    }
-    this._scene?.sound.play('laught');
+    this._active && this._manager?.play('laught');
   }
 
   public playCash(): void {
-    if (!this._audioActivate) {
-      return;
-    }
-    this._scene?.sound.play('cash');
+    this._active && this._manager?.play('cash');
   }
 }

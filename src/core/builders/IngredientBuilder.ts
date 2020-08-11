@@ -1,7 +1,7 @@
 import { IngredientExtended } from '../../entities/dynamic/IngredientExtended';
 import { IEmitter } from '../../entities/game/IEmitter';
+import { IIngredientGameObject } from '../../entities/game/IIngredientGameObject';
 import { IScene } from '../../entities/game/IScene';
-import { IngredientGameObject } from '../../entities/game/IngredientGameObject';
 import { IngredientType } from '../../entities/static/Ingredient';
 import { BottleBuilder } from './BottleBuilder';
 import { FruitBuilder } from './FruitBuilder';
@@ -11,7 +11,7 @@ export class IngredientBuilder {
   private readonly _emitter: IEmitter;
   private readonly _ingredient: IngredientExtended;
 
-  constructor(
+  public constructor(
     scene: IScene,
     emitter: IEmitter,
     ingredient: IngredientExtended
@@ -21,7 +21,7 @@ export class IngredientBuilder {
     this._ingredient = ingredient;
   }
 
-  public build(): IngredientGameObject {
+  public build(): IIngredientGameObject {
     switch (this._ingredient.provided.base.type) {
       case IngredientType.Bottle:
         return new BottleBuilder(

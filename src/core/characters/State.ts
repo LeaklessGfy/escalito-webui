@@ -10,64 +10,64 @@ enum StateKey {
 export class State {
   private readonly _states: Set<StateKey> = new Set();
 
-  constructor() {
+  public constructor() {
     this._states.add(StateKey.Idle);
   }
 
-  public get idling() {
+  public get idling(): boolean {
     return this._states.has(StateKey.Idle);
   }
 
-  public get moving() {
+  public get moving(): boolean {
     return this._states.has(StateKey.Move);
   }
 
-  public get waiting() {
+  public get waiting(): boolean {
     return this._states.has(StateKey.Wait);
   }
 
-  public get leaving() {
+  public get leaving(): boolean {
     return this._states.has(StateKey.Leave);
   }
 
-  public get exhausted() {
+  public get exhausted(): boolean {
     return this._states.has(StateKey.Exhaust);
   }
 
-  public get served() {
+  public get served(): boolean {
     return this._states.has(StateKey.Served);
   }
 
-  public idle() {
+  public idle(): void {
     this._states.delete(StateKey.Move);
     this._states.add(StateKey.Idle);
   }
 
-  public move() {
+  public move(): void {
     this._states.delete(StateKey.Idle);
     this._states.add(StateKey.Move);
   }
 
-  public wait() {
+  public wait(): void {
     this._states.delete(StateKey.Exhaust);
     this._states.add(StateKey.Wait);
   }
 
-  public unWait() {
+  public unWait(): void {
     this._states.delete(StateKey.Wait);
   }
 
-  public leave() {
+  public leave(): void {
     this._states.delete(StateKey.Wait);
     this._states.add(StateKey.Leave);
   }
 
-  public exhaust() {
+  public exhaust(): void {
     this._states.delete(StateKey.Wait);
     this._states.add(StateKey.Exhaust);
   }
 
-  public serve() {
+  public serve(): void {
     this._states.delete(StateKey.Wait);
     this._states.add(StateKey.Served);
   }

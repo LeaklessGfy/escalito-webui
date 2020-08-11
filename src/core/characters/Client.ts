@@ -10,6 +10,7 @@ import { AbstractCharacter } from './AbstractCharacter';
 
 export class Client extends AbstractCharacter implements IBehavioral {
   private static readonly WAITING_BAR_HEIGHT: number = 5;
+  private static readonly BAR_OVERFLOW_DIST: number = 4;
 
   private readonly _waitingBar: Bar;
   private readonly _orderText: Phaser.GameObjects.Text;
@@ -25,7 +26,7 @@ export class Client extends AbstractCharacter implements IBehavioral {
 
   private _waitingPos: IPoint = { x: 0, y: 0 };
 
-  constructor(builder: ClientBuilder) {
+  public constructor(builder: ClientBuilder) {
     super(builder.sprite, builder.spriteKey);
 
     this._waitingBar = builder.waitingBar;
@@ -67,7 +68,7 @@ export class Client extends AbstractCharacter implements IBehavioral {
     }
   }
 
-  public behave(next: IPoint, bar: IPoint, spawn: IPoint): void {
+  public behave(leader: IPoint | undefined, bar: IPoint, spawn: IPoint): void {
     if (this._state.leaving) {
       throw new Error('Client should not behave while leaving');
     }
@@ -83,17 +84,26 @@ export class Client extends AbstractCharacter implements IBehavioral {
       return this.leaveTo(spawn);
     }
 
-    if (!this.isNear(next, 4)) {
-      return this.moveTo(next, 4);
+    let next = bar;
+    let dist = Client.BAR_OVERFLOW_DIST;
+
+    if (leader !== undefined) {
+      next = leader;
+      dist = this._sprite.displayWidth;
+    }
+
+    if (!this.isNear(next, dist)) {
+      return this.moveTo(next, dist);
     }
 
     if (this._order === undefined && this.isNear(bar, 4)) {
-      if (!this.askOrder()) {
-        this.satisfaction = 0;
-        this.leaveTo(spawn);
-      } else {
+      if (this.askOrder()) {
         this.await();
+      } else {
+        this._state.exhaust();
       }
+    } else {
+      // maybe function await in queue ?
     }
   }
 

@@ -11,7 +11,7 @@ export class EmployeeBuilder {
   private _key: EmployeeKey = EmployeeKey.BodyGuard;
   private _sprite?: Phaser.GameObjects.Sprite;
 
-  constructor(scene: IScene) {
+  public constructor(scene: IScene) {
     this._scene = scene;
   }
 

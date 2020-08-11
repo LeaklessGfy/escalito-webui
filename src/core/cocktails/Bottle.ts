@@ -1,33 +1,28 @@
+import { IngredientExtended } from '../../entities/dynamic/IngredientExtended';
 import { IEmitter } from '../../entities/game/IEmitter';
+import { IIngredientGameObject } from '../../entities/game/IIngredientGameObject';
 import { IPoint } from '../../entities/game/IPoint';
 import { IScene } from '../../entities/game/IScene';
-import { IngredientGameObject } from '../../entities/game/IngredientGameObject';
 import { Ingredient } from '../../entities/static/Ingredient';
-import { IngredientProvided } from '../../entities/static/IngredientProvided';
 import { ProviderKey } from '../../entities/static/Provider';
 import { BottleBuilder } from '../builders/BottleBuilder';
 import { Bar } from '../sprites/Bar';
 
-interface ProviderInfo {
-  provided: IngredientProvided;
-  stock: number;
-}
-
-export class Bottle implements IngredientGameObject {
+export class Bottle implements IIngredientGameObject {
   private static readonly STOCK_BAR_HEIGHT: number = 5;
 
   private readonly _ingredient: Ingredient;
   private readonly _sprite: Phaser.GameObjects.Sprite;
   private readonly _emitter: IEmitter;
   private readonly _stockBar: Bar;
-  private readonly _providers: Map<ProviderKey, ProviderInfo>;
+  private readonly _providers: Map<ProviderKey, IngredientExtended>;
   private readonly _initialPosition: IPoint;
   private readonly _glassPosition: IPoint;
 
   private _currentAmount: number;
   private _isFlowing: boolean;
 
-  constructor(builder: BottleBuilder) {
+  public constructor(builder: BottleBuilder) {
     this._ingredient = builder.ingredient.provided.base;
     this._sprite = builder.sprite;
     this._emitter = builder.emitter;
@@ -54,10 +49,10 @@ export class Bottle implements IngredientGameObject {
       height: Bottle.STOCK_BAR_HEIGHT
     });
 
-    this._providers.set(builder.ingredient.provided.providerKey, {
-      provided: builder.ingredient.provided,
-      stock: builder.ingredient.stock
-    });
+    this._providers.set(
+      builder.ingredient.provided.providerKey,
+      builder.ingredient
+    );
   }
 
   public turnOn(): void {
@@ -88,8 +83,8 @@ export class Bottle implements IngredientGameObject {
     }
   }
 
-  public addProvided(ingredient: IngredientProvided): void {
-    if (ingredient.base !== this._ingredient) {
+  public addProvided(ingredient: IngredientExtended): void {
+    if (ingredient.provided.base !== this._ingredient) {
       throw new Error(
         'Can not add provided ingredient on different ingredient'
       );
@@ -98,24 +93,20 @@ export class Bottle implements IngredientGameObject {
     this._currentAmount += this._ingredient.amount;
     // calculate quality average etc ...
 
-    const info = this._providers.get(ingredient.providerKey) ?? {
-      provided: ingredient,
-      stock: 0
-    };
-    info.stock += 1;
-    this._providers.set(ingredient.providerKey, info);
+    const clone = ingredient.clone(ingredient.stock + 1);
+    this._providers.set(ingredient.provided.providerKey, clone);
 
     this.updateStockBar();
   }
 
-  public removeProvided(ingredient: IngredientProvided): void {
-    if (ingredient.base !== this._ingredient) {
+  public removeProvided(ingredient: IngredientExtended): void {
+    if (ingredient.provided.base !== this._ingredient) {
       throw new Error(
         'Can not remove provided ingredient on different ingredient'
       );
     }
 
-    const info = this._providers.get(ingredient.providerKey);
+    const info = this._providers.get(ingredient.provided.providerKey);
 
     if (info === undefined) {
       throw new Error('Can not remove unexisting provided ingredient');
@@ -135,7 +126,7 @@ export class Bottle implements IngredientGameObject {
 
     this._currentAmount = nextAmount;
 
-    this._providers.delete(ingredient.providerKey);
+    this._providers.delete(ingredient.provided.providerKey);
 
     this.updateStockBar();
   }

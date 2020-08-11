@@ -1,8 +1,8 @@
-import { IScene } from '../../entities/game/IScene';
-import { AnimKey } from '../sprites/AnimKey';
-import { SpriteKey } from '../sprites/SpriteKey';
+import { IScene } from '../../../entities/game/IScene';
+import { AnimKey } from '../../sprites/AnimKey';
+import { SpriteKey } from '../../sprites/SpriteKey';
 
-export class SubCharacterController {
+export class CharacterControllerHelper {
   public static preload(scene: IScene) {
     scene.load.spritesheet(
       SpriteKey.Barmaid + '.' + AnimKey.Idle,

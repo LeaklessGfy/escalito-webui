@@ -18,7 +18,7 @@ export class Employee {
   public readonly price: number;
   public readonly salary: number;
 
-  constructor(key: EmployeeKey, price: number, salary: number) {
+  public constructor(key: EmployeeKey, price: number, salary: number) {
     this.key = key;
     this.name = EmployeeNames[key];
     this.price = price;

@@ -32,7 +32,7 @@ export class Inventory {
   @observable
   public readonly employees$: EmployeeMapper;
 
-  constructor(
+  public constructor(
     service: Service,
     cash: number,
     ingredients: IngredientMapper = new Map(),

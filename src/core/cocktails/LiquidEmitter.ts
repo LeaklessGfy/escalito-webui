@@ -10,7 +10,7 @@ export class LiquidEmitter implements IEmitter {
 
   private _emitting: boolean = false;
 
-  constructor(
+  public constructor(
     barCtr: BarController,
     emitter: Phaser.GameObjects.Particles.ParticleEmitter
   ) {

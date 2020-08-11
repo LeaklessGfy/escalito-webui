@@ -3,11 +3,11 @@ import { ClockController } from '../controllers/ClockController';
 import { ITimeAction } from './ITimeAction';
 
 export abstract class AbstractTimeAction implements ITimeAction {
-  private readonly _overflow: number;
+  protected _overflow: number;
   private _delta: number;
   private _repetion: number;
 
-  constructor(
+  public constructor(
     triggerTime: number,
     triggerUnit: TriggerUnit,
     repetition: number = -1
@@ -35,8 +35,9 @@ export abstract class AbstractTimeAction implements ITimeAction {
 
   public trigger(): void {
     this._delta = 0;
-    this._repetion =
-      this._repetion === -1 ? this._repetion : this._repetion - 1;
+    if (this._repetion > 0) {
+      this._repetion -= 1;
+    }
     this.action();
   }
 

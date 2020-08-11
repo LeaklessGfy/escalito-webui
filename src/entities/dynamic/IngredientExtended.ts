@@ -8,4 +8,8 @@ export class IngredientExtended {
     this.provided = provided;
     this.stock = stock;
   }
+
+  public clone(stock: number): IngredientExtended {
+    return new IngredientExtended(this.provided, stock);
+  }
 }

@@ -4,6 +4,7 @@ import { TriggerUnit } from '../../entities/static/TimeTrigger';
 
 export class ClockController implements IController {
   public static readonly KEY = Symbol();
+
   private static readonly MS_MULTIPLIER = 60;
   private static readonly TO_SECONDS = 1000;
   private static readonly TO_MINUTES = ClockController.TO_SECONDS * 60;
@@ -19,8 +20,8 @@ export class ClockController implements IController {
     }
   };
 
-  private _time: number = 0;
   private _clock?: Phaser.GameObjects.Text;
+  private _time: number = 0;
 
   /** Interface **/
   public preload(scene: IScene): void {}
@@ -42,6 +43,8 @@ export class ClockController implements IController {
 
     this._clock?.setText(text);
   }
+
+  public rescale(): void {}
 
   /** Custom **/
   public get seconds(): number {
@@ -81,6 +84,7 @@ export class ClockController implements IController {
       case TriggerUnit.Minute:
         return triggerTime * this.TO_SECONDS;
       case TriggerUnit.Second:
+      case TriggerUnit.Real:
         return triggerTime;
       case TriggerUnit.MilliSecond:
         return triggerTime / this.MS_MULTIPLIER;

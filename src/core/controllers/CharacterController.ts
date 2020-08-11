@@ -2,36 +2,53 @@ import { IBehavioral } from '../../entities/game/IBehavioral';
 import { IController } from '../../entities/game/IController';
 import { IScene } from '../../entities/game/IScene';
 import { EmployeeKey } from '../../entities/static/Employee';
+import { TriggerUnit } from '../../entities/static/TimeTrigger';
 import { BarmaidBuilder } from '../builders/BarmaidBuilder';
 import { ClientBuilder } from '../builders/ClientBuilder';
 import { EmployeeBuilder } from '../builders/EmployeeBuilder';
 import { Barmaid } from '../characters/Barmaid';
-import { Client } from '../characters/Client';
+import { RandomTimeAction } from '../times/RandomTimeAction';
+import { TimeActionManager } from '../times/TimeActionManager';
 import { BarController } from './BarController';
-import { SubCharacterController } from './SubCharacterController';
+import { CharacterControllerHelper } from './helpers/CharacterControllerHelper';
 
 export class CharacterController implements IController {
   public static readonly KEY = Symbol();
 
+  private readonly _timeManager: TimeActionManager;
   private readonly _visitors: IBehavioral[];
-  private readonly _leaving: Client[];
+  private readonly _visitorsLeaving: IBehavioral[];
   private readonly _employees: Map<EmployeeKey, IBehavioral>;
 
   private _barmaid?: Barmaid;
+  private _barCtr?: BarController;
 
   constructor() {
+    this._timeManager = new TimeActionManager();
     this._visitors = [];
-    this._leaving = [];
+    this._visitorsLeaving = [];
     this._employees = new Map();
   }
 
   /** Interface **/
   public preload(scene: IScene): void {
-    SubCharacterController.preload(scene);
+    CharacterControllerHelper.preload(scene);
+    this._barCtr = scene.getController<BarController>(BarController.KEY);
+
+    this._timeManager.add(
+      new RandomTimeAction(
+        2000,
+        5000,
+        TriggerUnit.Real,
+        5,
+        () => this._barCtr?.open ?? false,
+        () => this.createClient(scene)
+      )
+    );
   }
 
   public create(scene: IScene): void {
-    SubCharacterController.create(scene);
+    CharacterControllerHelper.create(scene);
 
     /*scene.time.addEvent({
       delay: 3000,
@@ -40,7 +57,6 @@ export class CharacterController implements IController {
     });*/
 
     this._barmaid = new BarmaidBuilder(scene).build();
-    this.createClient(scene);
 
     scene.inventory.employees$.subscribe(change => {
       if (change === undefined) {
@@ -69,18 +85,18 @@ export class CharacterController implements IController {
   }
 
   public update(scene: IScene, delta: number): void {
-    const visitors = this._visitors;
-    const length = visitors.length;
+    this._timeManager.update(delta);
 
-    this._barmaid?.update(delta);
+    const visitors = [...this._visitors];
+    const length = visitors.length;
 
     for (let i = 0; i < length; i++) {
       const current = visitors[i];
-      let next = scene.settings.middleDimension;
+      let next;
 
       // Has leader
-      if (i + 1 < length) {
-        next = visitors[i + 1].position;
+      if (i - 1 > -1) {
+        next = visitors[i - 1].position;
       }
 
       current.update(delta);
@@ -92,7 +108,7 @@ export class CharacterController implements IController {
     }
 
     let toRemove = 0;
-    for (const leaving of this._leaving) {
+    for (const leaving of this._visitorsLeaving) {
       leaving.update(delta);
 
       if (leaving.isNear(scene.settings.spawn, 4)) {
@@ -102,19 +118,21 @@ export class CharacterController implements IController {
     }
 
     while (toRemove > 0) {
-      this._leaving.pop();
+      this._visitorsLeaving.shift();
       toRemove--;
     }
   }
 
+  public rescale(): void {}
+
   /** Custom **/
-  private createClient(scene: IScene) {
+  public createClient(scene: IScene) {
     const client = new ClientBuilder(scene).build();
 
     client.onLeave = () => {
-      this._visitors.pop();
-      this._leaving.push(client);
-      scene.getController<BarController>(BarController.KEY).destroyGlass();
+      this._visitors.shift();
+      this._visitorsLeaving.push(client);
+      this._barCtr?.destroyGlass();
     };
 
     this._visitors.push(client);

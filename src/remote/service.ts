@@ -9,7 +9,7 @@ import { ClientEnv, ClientFactory, IClient } from './IClient';
 export class Service {
   private readonly _client: IClient;
 
-  constructor() {
+  public constructor() {
     this._client = ClientFactory.BuildClient(ClientEnv.DEV);
   }
 

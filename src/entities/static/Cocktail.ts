@@ -17,7 +17,7 @@ export class Cocktail {
   public readonly name: string;
   public readonly recipe: Map<IngredientKey, number>;
 
-  constructor(
+  public constructor(
     key: CocktailKey,
     glassKey: GlassKey,
     recipe: Map<IngredientKey, number>

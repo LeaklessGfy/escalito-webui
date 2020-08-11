@@ -9,7 +9,7 @@ export class BarmaidBuilder {
   private _spriteKey: SpriteKey = SpriteKey.Barmaid;
   private _sprite?: Phaser.GameObjects.Sprite;
 
-  constructor(scene: IScene) {
+  public constructor(scene: IScene) {
     this._scene = scene;
   }
 

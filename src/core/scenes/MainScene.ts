@@ -16,15 +16,15 @@ import { TimeActionManager } from '../times/TimeActionManager';
 
 export class MainScene extends Phaser.Scene implements IScene {
   private readonly _inventory: IInventory;
-  private readonly _settings: Settings;
   private readonly _controllers: Map<Symbol, IController>;
   private readonly _timeManager: TimeActionManager;
 
-  constructor(inventory: IInventory) {
+  private _settings?: Settings;
+
+  public constructor(inventory: IInventory) {
     super({ key: MainScene.name });
 
     this._inventory = inventory;
-    this._settings = new Settings();
     this._controllers = new Map<Symbol, IController>();
     this._timeManager = new TimeActionManager();
 
@@ -42,11 +42,15 @@ export class MainScene extends Phaser.Scene implements IScene {
   }
 
   public get settings(): ISettings {
+    if (this._settings === undefined) {
+      throw new Error('Settings is not defined yet');
+    }
     return this._settings;
   }
 
   public preload(): void {
-    this._settings.scene = this;
+    const { width, height } = this.scale.displaySize;
+    this._settings = new Settings(width, height);
 
     for (const controller of this._controllers.values()) {
       controller.preload(this);
@@ -71,7 +75,9 @@ export class MainScene extends Phaser.Scene implements IScene {
       const height = 300;
       this.scale.resize(width, height);
 
-      // call rescale on controllers ?
+      for (const controller of this._controllers.values()) {
+        controller.rescale();
+      }
     });
 
     for (const controller of this._controllers.values()) {
@@ -86,7 +92,7 @@ export class MainScene extends Phaser.Scene implements IScene {
     this._timeManager.update(delta);
   }
 
-  public start() {
+  public start(): void {
     this.scene.resume();
   }
 

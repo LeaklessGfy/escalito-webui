@@ -12,7 +12,7 @@ export class Glass {
   private readonly _graphics: Phaser.GameObjects.Graphics;
   private readonly _recipe: Map<IngredientKey, IngredientInfo>;
 
-  constructor(builder: GlassBuilder) {
+  public constructor(builder: GlassBuilder) {
     this._sprite = builder.sprite;
     this._mask = builder.mask;
     this._graphics = builder.graphics;
@@ -53,7 +53,7 @@ export class Glass {
     this.updateGraphics();
   }
 
-  public destroy() {
+  public destroy(): void {
     this._sprite.destroy();
     this._mask.destroy();
     this._graphics.clear().destroy();

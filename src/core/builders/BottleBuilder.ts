@@ -25,7 +25,7 @@ export class BottleBuilder {
   private _sprite?: Phaser.GameObjects.Sprite;
   private _stockBar?: Bar;
 
-  constructor(
+  public constructor(
     scene: IScene,
     emitter: IEmitter,
     ingredient: IngredientExtended

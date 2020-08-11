@@ -3,6 +3,7 @@ import { IScene } from '../../entities/game/IScene';
 
 export class SelectController implements IController {
   public static readonly KEY = Symbol();
+
   private static readonly STYLE: Phaser.Types.GameObjects.Text.TextStyle = {
     color: '#FFFFFF',
     fontFamily: 'Arial Black',
@@ -26,6 +27,8 @@ export class SelectController implements IController {
   }
 
   public update(scene: IScene, delta: number): void {}
+
+  public rescale(): void {}
 
   /** Custom **/
   public addSelect(scene: IScene, sprite: Phaser.GameObjects.GameObject) {

@@ -26,6 +26,8 @@ export class MainController implements IController {
 
   public update(scene: IScene, delta: number): void {}
 
+  public rescale(): void {}
+
   /** Custom **/
   public increment(client: Client, order: Order): number {
     return client.satisfied

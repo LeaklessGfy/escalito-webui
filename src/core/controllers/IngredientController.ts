@@ -1,8 +1,8 @@
 import { IngredientExtended } from '../../entities/dynamic/IngredientExtended';
 import { IController } from '../../entities/game/IController';
 import { IEmitter } from '../../entities/game/IEmitter';
+import { IIngredientGameObject } from '../../entities/game/IIngredientGameObject';
 import { IScene } from '../../entities/game/IScene';
-import { IngredientGameObject } from '../../entities/game/IngredientGameObject';
 import { IngredientKey } from '../../entities/static/Ingredient';
 import { IngredientBuilder } from '../builders/IngredientBuilder';
 import { LiquidEmitter } from '../cocktails/LiquidEmitter';
@@ -14,9 +14,10 @@ export class IngredientController implements IController {
 
   private readonly _ingredients: Map<
     IngredientKey,
-    IngredientGameObject
+    IIngredientGameObject
   > = new Map();
 
+  /** Interface **/
   public preload(scene: IScene): void {
     scene.load.image(SpriteKey.RumBottle, 'assets/bottle.rum.png');
   }
@@ -59,6 +60,9 @@ export class IngredientController implements IController {
     }
   }
 
+  public rescale(): void {}
+
+  /** Custom **/
   private createOrUpdateIngredient(
     scene: IScene,
     emitter: IEmitter,
@@ -89,9 +93,7 @@ export class IngredientController implements IController {
     if (gameObject === undefined) {
       throw new Error('Can not update unexisting ingredient');
     }
-
-    // Be careful, stock is the absolute value, so 'addStock' is not add but update
-    gameObject.addProvided(ingredient.provided);
+    gameObject.addProvided(ingredient);
   }
 
   private removeIngredient(ingredient: IngredientExtended) {
@@ -99,9 +101,7 @@ export class IngredientController implements IController {
     if (gameObject === undefined) {
       throw new Error('Can not remove unexisting ingredient');
     }
-
-    gameObject.removeProvided(ingredient.provided);
-
+    gameObject.removeProvided(ingredient);
     if (gameObject.shouldDestroy()) {
       gameObject.destroy();
       this._ingredients.delete(ingredient.provided.base.key);

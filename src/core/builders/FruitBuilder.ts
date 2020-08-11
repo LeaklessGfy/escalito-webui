@@ -7,7 +7,7 @@ export class FruitBuilder {
   private readonly _emitter: IEmitter;
   private readonly _ingredient: IngredientExtended;
 
-  constructor(
+  public constructor(
     scene: IScene,
     emitter: IEmitter,
     ingredient: IngredientExtended
