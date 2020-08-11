@@ -7,7 +7,7 @@ import { AudioController } from './AudioController';
 export class MainController implements IController {
   public static readonly KEY = Symbol();
 
-  private _audioCtr?: AudioController;
+  private _audioCtr!: AudioController;
 
   private _currentDifficulty: number = 1;
   private _currentReputation: number = 1;
@@ -40,10 +40,10 @@ export class MainController implements IController {
     this._negativeCombo = 0;
 
     const amount = this.applyBonuses(client);
-    this._audioCtr?.playSuccess();
+    this._audioCtr.playSuccess();
 
     if (this._positiveCombo % 3 == 0) {
-      this._audioCtr?.playLaught();
+      this._audioCtr.playLaught();
     }
 
     if (this._positiveCombo % 10 == 0) {
@@ -64,7 +64,7 @@ export class MainController implements IController {
     this._negativeCombo++;
 
     const amount = this.applyPenalties(client);
-    this._audioCtr?.playFailue();
+    this._audioCtr.playFailue();
 
     if (this._negativeCombo % 10 == 0) {
       this._nextReputation--;

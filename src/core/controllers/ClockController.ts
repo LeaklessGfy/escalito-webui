@@ -20,7 +20,7 @@ export class ClockController implements IController {
     }
   };
 
-  private _clock?: Phaser.GameObjects.Text;
+  private _clock!: Phaser.GameObjects.Text;
   private _time: number = 0;
 
   /** Interface **/
@@ -41,7 +41,7 @@ export class ClockController implements IController {
       ':' +
       ClockController.format(this.minutes);
 
-    this._clock?.setText(text);
+    this._clock.setText(text);
   }
 
   public rescale(): void {}

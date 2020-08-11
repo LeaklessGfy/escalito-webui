@@ -5,17 +5,11 @@ import { IScene } from '../../entities/game/IScene';
 export class FruitBuilder {
   private readonly _scene: IScene;
   private readonly _emitter: IEmitter;
-  private readonly _ingredient: IngredientExtended;
 
-  public constructor(
-    scene: IScene,
-    emitter: IEmitter,
-    ingredient: IngredientExtended
-  ) {
+  public constructor(scene: IScene, emitter: IEmitter) {
     this._scene = scene;
     this._emitter = emitter;
-    this._ingredient = ingredient;
   }
 
-  public build(): any {}
+  public build(ingredient: IngredientExtended): any {}
 }

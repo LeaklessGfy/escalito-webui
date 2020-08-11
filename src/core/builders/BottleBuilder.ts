@@ -10,29 +10,24 @@ import { Bar } from '../sprites/Bar';
 import { SpriteKey } from '../sprites/SpriteKey';
 
 export const IngredientToSprite: { [key in IngredientKey]: SpriteKey } = {
-  [IngredientKey.Rum]: SpriteKey.RumBottle,
-  [IngredientKey.Cola]: SpriteKey.RumBottle,
-  [IngredientKey.Lemonade]: SpriteKey.RumBottle,
-  [IngredientKey.Lemon]: SpriteKey.RumBottle,
-  [IngredientKey.Strawberry]: SpriteKey.RumBottle
+  [IngredientKey.Rum]: SpriteKey.BottleRum,
+  [IngredientKey.Cola]: SpriteKey.BottleCola,
+  [IngredientKey.Lemonade]: SpriteKey.BottleLemonade,
+  [IngredientKey.Lemon]: SpriteKey.BottleRum,
+  [IngredientKey.Strawberry]: SpriteKey.BottleRum
 };
 
 export class BottleBuilder {
   private readonly _scene: IScene;
   private readonly _emitter: IEmitter;
-  private readonly _ingredient: IngredientExtended;
 
+  private _ingredient?: IngredientExtended;
   private _sprite?: Phaser.GameObjects.Sprite;
   private _stockBar?: Bar;
 
-  public constructor(
-    scene: IScene,
-    emitter: IEmitter,
-    ingredient: IngredientExtended
-  ) {
+  public constructor(scene: IScene, emitter: IEmitter) {
     this._scene = scene;
     this._emitter = emitter;
-    this._ingredient = ingredient;
   }
 
   public get sprite(): Phaser.GameObjects.Sprite {
@@ -50,6 +45,9 @@ export class BottleBuilder {
   }
 
   public get ingredient(): IngredientExtended {
+    if (this._ingredient === undefined) {
+      throw new Error('Can not access ingredient on un-build builder');
+    }
     return this._ingredient;
   }
 
@@ -65,7 +63,9 @@ export class BottleBuilder {
     return this._scene.settings.middleDimension;
   }
 
-  public build(): Bottle {
+  public build(ingredient: IngredientExtended): Bottle {
+    this._ingredient = ingredient;
+
     this.buildSprite();
     this.buildStockBar();
 
@@ -77,12 +77,12 @@ export class BottleBuilder {
     const sprite = this._scene.add.sprite(
       x,
       y,
-      IngredientToSprite[this._ingredient.provided.base.key]
+      IngredientToSprite[this.ingredient.provided.base.key]
     );
 
     sprite
       .setY(y - sprite.displayHeight / 2)
-      .setName(this._ingredient.provided.base.name)
+      .setName(this.ingredient.provided.base.name)
       .setInteractive();
 
     const ctr = this._scene.getController<SelectController>(

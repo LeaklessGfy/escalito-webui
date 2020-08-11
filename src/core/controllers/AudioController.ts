@@ -4,7 +4,7 @@ import { IScene } from '../../entities/game/IScene';
 export class AudioController implements IController {
   public static readonly KEY = Symbol();
 
-  private _manager?: Phaser.Sound.BaseSoundManager;
+  private _manager!: Phaser.Sound.BaseSoundManager;
   private _active: boolean = false;
 
   /** Interface **/
@@ -24,18 +24,23 @@ export class AudioController implements IController {
 
   /** Custom **/
   public playSuccess(): void {
-    this._active && this._manager?.play('success');
+    this._active && this._manager.play('success');
   }
 
   public playFailue(): void {
-    this._active && this._manager?.play('failure');
+    this._active && this._manager.play('failure');
   }
 
   public playLaught(): void {
-    this._active && this._manager?.play('laught');
+    this._active && this._manager.play('laught');
   }
 
   public playCash(): void {
-    this._active && this._manager?.play('cash');
+    this._active && this._manager.play('cash');
+  }
+
+  public playRandomBackground(): void {
+    // get random song key
+    this._active && this._manager.play('background');
   }
 }

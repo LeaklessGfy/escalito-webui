@@ -1,22 +1,25 @@
 export enum SpriteKey {
   // Decoration
   Bar = 'bar',
-  BarTop = 'bar.top',
+  BarTop = 'bar_top',
   Door = 'door',
   Window = 'window',
-  Square = 'square',
+  Jukebox = 'jukebox',
   Wall = 'wall',
   Wood = 'wood',
+  Square = 'square',
 
   // Characters
-  Barmaid = 'barmaid',
-  BodyGuard = 'body.guard',
-  DefaultClient = 'client.default',
+  Barmaid = 'character.barmaid',
+  BodyGuard = 'character.employee.body_guard',
+  ClientDefault = 'character.client.default',
 
   // Ingredients
-  RumBottle = 'bottle.rum',
+  BottleRum = 'ingredient.bottle.rum',
+  BottleCola = 'ingredient.bottle.cola',
+  BottleLemonade = 'ingredient.bottle.lemonade',
 
   // Glass
-  DefaultGlass = 'glass.default',
-  DefaultGlassMask = 'glass.default.mask'
+  GlassDefault = 'glass.default',
+  GlassDefaultMask = 'glass.default.mask'
 }

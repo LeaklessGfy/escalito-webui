@@ -21,7 +21,7 @@ export class CharacterControllerHelper {
       }
     );
     scene.load.spritesheet(
-      SpriteKey.DefaultClient + '.' + AnimKey.Idle,
+      SpriteKey.ClientDefault + '.' + AnimKey.Idle,
       'assets/client1.idle.png',
       {
         frameWidth: 32,
@@ -29,7 +29,7 @@ export class CharacterControllerHelper {
       }
     );
     scene.load.spritesheet(
-      SpriteKey.DefaultClient + '.' + AnimKey.Move,
+      SpriteKey.ClientDefault + '.' + AnimKey.Move,
       'assets/client1.move.png',
       {
         frameWidth: 32,
@@ -64,9 +64,9 @@ export class CharacterControllerHelper {
       repeat: -1
     });
     scene.anims.create({
-      key: SpriteKey.DefaultClient + '.' + AnimKey.Idle,
+      key: SpriteKey.ClientDefault + '.' + AnimKey.Idle,
       frames: scene.anims.generateFrameNumbers(
-        SpriteKey.DefaultClient + '.' + AnimKey.Idle,
+        SpriteKey.ClientDefault + '.' + AnimKey.Idle,
         {
           start: 0,
           end: 7
@@ -76,9 +76,9 @@ export class CharacterControllerHelper {
       repeat: -1
     });
     scene.anims.create({
-      key: SpriteKey.DefaultClient + '.' + AnimKey.Move,
+      key: SpriteKey.ClientDefault + '.' + AnimKey.Move,
       frames: scene.anims.generateFrameNumbers(
-        SpriteKey.DefaultClient + '.' + AnimKey.Move,
+        SpriteKey.ClientDefault + '.' + AnimKey.Move,
         {
           start: 0,
           end: 7

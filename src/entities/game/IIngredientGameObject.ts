@@ -5,6 +5,6 @@ export interface IIngredientGameObject {
   update(scene: IScene): void;
   addProvided(ingredient: IngredientExtended): void;
   removeProvided(ingredient: IngredientExtended): void;
-  shouldDestroy(): boolean;
+  isEmpty(): boolean;
   destroy(): void;
 }

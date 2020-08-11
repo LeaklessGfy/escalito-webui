@@ -24,7 +24,7 @@ export class ClientBuilder {
 
   private readonly _scene: IScene;
 
-  private _spriteKey: SpriteKey = SpriteKey.DefaultClient;
+  private _spriteKey: SpriteKey = SpriteKey.ClientDefault;
   private _sprite?: Phaser.GameObjects.Sprite;
   private _waitingBar?: Bar;
 

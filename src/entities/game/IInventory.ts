@@ -35,7 +35,10 @@ export declare type EmployeeChange = Change<Employee>;
 export interface IInventory {
   readonly current: Readonly<Inventory>;
   readonly cash$: Observable<CashChange>;
-  readonly ingredients$: Observable<IngredientChange | undefined>;
+  readonly ingredients$: Observable<IngredientChange>;
   readonly cocktails$: Observable<CocktailChange>;
-  readonly employees$: Observable<EmployeeChange | undefined>;
+  readonly employees$: Observable<EmployeeChange>;
+
+  initIngredients(): void;
+  initEmployees(): void;
 }

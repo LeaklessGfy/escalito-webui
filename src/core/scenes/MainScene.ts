@@ -2,7 +2,6 @@ import { IController } from '../../entities/game/IController';
 import { IInventory } from '../../entities/game/IInventory';
 import { IScene } from '../../entities/game/IScene';
 import { ISettings } from '../../entities/game/ISettings';
-import { TriggerUnit } from '../../entities/static/TimeTrigger';
 import { Settings } from '../Settings';
 import { AudioController } from '../controllers/AudioController';
 import { BarController } from '../controllers/BarController';
@@ -11,22 +10,18 @@ import { ClockController } from '../controllers/ClockController';
 import { IngredientController } from '../controllers/IngredientController';
 import { MainController } from '../controllers/MainController';
 import { SelectController } from '../controllers/SelectController';
-import { DelegateTimeAction } from '../times/DelegateTimeAction';
-import { TimeActionManager } from '../times/TimeActionManager';
 
 export class MainScene extends Phaser.Scene implements IScene {
   private readonly _inventory: IInventory;
   private readonly _controllers: Map<Symbol, IController>;
-  private readonly _timeManager: TimeActionManager;
 
-  private _settings?: Settings;
+  private _settings!: Settings;
 
   public constructor(inventory: IInventory) {
     super({ key: MainScene.name });
 
     this._inventory = inventory;
     this._controllers = new Map<Symbol, IController>();
-    this._timeManager = new TimeActionManager();
 
     this._controllers.set(BarController.KEY, new BarController());
     this._controllers.set(CharacterController.KEY, new CharacterController());
@@ -42,9 +37,6 @@ export class MainScene extends Phaser.Scene implements IScene {
   }
 
   public get settings(): ISettings {
-    if (this._settings === undefined) {
-      throw new Error('Settings is not defined yet');
-    }
     return this._settings;
   }
 
@@ -55,18 +47,6 @@ export class MainScene extends Phaser.Scene implements IScene {
     for (const controller of this._controllers.values()) {
       controller.preload(this);
     }
-
-    /*this._timeManager.add(
-      new DelegateTimeAction(
-        1,
-        TriggerUnit.Day,
-        -1,
-        () => true,
-        () => {
-          this._controllers.forEach(c => c.daily(this, this._store, 1));
-        }
-      )
-    );*/
   }
 
   public create(): void {
@@ -89,7 +69,6 @@ export class MainScene extends Phaser.Scene implements IScene {
     for (const controller of this._controllers.values()) {
       controller.update(this, delta);
     }
-    this._timeManager.update(delta);
   }
 
   public start(): void {

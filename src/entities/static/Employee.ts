@@ -1,3 +1,5 @@
+import { Character, CharacterKey } from './Character';
+
 export enum EmployeeKey {
   Barmaid,
   BodyGuard,
@@ -12,15 +14,16 @@ const EmployeeNames: { [key in EmployeeKey]: string } = {
   [EmployeeKey.Delivery]: 'Delivery'
 };
 
-export class Employee {
-  public readonly key: EmployeeKey;
+export class Employee extends Character {
+  public readonly subKey: EmployeeKey;
   public readonly name: string;
   public readonly price: number;
   public readonly salary: number;
 
-  public constructor(key: EmployeeKey, price: number, salary: number) {
-    this.key = key;
-    this.name = EmployeeNames[key];
+  public constructor(subKey: EmployeeKey, price: number, salary: number) {
+    super(CharacterKey.Employee);
+    this.subKey = subKey;
+    this.name = EmployeeNames[subKey];
     this.price = price;
     this.salary = salary;
   }

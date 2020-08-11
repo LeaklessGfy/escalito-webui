@@ -1,6 +1,5 @@
 import { IngredientExtended } from '../../entities/dynamic/IngredientExtended';
 import { IController } from '../../entities/game/IController';
-import { IEmitter } from '../../entities/game/IEmitter';
 import { IIngredientGameObject } from '../../entities/game/IIngredientGameObject';
 import { IScene } from '../../entities/game/IScene';
 import { IngredientKey } from '../../entities/static/Ingredient';
@@ -17,9 +16,13 @@ export class IngredientController implements IController {
     IIngredientGameObject
   > = new Map();
 
+  private _ingredientBuilder!: IngredientBuilder;
+
   /** Interface **/
   public preload(scene: IScene): void {
-    scene.load.image(SpriteKey.RumBottle, 'assets/bottle.rum.png');
+    scene.load.image(SpriteKey.BottleRum, 'assets/bottle.rum.png');
+    scene.load.image(SpriteKey.BottleCola, 'assets/bottle.cola.png');
+    scene.load.image(SpriteKey.BottleLemonade, 'assets/bottle.lemonade.png');
   }
 
   public create(scene: IScene): void {
@@ -35,6 +38,12 @@ export class IngredientController implements IController {
     const barCtr = scene.getController<BarController>(BarController.KEY);
     const liquidEmitter = new LiquidEmitter(barCtr, baseEmitter);
 
+    this._ingredientBuilder = new IngredientBuilder(
+      scene,
+      liquidEmitter,
+      liquidEmitter
+    );
+
     scene.inventory.ingredients$.subscribe(change => {
       if (change === undefined) {
         return;
@@ -43,15 +52,12 @@ export class IngredientController implements IController {
       switch (change.type) {
         case 'add':
         case 'update':
-          return this.createOrUpdateIngredient(
-            scene,
-            liquidEmitter,
-            change.newValue
-          );
+          return this.createOrUpdateIngredient(change.newValue);
         case 'remove':
           return this.removeIngredient(change.oldValue);
       }
     });
+    scene.inventory.initIngredients();
   }
 
   public update(scene: IScene, delta: number): void {
@@ -63,28 +69,15 @@ export class IngredientController implements IController {
   public rescale(): void {}
 
   /** Custom **/
-  private createOrUpdateIngredient(
-    scene: IScene,
-    emitter: IEmitter,
-    ingredient: IngredientExtended
-  ) {
+  private createOrUpdateIngredient(ingredient: IngredientExtended) {
     if (!this._ingredients.has(ingredient.provided.base.key)) {
-      return this.createIngredient(scene, emitter, ingredient);
+      return this.createIngredient(ingredient);
     }
     return this.updateIngredient(ingredient);
   }
 
-  private createIngredient(
-    scene: IScene,
-    emitter: IEmitter,
-    ingredient: IngredientExtended
-  ) {
-    const gameObject = new IngredientBuilder(
-      scene,
-      emitter,
-      ingredient
-    ).build();
-
+  private createIngredient(ingredient: IngredientExtended) {
+    const gameObject = this._ingredientBuilder.build(ingredient);
     this._ingredients.set(ingredient.provided.base.key, gameObject);
   }
 
@@ -102,7 +95,7 @@ export class IngredientController implements IController {
       throw new Error('Can not remove unexisting ingredient');
     }
     gameObject.removeProvided(ingredient);
-    if (gameObject.shouldDestroy()) {
+    if (gameObject.isEmpty()) {
       gameObject.destroy();
       this._ingredients.delete(ingredient.provided.base.key);
     }

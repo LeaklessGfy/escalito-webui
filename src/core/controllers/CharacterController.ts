@@ -20,8 +20,8 @@ export class CharacterController implements IController {
   private readonly _visitorsLeaving: IBehavioral[];
   private readonly _employees: Map<EmployeeKey, IBehavioral>;
 
-  private _barmaid?: Barmaid;
-  private _barCtr?: BarController;
+  private _barmaid!: Barmaid;
+  private _barCtr!: BarController;
 
   constructor() {
     this._timeManager = new TimeActionManager();
@@ -41,7 +41,7 @@ export class CharacterController implements IController {
         5000,
         TriggerUnit.Real,
         5,
-        () => this._barCtr?.open ?? false,
+        () => this._barCtr.open,
         () => this.createClient(scene)
       )
     );
@@ -49,13 +49,6 @@ export class CharacterController implements IController {
 
   public create(scene: IScene): void {
     CharacterControllerHelper.create(scene);
-
-    /*scene.time.addEvent({
-      delay: 3000,
-      loop: true,
-      callback: () => {}
-    });*/
-
     this._barmaid = new BarmaidBuilder(scene).build();
 
     scene.inventory.employees$.subscribe(change => {
@@ -66,22 +59,23 @@ export class CharacterController implements IController {
       switch (change.type) {
         case 'add':
         case 'update':
-          if (!this._employees.has(change.newValue.key)) {
+          if (!this._employees.has(change.newValue.subKey)) {
             const gameObject = new EmployeeBuilder(scene).build();
-            this._employees.set(change.newValue.key, gameObject);
+            this._employees.set(change.newValue.subKey, gameObject);
           }
           break;
         case 'remove':
         case 'delete':
-          const gameObject = this._employees.get(change.oldValue.key);
+          const gameObject = this._employees.get(change.oldValue.subKey);
           if (gameObject === undefined) {
             throw new Error('Can not remove unexisting employee');
           }
           gameObject.destroy();
-          this._employees.delete(change.oldValue.key);
+          this._employees.delete(change.oldValue.subKey);
           break;
       }
     });
+    scene.inventory.initEmployees();
   }
 
   public update(scene: IScene, delta: number): void {
@@ -132,7 +126,7 @@ export class CharacterController implements IController {
     client.onLeave = () => {
       this._visitors.shift();
       this._visitorsLeaving.push(client);
-      this._barCtr?.destroyGlass();
+      this._barCtr.destroyGlass();
     };
 
     this._visitors.push(client);

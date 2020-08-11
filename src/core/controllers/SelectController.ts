@@ -16,7 +16,7 @@ export class SelectController implements IController {
 
   private readonly _selectors: Phaser.GameObjects.GameObject[] = [];
 
-  private _selectedText?: Phaser.GameObjects.Text;
+  private _selectedText!: Phaser.GameObjects.Text;
 
   /** Interface **/
   public preload(scene: IScene): void {}
@@ -37,11 +37,11 @@ export class SelectController implements IController {
     sprite.setInteractive();
     sprite.on('pointerover', () => {
       scene.input.setDefaultCursor('pointer');
-      this._selectedText?.setText(sprite.name);
+      this._selectedText.setText(sprite.name);
     });
     sprite.on('pointerout', () => {
       scene.input.setDefaultCursor('default');
-      this._selectedText?.setText('');
+      this._selectedText.setText('');
     });
   }
 }

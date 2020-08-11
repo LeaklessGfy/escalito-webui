@@ -131,7 +131,7 @@ export class Bottle implements IIngredientGameObject {
     this.updateStockBar();
   }
 
-  public shouldDestroy(): boolean {
+  public isEmpty(): boolean {
     return this.getTotal() < 1;
   }
 

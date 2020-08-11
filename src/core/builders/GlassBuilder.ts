@@ -18,14 +18,14 @@ export class GlassBuilder {
 
   public get spriteKey(): SpriteKey {
     return this._glassKey === GlassKey.Default
-      ? SpriteKey.DefaultGlass
-      : SpriteKey.DefaultGlass;
+      ? SpriteKey.GlassDefault
+      : SpriteKey.GlassDefault;
   }
 
   public get maskSpriteKey(): SpriteKey {
     return this._glassKey === GlassKey.Default
-      ? SpriteKey.DefaultGlassMask
-      : SpriteKey.DefaultGlassMask;
+      ? SpriteKey.GlassDefaultMask
+      : SpriteKey.GlassDefaultMask;
   }
 
   public get sprite(): Phaser.GameObjects.Sprite {

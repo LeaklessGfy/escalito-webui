@@ -209,9 +209,9 @@ export class Inventory {
 
     const newCash = cash - employee.price;
     this.cash$.set(newCash);
-    this.employees$.set(employee.key, employee);
+    this.employees$.set(employee.subKey, employee);
     this.$service.setCash(newCash);
-    this.$service.addEmployee(employee.key);
+    this.$service.addEmployee(employee.subKey);
   }
 
   @action

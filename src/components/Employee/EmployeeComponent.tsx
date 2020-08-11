@@ -22,10 +22,10 @@ const EmployeeComponent: FunctionalComponent = () => {
             <li key={employee.key} class="list-item flex items-center bg-white">
               <p class="flex-grow">{employee.name}</p>
 
-              {inventory.hasEmployee(employee.key) ? (
+              {inventory.hasEmployee(employee.subKey) ? (
                 <button
                   class="btn bg-red-500"
-                  onClick={() => inventory.removeEmployee(employee.key)}
+                  onClick={() => inventory.removeEmployee(employee.subKey)}
                 >
                   Fire
                 </button>

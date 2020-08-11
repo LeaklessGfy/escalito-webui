@@ -1,9 +1,10 @@
+import { ICharacterGameObject } from '../../entities/game/ICharacterGameObject';
 import { IPoint } from '../../entities/game/IPoint';
 import { AnimKey } from '../sprites/AnimKey';
 import { SpriteKey } from '../sprites/SpriteKey';
 import { State } from './State';
 
-export abstract class AbstractCharacter {
+export abstract class AbstractCharacter implements ICharacterGameObject {
   private static readonly SPEED: number = 2;
 
   protected readonly _state: State;

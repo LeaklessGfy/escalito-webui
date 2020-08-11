@@ -1,5 +1,5 @@
 import { IObjectDidChange, observe } from 'mobx';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 import { Inventory } from '../entities/Inventory';
 import { IngredientExtended } from '../entities/dynamic/IngredientExtended';
@@ -16,13 +16,9 @@ export class InventoryProxy implements IInventory {
   private readonly _inventory: Inventory;
 
   private readonly _cash$: Subject<CashChange> = new Subject();
-  private readonly _ingredients$ = new BehaviorSubject<
-    IngredientChange | undefined
-  >(undefined);
+  private readonly _ingredients$ = new Subject<IngredientChange>();
   private readonly _cocktails$: Subject<CocktailChange> = new Subject();
-  private readonly _employees$ = new BehaviorSubject<
-    EmployeeChange | undefined
-  >(undefined);
+  private readonly _employees$ = new Subject<EmployeeChange>();
 
   public constructor(inventory: Inventory) {
     this._inventory = inventory;
@@ -36,15 +32,15 @@ export class InventoryProxy implements IInventory {
     return this._cash$.asObservable();
   }
 
-  public get ingredients$(): Observable<IngredientChange | undefined> {
-    return this._ingredients$.asObservable();
+  public get ingredients$(): Observable<IngredientChange> {
+    return this._ingredients$.asObservable().pipe();
   }
 
   public get cocktails$(): Observable<CocktailChange> {
     return this._cocktails$.asObservable();
   }
 
-  public get employees$(): Observable<EmployeeChange | undefined> {
+  public get employees$(): Observable<EmployeeChange> {
     return this._employees$;
   }
 
@@ -73,6 +69,13 @@ export class InventoryProxy implements IInventory {
       }
     });
 
+    for (const providers of this._inventory.ingredients$.values()) {
+      observe(providers, change => {
+        console.log('- Providers', change);
+        return this.updateIngredient(change);
+      });
+    }
+
     observe(this._inventory.cocktails$, change => {
       console.log('- Cocktail', change);
       this._cocktails$.next(change);
@@ -82,22 +85,18 @@ export class InventoryProxy implements IInventory {
       console.log('- Employee', change);
       this._employees$.next(change);
     });
+  }
 
-    // For each nested providers, add observe
-    for (const providers of this._inventory.ingredients$.values()) {
-      for (const ingredient of providers.values()) {
-        this._ingredients$.next({
-          type: 'add',
-          newValue: ingredient
-        });
-      }
-
-      observe(providers, change => {
-        console.log('- Providers', change);
-        return this.updateIngredient(change);
+  public initIngredients(): void {
+    for (const ingredient of this._inventory.ingredients.values()) {
+      this._ingredients$.next({
+        type: 'add',
+        newValue: ingredient
       });
     }
+  }
 
+  public initEmployees(): void {
     for (const employee of this._inventory.employees) {
       this._employees$.next({
         type: 'add',
