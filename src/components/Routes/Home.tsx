@@ -2,11 +2,11 @@ import { observer } from 'mobx-react-lite';
 import { FunctionalComponent, h } from 'preact';
 import { route } from 'preact-router';
 
-import EmployeeComponent from '../components/Employee/EmployeeComponent';
-import GameComponent from '../components/Game/GameComponent';
-import MenuComponent from '../components/Menu/MenuComponent';
-import ShopComponent from '../components/Shop/ShopComponent';
-import { useStore } from '../store';
+import { useStore } from '../../store';
+import EmployeeComponent from '../Employee/EmployeeComponent';
+import GameComponent from '../Game/GameComponent';
+import MenuComponent from '../Menu/MenuComponent';
+import ShopComponent from '../Shop/ShopComponent';
 
 const Home: FunctionalComponent = () => {
   const { ready, user } = useStore();

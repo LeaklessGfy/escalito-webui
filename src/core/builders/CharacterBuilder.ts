@@ -1,29 +1,42 @@
-import { ICharacterGameObject } from '../../entities/game/ICharacterGameObject';
+import { IBehavioral } from '../../entities/game/IBehavioral';
 import { IScene } from '../../entities/game/IScene';
-import { Character, CharacterKey } from '../../entities/static/Character';
+import { Client } from '../../entities/static/Client';
+import { Employee } from '../../entities/static/Employee';
+import { Sponsor } from '../../entities/static/Sponsor';
+import { Barmaid } from '../characters/Barmaid';
+import { ClientGo } from '../characters/ClientGo';
+import { SponsorGo } from '../characters/SponsorGo';
 import { BarmaidBuilder } from './BarmaidBuilder';
 import { ClientBuilder } from './ClientBuilder';
 import { EmployeeBuilder } from './EmployeeBuilder';
+import { SponsorBuilder } from './SponsorBuilder';
 
 export class CharacterBuilder {
-  private readonly _scene: IScene;
+  private readonly _barmaidBuilder: BarmaidBuilder;
+  private readonly _clientBuilder: ClientBuilder;
+  private readonly _employeeBuilder: EmployeeBuilder;
+  private readonly _sponsorBuilder: SponsorBuilder;
 
   public constructor(scene: IScene) {
-    this._scene = scene;
+    this._barmaidBuilder = new BarmaidBuilder(scene);
+    this._clientBuilder = new ClientBuilder(scene);
+    this._employeeBuilder = new EmployeeBuilder(scene);
+    this._sponsorBuilder = new SponsorBuilder(scene);
   }
 
-  public build<T extends ICharacterGameObject, V extends Character>(
-    character: V
-  ): T {
-    switch (character.key) {
-      case CharacterKey.Barmaid:
-        return new BarmaidBuilder(this._scene).build() as any;
-      case CharacterKey.Client:
-        return new ClientBuilder(this._scene).build() as any;
-      case CharacterKey.Employee:
-        return new EmployeeBuilder(this._scene).build() as any;
-      default:
-        throw new Error('Type has no defined builder');
-    }
+  public buildBarmaid(): Barmaid {
+    return this._barmaidBuilder.build();
+  }
+
+  public buildClient(client: Client): ClientGo {
+    return this._clientBuilder.build(client);
+  }
+
+  public buildEmployee(employee: Employee): IBehavioral {
+    return this._employeeBuilder.build(employee);
+  }
+
+  public buildSponsor(sponsor: Sponsor): SponsorGo {
+    return this._sponsorBuilder.build(sponsor);
   }
 }

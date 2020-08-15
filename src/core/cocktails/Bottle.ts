@@ -44,7 +44,7 @@ export class Bottle implements IIngredientGameObject {
 
     this._stockBar.show({
       x: this._sprite.x - this._sprite.displayWidth / 2,
-      y: this._sprite.y + this._sprite.displayHeight / 2.5,
+      y: this._sprite.y + this._sprite.displayHeight / 2,
       width: this._sprite.width,
       height: Bottle.STOCK_BAR_HEIGHT
     });
@@ -57,29 +57,39 @@ export class Bottle implements IIngredientGameObject {
 
   public turnOn(): void {
     this._isFlowing = true;
+
+    this._sprite.setPosition(this._glassPosition.x, this._glassPosition.y);
+    this._sprite.angle = -80;
+
+    const point = {
+      x: this._glassPosition.x - this._sprite.displayHeight / 2,
+      y: this._glassPosition.y + 10
+    };
+    this._emitter.start(this._ingredient, point);
   }
 
   public turnOff(): void {
     this._isFlowing = false;
     this._emitter.stop();
+
+    this._sprite.setPosition(this._initialPosition.x, this._initialPosition.y);
+    this._sprite.angle = 0;
   }
 
   public update(scene: IScene): void {
+    if (!this._isFlowing) {
+      return;
+    }
+
+    if (!scene.input.activePointer.isDown) {
+      return this.turnOff();
+    }
+
     this._emitter.checkCollision(scene, this._ingredient);
 
     if (this._emitter.isEmitting()) {
       this._currentAmount -= 1;
       this.updateStockBar();
-    }
-
-    if (this._isFlowing) {
-      if (!scene.input.activePointer.isDown) {
-        return this.turnOff();
-      }
-
-      this.flow();
-    } else {
-      this.unflow();
     }
   }
 
@@ -145,47 +155,6 @@ export class Bottle implements IIngredientGameObject {
       (p, c) => p + c.stock,
       0
     );
-  }
-
-  private flow(): void {
-    if (this._sprite.angle > -80) {
-      this._sprite.angle -= 5;
-    }
-
-    if (this.moveTo(this._glassPosition)) {
-      const point = {
-        x: this._glassPosition.x - this._sprite.displayHeight / 2,
-        y: this._glassPosition.y + 10
-      };
-      this._emitter.start(this._ingredient, point);
-    }
-  }
-
-  private unflow(): void {
-    if (this._sprite.angle < 0) {
-      this._sprite.angle += 5;
-    }
-
-    this.moveTo(this._initialPosition);
-  }
-
-  private moveTo(point: IPoint): boolean {
-    const { x, y } = this._sprite;
-    let move = true;
-
-    if (Math.abs(x - point.x) > 3) {
-      const dirX = point.x < x ? -1 : 1;
-      this._sprite.setX(x + 5 * dirX);
-      move = false;
-    }
-
-    if (Math.abs(y - point.y) > 1) {
-      const dirY = point.y < y ? -1 : 1;
-      this._sprite.setY(y + 2 * dirY);
-      move = false;
-    }
-
-    return move;
   }
 
   private updateStockBar() {

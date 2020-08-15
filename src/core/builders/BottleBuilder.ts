@@ -19,40 +19,16 @@ export const IngredientToSprite: { [key in IngredientKey]: SpriteKey } = {
 
 export class BottleBuilder {
   private readonly _scene: IScene;
-  private readonly _emitter: IEmitter;
 
-  private _ingredient?: IngredientExtended;
-  private _sprite?: Phaser.GameObjects.Sprite;
-  private _stockBar?: Bar;
+  public readonly emitter: IEmitter;
+  public ingredient!: IngredientExtended;
+  public nb!: number;
+  public sprite!: Phaser.GameObjects.Sprite;
+  public stockBar!: Bar;
 
   public constructor(scene: IScene, emitter: IEmitter) {
     this._scene = scene;
-    this._emitter = emitter;
-  }
-
-  public get sprite(): Phaser.GameObjects.Sprite {
-    if (this._sprite === undefined) {
-      throw new Error('Can not access sprite on un-build builder');
-    }
-    return this._sprite;
-  }
-
-  public get stockBar(): Bar {
-    if (this._stockBar === undefined) {
-      throw new Error('Can not access stock bar on un-build builder');
-    }
-    return this._stockBar;
-  }
-
-  public get ingredient(): IngredientExtended {
-    if (this._ingredient === undefined) {
-      throw new Error('Can not access ingredient on un-build builder');
-    }
-    return this._ingredient;
-  }
-
-  public get emitter(): IEmitter {
-    return this._emitter;
+    this.emitter = emitter;
   }
 
   public get barCtr(): BarController {
@@ -63,9 +39,9 @@ export class BottleBuilder {
     return this._scene.settings.middleDimension;
   }
 
-  public build(ingredient: IngredientExtended): Bottle {
-    this._ingredient = ingredient;
-
+  public build(ingredient: IngredientExtended, nb: number): Bottle {
+    this.ingredient = ingredient;
+    this.nb = nb;
     this.buildSprite();
     this.buildStockBar();
 
@@ -81,6 +57,7 @@ export class BottleBuilder {
     );
 
     sprite
+      .setX(x + (10 + sprite.displayWidth) * this.nb)
       .setY(y - sprite.displayHeight / 2)
       .setName(this.ingredient.provided.base.name)
       .setInteractive();
@@ -90,13 +67,13 @@ export class BottleBuilder {
     );
     ctr.addSelect(this._scene, sprite);
 
-    this._sprite = sprite;
+    this.sprite = sprite;
   }
 
   private buildStockBar() {
     const background = this._scene.add.graphics().setDepth(2);
     const foreground = this._scene.add.graphics().setDepth(3);
 
-    this._stockBar = new Bar(background, foreground);
+    this.stockBar = new Bar(background, foreground);
   }
 }

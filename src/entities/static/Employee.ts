@@ -14,16 +14,17 @@ const EmployeeNames: { [key in EmployeeKey]: string } = {
   [EmployeeKey.Delivery]: 'Delivery'
 };
 
-export class Employee extends Character {
-  public readonly subKey: EmployeeKey;
+export class Employee implements Character {
+  public readonly key: EmployeeKey;
+  public readonly type: CharacterKey;
   public readonly name: string;
   public readonly price: number;
   public readonly salary: number;
 
-  public constructor(subKey: EmployeeKey, price: number, salary: number) {
-    super(CharacterKey.Employee);
-    this.subKey = subKey;
-    this.name = EmployeeNames[subKey];
+  public constructor(key: EmployeeKey, price: number, salary: number) {
+    this.key = key;
+    this.type = CharacterKey.Employee;
+    this.name = EmployeeNames[key];
     this.price = price;
     this.salary = salary;
   }

@@ -1,14 +1,13 @@
-import { IBehavioral } from '../../entities/game/IBehavioral';
 import { IScene } from '../../entities/game/IScene';
-import { Employee, EmployeeKey } from '../../entities/static/Employee';
-import { BodyGuard } from '../characters/BodyGuard';
+import { Sponsor } from '../../entities/static/Sponsor';
+import { SponsorGo } from '../characters/SponsorGo';
 import { SelectController } from '../controllers/SelectController';
 import { SpriteKey } from '../sprites/SpriteKey';
 
-export class EmployeeBuilder {
+export class SponsorBuilder {
   private readonly _scene: IScene;
 
-  public employee!: Employee;
+  public sponsor!: Sponsor;
   public sprite!: Phaser.GameObjects.Sprite;
 
   public constructor(scene: IScene) {
@@ -16,25 +15,26 @@ export class EmployeeBuilder {
   }
 
   public get spriteKey(): SpriteKey {
-    switch (this.employee.key) {
-      case EmployeeKey.BodyGuard:
-        return SpriteKey.BodyGuard;
-      default:
-        return SpriteKey.BodyGuard;
-    }
+    return SpriteKey.Sponsor;
   }
 
-  public build(employee: Employee): IBehavioral {
-    this.employee = employee;
+  public build(sponsor: Sponsor): SponsorGo {
+    this.sponsor = sponsor;
     this.buildSprite();
 
-    return new BodyGuard(this);
+    return new SponsorGo(this);
   }
 
   private buildSprite() {
     const { x, y } = this._scene.settings.spawn;
 
     const sprite = this._scene.add.sprite(x, y, this.spriteKey);
+    sprite
+      .setScale(2)
+      .setFlipX(true)
+      .setY(y - sprite.displayHeight / 2)
+      .setDepth(2)
+      .setName(this.sponsor.name);
 
     const selectCtr = this._scene.getController<SelectController>(
       SelectController.KEY

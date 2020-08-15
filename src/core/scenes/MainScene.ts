@@ -54,6 +54,7 @@ export class MainScene extends Phaser.Scene implements IScene {
       const width = this.sys.canvas.parentElement?.clientWidth ?? 300;
       const height = 300;
       this.scale.resize(width, height);
+      this._settings = new Settings(width, height);
 
       for (const controller of this._controllers.values()) {
         controller.rescale();

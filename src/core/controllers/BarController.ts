@@ -12,6 +12,7 @@ export class BarController implements IController {
 
   private _audioCtr!: AudioController;
   private _block!: Phaser.GameObjects.GameObject;
+  private _spriteDoor!: Phaser.GameObjects.Image;
   private _glass?: Glass;
   private _open: boolean = true;
 
@@ -29,14 +30,10 @@ export class BarController implements IController {
       block
     } = BarControllerHelper.create(scene);
     this._block = block;
+    this._spriteDoor = spriteDoor;
 
     spriteDoor.on('pointerdown', () => {
-      this._open = !this._open;
-      if (this._open) {
-        spriteDoor.setFrame('open.png');
-      } else {
-        spriteDoor.setFrame('close.png');
-      }
+      this.open = !this.open;
     });
 
     spriteJukebox.on('pointerdown', () => {
@@ -46,8 +43,8 @@ export class BarController implements IController {
     const selectCtr = scene.getController<SelectController>(
       SelectController.KEY
     );
-    selectCtr.addSelect(scene, spriteDoor);
     selectCtr.addSelect(scene, spriteBar);
+    selectCtr.addSelect(scene, spriteDoor);
     selectCtr.addSelect(scene, spriteJukebox);
   }
 
@@ -64,6 +61,15 @@ export class BarController implements IController {
 
   public get glass(): Glass | undefined {
     return this._glass;
+  }
+
+  public set open(open: boolean) {
+    this._open = open;
+    if (this._open) {
+      this._spriteDoor.setFrame('open.png');
+    } else {
+      this._spriteDoor.setFrame('close.png');
+    }
   }
 
   public createGlass(scene: IScene, key: GlassKey): void {

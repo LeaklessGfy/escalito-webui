@@ -8,5 +8,5 @@ export class BodyGuard extends AbstractCharacter implements IBehavioral {
     super(builder.sprite, builder.spriteKey);
   }
 
-  behave(next: IPoint, bar: IPoint, spawn: IPoint): void {}
+  behave(leader: IPoint, bar: IPoint, spawn: IPoint): void {}
 }

@@ -1,30 +1,29 @@
 import { IBehavioral } from '../../entities/game/IBehavioral';
 import { IController } from '../../entities/game/IController';
 import { IScene } from '../../entities/game/IScene';
+import { Client, ClientKey } from '../../entities/static/Client';
 import { EmployeeKey } from '../../entities/static/Employee';
+import { Sponsor } from '../../entities/static/Sponsor';
 import { TriggerUnit } from '../../entities/static/TimeTrigger';
-import { BarmaidBuilder } from '../builders/BarmaidBuilder';
-import { ClientBuilder } from '../builders/ClientBuilder';
-import { EmployeeBuilder } from '../builders/EmployeeBuilder';
+import { CharacterBuilder } from '../builders/CharacterBuilder';
 import { Barmaid } from '../characters/Barmaid';
 import { RandomTimeAction } from '../times/RandomTimeAction';
-import { TimeActionManager } from '../times/TimeActionManager';
 import { BarController } from './BarController';
+import { ClockController } from './ClockController';
 import { CharacterControllerHelper } from './helpers/CharacterControllerHelper';
 
 export class CharacterController implements IController {
   public static readonly KEY = Symbol();
 
-  private readonly _timeManager: TimeActionManager;
   private readonly _visitors: IBehavioral[];
   private readonly _visitorsLeaving: IBehavioral[];
   private readonly _employees: Map<EmployeeKey, IBehavioral>;
 
   private _barmaid!: Barmaid;
+  private _characterBuilder!: CharacterBuilder;
   private _barCtr!: BarController;
 
   constructor() {
-    this._timeManager = new TimeActionManager();
     this._visitors = [];
     this._visitorsLeaving = [];
     this._employees = new Map();
@@ -33,45 +32,46 @@ export class CharacterController implements IController {
   /** Interface **/
   public preload(scene: IScene): void {
     CharacterControllerHelper.preload(scene);
+    this._characterBuilder = new CharacterBuilder(scene);
     this._barCtr = scene.getController<BarController>(BarController.KEY);
+  }
 
-    this._timeManager.add(
+  public create(scene: IScene): void {
+    CharacterControllerHelper.create(scene);
+    this._barmaid = this._characterBuilder.buildBarmaid();
+
+    scene.getController<ClockController>(ClockController.KEY).addAction(
       new RandomTimeAction(
         2000,
         5000,
         TriggerUnit.Real,
         5,
         () => this._barCtr.open,
-        () => this.createClient(scene)
+        () => {} //this.createClient(scene)
       )
     );
-  }
 
-  public create(scene: IScene): void {
-    CharacterControllerHelper.create(scene);
-    this._barmaid = new BarmaidBuilder(scene).build();
+    this.createSponsor();
 
     scene.inventory.employees$.subscribe(change => {
-      if (change === undefined) {
-        return;
-      }
-
       switch (change.type) {
         case 'add':
         case 'update':
-          if (!this._employees.has(change.newValue.subKey)) {
-            const gameObject = new EmployeeBuilder(scene).build();
-            this._employees.set(change.newValue.subKey, gameObject);
+          if (!this._employees.has(change.newValue.key)) {
+            const gameObject = this._characterBuilder.buildEmployee(
+              change.newValue
+            );
+            this._employees.set(change.newValue.key, gameObject);
           }
           break;
         case 'remove':
         case 'delete':
-          const gameObject = this._employees.get(change.oldValue.subKey);
+          const gameObject = this._employees.get(change.oldValue.key);
           if (gameObject === undefined) {
             throw new Error('Can not remove unexisting employee');
           }
           gameObject.destroy();
-          this._employees.delete(change.oldValue.subKey);
+          this._employees.delete(change.oldValue.key);
           break;
       }
     });
@@ -79,8 +79,6 @@ export class CharacterController implements IController {
   }
 
   public update(scene: IScene, delta: number): void {
-    this._timeManager.update(delta);
-
     const visitors = [...this._visitors];
     const length = visitors.length;
 
@@ -120,15 +118,28 @@ export class CharacterController implements IController {
   public rescale(): void {}
 
   /** Custom **/
-  public createClient(scene: IScene) {
-    const client = new ClientBuilder(scene).build();
+  public createClient() {
+    const client = new Client(ClientKey.Default);
+    const clientGo = this._characterBuilder.buildClient(client);
 
-    client.onLeave = () => {
+    clientGo.onLeave = () => {
       this._visitors.shift();
-      this._visitorsLeaving.push(client);
+      this._visitorsLeaving.push(clientGo);
       this._barCtr.destroyGlass();
     };
 
-    this._visitors.push(client);
+    this._visitors.push(clientGo);
+  }
+
+  public createSponsor() {
+    const sponsor = new Sponsor('toto', null as any);
+    const sponsorGo = this._characterBuilder.buildSponsor(sponsor);
+
+    sponsorGo.onLeave = () => {
+      this._visitors.shift();
+      this._visitorsLeaving.push(sponsorGo);
+    };
+
+    this._visitors.push(sponsorGo);
   }
 }

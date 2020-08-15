@@ -5,7 +5,7 @@ import { IScene } from '../../entities/game/IScene';
 import { IngredientKey } from '../../entities/static/Ingredient';
 import { IngredientBuilder } from '../builders/IngredientBuilder';
 import { LiquidEmitter } from '../cocktails/LiquidEmitter';
-import { SpriteKey } from '../sprites/SpriteKey';
+import { SpriteKey, toPath } from '../sprites/SpriteKey';
 import { BarController } from './BarController';
 
 export class IngredientController implements IController {
@@ -20,9 +20,12 @@ export class IngredientController implements IController {
 
   /** Interface **/
   public preload(scene: IScene): void {
-    scene.load.image(SpriteKey.BottleRum, 'assets/bottle.rum.png');
-    scene.load.image(SpriteKey.BottleCola, 'assets/bottle.cola.png');
-    scene.load.image(SpriteKey.BottleLemonade, 'assets/bottle.lemonade.png');
+    scene.load.image(SpriteKey.BottleRum, toPath(SpriteKey.BottleRum));
+    scene.load.image(SpriteKey.BottleCola, toPath(SpriteKey.BottleCola));
+    scene.load.image(
+      SpriteKey.BottleLemonade,
+      toPath(SpriteKey.BottleLemonade)
+    );
   }
 
   public create(scene: IScene): void {
@@ -45,10 +48,6 @@ export class IngredientController implements IController {
     );
 
     scene.inventory.ingredients$.subscribe(change => {
-      if (change === undefined) {
-        return;
-      }
-
       switch (change.type) {
         case 'add':
         case 'update':
@@ -77,7 +76,10 @@ export class IngredientController implements IController {
   }
 
   private createIngredient(ingredient: IngredientExtended) {
-    const gameObject = this._ingredientBuilder.build(ingredient);
+    const gameObject = this._ingredientBuilder.build(
+      ingredient,
+      this._ingredients.size
+    );
     this._ingredients.set(ingredient.provided.base.key, gameObject);
   }
 

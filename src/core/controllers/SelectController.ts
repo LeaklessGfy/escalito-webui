@@ -1,10 +1,11 @@
 import { IController } from '../../entities/game/IController';
 import { IScene } from '../../entities/game/IScene';
+import { Style } from '../sprites/Style';
 
 export class SelectController implements IController {
   public static readonly KEY = Symbol();
 
-  private static readonly STYLE: Phaser.Types.GameObjects.Text.TextStyle = {
+  private static readonly STYLE: Style = {
     color: '#FFFFFF',
     fontFamily: 'Arial Black',
     fontSize: '15px',

@@ -33,7 +33,7 @@ export declare type CocktailChange = Change<CocktailExtended>;
 export declare type EmployeeChange = Change<Employee>;
 
 export interface IInventory {
-  readonly current: Readonly<Inventory>;
+  readonly current: Inventory;
   readonly cash$: Observable<CashChange>;
   readonly ingredients$: Observable<IngredientChange>;
   readonly cocktails$: Observable<CocktailChange>;

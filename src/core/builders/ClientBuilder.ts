@@ -1,17 +1,17 @@
 import { IScene } from '../../entities/game/IScene';
+import { Client, ClientKey } from '../../entities/static/Client';
 import { Order } from '../../entities/static/Order';
-import { Client } from '../characters/Client';
+import { ClientGo } from '../characters/ClientGo';
 import { BarController } from '../controllers/BarController';
 import { MainController } from '../controllers/MainController';
 import { SelectController } from '../controllers/SelectController';
 import { Bar } from '../sprites/Bar';
 import { SpriteKey } from '../sprites/SpriteKey';
+import { Style } from '../sprites/Style';
 import { Producer } from '../utils/Interfaces';
 
 export class ClientBuilder {
-  private static readonly PATIENCE: number = 20000;
-  private static readonly SATISFACTION_THRESHOLD: number = 20;
-  private static readonly STYLE: Phaser.Types.GameObjects.Text.TextStyle = {
+  private static readonly ORDER_STYLE: Style = {
     color: '#FFF',
     fontFamily: 'Arial Black',
     fontSize: '10px',
@@ -22,84 +22,37 @@ export class ClientBuilder {
     }
   };
 
+  private static readonly CASH_STYLE: Style = {
+    color: '#FF00FF',
+    fontFamily: 'Arial Black',
+    fontSize: '15px'
+  };
+
   private readonly _scene: IScene;
 
-  private _spriteKey: SpriteKey = SpriteKey.ClientDefault;
-  private _sprite?: Phaser.GameObjects.Sprite;
-  private _waitingBar?: Bar;
+  public client!: Client;
+  public sprite!: Phaser.GameObjects.Sprite;
+  public waitingBar!: Bar;
 
-  private _orderText?: Phaser.GameObjects.Text;
-  private _createCollider?: Function;
-  private _createOrder?: Producer<Order | undefined>;
-  private _increment?: Function;
-
-  private _patience: number = ClientBuilder.PATIENCE;
-  private _satisfactionThreshold: number = ClientBuilder.SATISFACTION_THRESHOLD;
-  private _cash: number = 5;
+  public orderText!: Phaser.GameObjects.Text;
+  public cashText!: Phaser.GameObjects.Text;
+  public createCollider!: Function;
+  public createOrder!: Producer<Order | undefined>;
+  public increment!: () => number;
 
   public constructor(scene: IScene) {
     this._scene = scene;
   }
 
   public get spriteKey(): SpriteKey {
-    return this._spriteKey;
-  }
-
-  public get sprite(): Phaser.GameObjects.Sprite {
-    if (this._sprite === undefined) {
-      throw new Error('Can not access sprite on un-build builder');
+    switch (this.client.key) {
+      case ClientKey.Default:
+        return SpriteKey.ClientDefault;
     }
-    return this._sprite;
   }
 
-  public get waitingBar(): Bar {
-    if (this._waitingBar === undefined) {
-      throw new Error('Can not access waiting bar on un-build builder');
-    }
-    return this._waitingBar;
-  }
-
-  public get orderText(): Phaser.GameObjects.Text {
-    if (this._orderText === undefined) {
-      throw new Error('Can not access order text on un-build builder');
-    }
-    return this._orderText;
-  }
-
-  public get createCollider(): Function {
-    if (this._createCollider === undefined) {
-      throw new Error('Can not access create collider on un-build builder');
-    }
-    return this._createCollider;
-  }
-
-  public get createOrder(): Producer<Order | undefined> {
-    if (this._createOrder === undefined) {
-      throw new Error('Can not access create order on un-build builder');
-    }
-    return this._createOrder;
-  }
-
-  public get increment(): Function {
-    if (this._increment === undefined) {
-      throw new Error('Can not access increment on un-build builder');
-    }
-    return this._increment;
-  }
-
-  public get patience(): number {
-    return this._patience;
-  }
-
-  public get satisfactionThreshold(): number {
-    return this._satisfactionThreshold;
-  }
-
-  public get cash(): number {
-    return this._cash;
-  }
-
-  public build(): Client {
+  public build(client: Client): ClientGo {
+    this.client = client;
     this.buildSprite();
     this.buildWaitingBar();
     this.buildOrderText();
@@ -107,18 +60,18 @@ export class ClientBuilder {
     this.buildCreateOrder();
     this.buildIncrement();
 
-    return new Client(this);
+    return new ClientGo(this);
   }
 
   private buildSprite() {
     const { x, y } = this._scene.settings.spawn;
 
-    const sprite = this._scene.physics.add.sprite(x, y, this._spriteKey);
+    const sprite = this._scene.physics.add.sprite(x, y, this.spriteKey);
     sprite
       .setScale(2)
       .setY(sprite.y - sprite.displayHeight / 2)
       .setDepth(2)
-      .setName('Client');
+      .setName(this.client.name);
 
     const body = sprite.body as Phaser.Physics.Arcade.Body;
     body.collideWorldBounds = true;
@@ -129,36 +82,34 @@ export class ClientBuilder {
     );
     selectCtr.addSelect(this._scene, sprite);
 
-    this._sprite = sprite;
+    this.sprite = sprite;
   }
 
   private buildWaitingBar() {
     const background = this._scene.add.graphics().setDepth(2);
     const foreground = this._scene.add.graphics().setDepth(3);
 
-    this._waitingBar = new Bar(background, foreground);
+    this.waitingBar = new Bar(background, foreground);
   }
 
   private buildOrderText() {
-    const text = this._scene.add
-      .text(0, 0, '', ClientBuilder.STYLE)
-      .setDepth(2)
-      .setInteractive();
+    const orderText = this._scene.add
+      .text(0, 0, '', ClientBuilder.ORDER_STYLE)
+      .setDepth(2);
 
-    const selectCtr = this._scene.getController<SelectController>(
-      SelectController.KEY
-    );
-    selectCtr.addSelect(this._scene, text);
+    const cashText = this._scene.add
+      .text(0, 0, '', ClientBuilder.CASH_STYLE)
+      .setDepth(5);
 
-    this._orderText = text;
+    this.orderText = orderText;
+    this.cashText = cashText;
   }
 
   private buildCreateCollider() {
     const scene = this._scene;
+    const barCtr = scene.getController<BarController>(BarController.KEY);
 
-    this._createCollider = function(this: Client) {
-      const barCtr = scene.getController<BarController>(BarController.KEY);
-
+    this.createCollider = function(this: ClientGo) {
       if (barCtr.glass === undefined) {
         throw new Error('Glass is undefined');
       }
@@ -172,8 +123,9 @@ export class ClientBuilder {
 
   private buildCreateOrder() {
     const scene = this._scene;
+    const barCtr = scene.getController<BarController>(BarController.KEY);
 
-    this._createOrder = function(this: Client) {
+    this.createOrder = function(this: ClientGo) {
       const { cocktails } = scene.inventory.current;
 
       if (cocktails.length < 1) {
@@ -193,9 +145,7 @@ export class ClientBuilder {
         return undefined;
       }
 
-      scene
-        .getController<BarController>(BarController.KEY)
-        .createGlass(scene, cocktail.base.glassKey);
+      barCtr.createGlass(scene, cocktail.base.glassKey);
 
       return new Order(cocktail);
     };
@@ -203,10 +153,10 @@ export class ClientBuilder {
 
   private buildIncrement() {
     const scene = this._scene;
+    const mainCtr = scene.getController<MainController>(MainController.KEY);
 
-    this._increment = function(this: Client) {
-      const mainCtr = scene.getController<MainController>(MainController.KEY);
-      mainCtr.increment(this, this.order);
+    this.increment = function(this: ClientGo) {
+      return mainCtr.increment(this);
     };
   }
 }

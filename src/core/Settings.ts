@@ -24,7 +24,7 @@ export class Settings implements ISettings {
     this.middleDimension = { x: this.middleWidth, y: this.middleHeight };
     this.bottle = {
       x: this.middleWidth + this.middleWidth / 2,
-      y: this.middleHeight
+      y: this.middleHeight - floorHeight / 2
     };
     this.spawn = {
       x: width * 0.07,

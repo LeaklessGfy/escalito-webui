@@ -7,50 +7,29 @@ import { SpriteKey } from '../sprites/SpriteKey';
 export class GlassBuilder {
   private readonly _scene: IScene;
 
-  private _glassKey: GlassKey = GlassKey.Default;
-  private _sprite?: Phaser.GameObjects.Sprite;
-  private _mask?: Phaser.GameObjects.Sprite;
-  private _graphics?: Phaser.GameObjects.Graphics;
+  public glassKey: GlassKey = GlassKey.Default;
+  public sprite!: Phaser.GameObjects.Sprite;
+  public mask!: Phaser.GameObjects.Sprite;
+  public graphics!: Phaser.GameObjects.Graphics;
 
   public constructor(scene: IScene) {
     this._scene = scene;
   }
 
   public get spriteKey(): SpriteKey {
-    return this._glassKey === GlassKey.Default
+    return this.glassKey === GlassKey.Default
       ? SpriteKey.GlassDefault
       : SpriteKey.GlassDefault;
   }
 
   public get maskSpriteKey(): SpriteKey {
-    return this._glassKey === GlassKey.Default
+    return this.glassKey === GlassKey.Default
       ? SpriteKey.GlassDefaultMask
       : SpriteKey.GlassDefaultMask;
   }
 
-  public get sprite(): Phaser.GameObjects.Sprite {
-    if (this._sprite === undefined) {
-      throw new Error('Can not access sprite on un-build builder');
-    }
-    return this._sprite;
-  }
-
-  public get mask(): Phaser.GameObjects.Sprite {
-    if (this._mask === undefined) {
-      throw new Error('Can not access mask on un-build builder');
-    }
-    return this._mask;
-  }
-
-  public get graphics(): Phaser.GameObjects.Graphics {
-    if (this._graphics === undefined) {
-      throw new Error('Can not access graphics on un-build builder');
-    }
-    return this._graphics;
-  }
-
   public setGlassKey(key: GlassKey): GlassBuilder {
-    this._glassKey = key;
+    this.glassKey = key;
     return this;
   }
 
@@ -90,8 +69,8 @@ export class GlassBuilder {
     );
     selectCtr.addSelect(this._scene, sprite);
 
-    this._sprite = sprite;
-    this._mask = mask;
+    this.sprite = sprite;
+    this.mask = mask;
   }
 
   private buildGraphics() {
@@ -100,6 +79,6 @@ export class GlassBuilder {
       this.mask
     );
 
-    this._graphics = this._scene.add.graphics().setMask(spriteMask);
+    this.graphics = this._scene.add.graphics().setMask(spriteMask);
   }
 }

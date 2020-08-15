@@ -6,10 +6,6 @@ export enum CharacterKey {
   Cop
 }
 
-export class Character {
-  public readonly key: CharacterKey;
-
-  public constructor(key: CharacterKey) {
-    this.key = key;
-  }
+export interface Character {
+  readonly type: CharacterKey;
 }

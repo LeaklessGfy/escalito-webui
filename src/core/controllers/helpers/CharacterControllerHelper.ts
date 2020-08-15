@@ -1,91 +1,51 @@
 import { IScene } from '../../../entities/game/IScene';
 import { AnimKey } from '../../sprites/AnimKey';
-import { SpriteKey } from '../../sprites/SpriteKey';
+import { SpriteKey, toAnim, toSpriteSheet } from '../../sprites/SpriteKey';
 
 export class CharacterControllerHelper {
   public static preload(scene: IScene) {
-    scene.load.spritesheet(
-      SpriteKey.Barmaid + '.' + AnimKey.Idle,
-      'assets/barmaid.idle.png',
-      {
-        frameWidth: 19,
-        frameHeight: 34
-      }
-    );
-    scene.load.spritesheet(
-      SpriteKey.Barmaid + '.' + AnimKey.Move,
-      'assets/barmaid.move.png',
-      {
-        frameWidth: 21,
-        frameHeight: 33
-      }
-    );
-    scene.load.spritesheet(
-      SpriteKey.ClientDefault + '.' + AnimKey.Idle,
-      'assets/client1.idle.png',
-      {
-        frameWidth: 32,
-        frameHeight: 28
-      }
-    );
-    scene.load.spritesheet(
-      SpriteKey.ClientDefault + '.' + AnimKey.Move,
-      'assets/client1.move.png',
-      {
-        frameWidth: 32,
-        frameHeight: 32
-      }
-    );
+    this.loadSprite(scene, SpriteKey.Barmaid, AnimKey.Idle, 19, 34);
+    this.loadSprite(scene, SpriteKey.Barmaid, AnimKey.Move, 21, 33);
+
+    this.loadSprite(scene, SpriteKey.ClientDefault, AnimKey.Idle, 32, 28);
+    this.loadSprite(scene, SpriteKey.ClientDefault, AnimKey.Move, 32, 32);
+
+    this.loadSprite(scene, SpriteKey.BodyGuard, AnimKey.Idle, 20, 32);
+    this.loadSprite(scene, SpriteKey.Sponsor, AnimKey.Idle, 33, 43);
+    this.loadSprite(scene, SpriteKey.Sponsor, AnimKey.Move, 29, 42);
   }
 
   public static create(scene: IScene) {
-    scene.anims.create({
-      key: SpriteKey.Barmaid + '.' + AnimKey.Idle,
-      frames: scene.anims.generateFrameNumbers(
-        SpriteKey.Barmaid + '.' + AnimKey.Idle,
-        {
-          start: 0,
-          end: 11
-        }
-      ),
-      frameRate: 10,
-      repeat: -1
-    });
-    scene.anims.create({
-      key: SpriteKey.Barmaid + '.' + AnimKey.Move,
-      frames: scene.anims.generateFrameNumbers(
-        SpriteKey.Barmaid + '.' + AnimKey.Move,
-        {
-          start: 0,
-          end: 11
-        }
-      ),
-      frameRate: 10,
-      repeat: -1
-    });
-    scene.anims.create({
-      key: SpriteKey.ClientDefault + '.' + AnimKey.Idle,
-      frames: scene.anims.generateFrameNumbers(
-        SpriteKey.ClientDefault + '.' + AnimKey.Idle,
-        {
-          start: 0,
-          end: 7
-        }
-      ),
-      frameRate: 5,
-      repeat: -1
-    });
-    scene.anims.create({
-      key: SpriteKey.ClientDefault + '.' + AnimKey.Move,
-      frames: scene.anims.generateFrameNumbers(
-        SpriteKey.ClientDefault + '.' + AnimKey.Move,
-        {
-          start: 0,
-          end: 7
-        }
-      ),
-      frameRate: 7,
-      repeat: -1
-    });
+    this.loadAnim(scene, SpriteKey.Barmaid, AnimKey.Idle, 11, 10);
+    this.loadAnim(scene, SpriteKey.Barmaid, AnimKey.Move, 11, 10);
+
+    this.loadAnim(scene, SpriteKey.ClientDefault, AnimKey.Idle, 7, 5);
+    this.loadAnim(scene, SpriteKey.ClientDefault, AnimKey.Move, 7, 7);
+
+    this.loadAnim(scene, SpriteKey.BodyGuard, AnimKey.Idle, 3, 1);
+    this.loadAnim(scene, SpriteKey.Sponsor, AnimKey.Idle, 12, 5, true);
+    this.loadAnim(scene, SpriteKey.Sponsor, AnimKey.Move, 12, 5);
+  }
+
+  private static loadSprite(
+    scene: IScene,
+    key: SpriteKey,
+    anim: AnimKey,
+    width: number,
+    height: number
+  ) {
+    const spriteSheet = toSpriteSheet(key, anim, { x: width, y: height });
+    scene.load.spritesheet(spriteSheet.key, spriteSheet.path, spriteSheet.dim);
+  }
+
+  private static loadAnim(
+    scene: IScene,
+    key: SpriteKey,
+    anim: AnimKey,
+    length: number,
+    frameRate: number,
+    yoyo: boolean = false
+  ) {
+    scene.anims.create(toAnim(scene, key, anim, length, frameRate, yoyo));
   }
 }

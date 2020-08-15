@@ -7,30 +7,27 @@ import { BottleBuilder } from './BottleBuilder';
 import { FruitBuilder } from './FruitBuilder';
 
 export class IngredientBuilder {
-  private readonly _scene: IScene;
-  private readonly _liquidEmitter: IEmitter;
-  private readonly _fruitEmitter: IEmitter;
+  private readonly _bottleBuilder: BottleBuilder;
+  private readonly _fruitBuilder: FruitBuilder;
 
   public constructor(
     scene: IScene,
     liquidEmitter: IEmitter,
     fruitEmitter: IEmitter
   ) {
-    this._scene = scene;
-    this._liquidEmitter = liquidEmitter;
-    this._fruitEmitter = fruitEmitter;
+    this._bottleBuilder = new BottleBuilder(scene, liquidEmitter);
+    this._fruitBuilder = new FruitBuilder(scene, fruitEmitter);
   }
 
-  public build(ingredient: IngredientExtended): IIngredientGameObject {
+  public build(
+    ingredient: IngredientExtended,
+    nb: number
+  ): IIngredientGameObject {
     switch (ingredient.provided.base.type) {
       case IngredientType.Bottle:
-        return new BottleBuilder(this._scene, this._liquidEmitter).build(
-          ingredient
-        );
+        return this._bottleBuilder.build(ingredient, nb);
       case IngredientType.Fruit:
-        return new FruitBuilder(this._scene, this._fruitEmitter).build(
-          ingredient
-        );
+        return this._fruitBuilder.build(ingredient);
     }
   }
 }

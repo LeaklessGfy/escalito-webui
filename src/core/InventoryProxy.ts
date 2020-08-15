@@ -24,7 +24,7 @@ export class InventoryProxy implements IInventory {
     this._inventory = inventory;
   }
 
-  public get current(): Readonly<Inventory> {
+  public get current(): Inventory {
     return this._inventory;
   }
 
@@ -48,14 +48,12 @@ export class InventoryProxy implements IInventory {
     observe(
       this._inventory.cash$,
       change => {
-        console.log('- Cash', change);
         this._cash$.next(change);
       },
       true
     );
 
     observe(this._inventory.ingredients$, change => {
-      console.log('- Ingredients', change);
       switch (change.type) {
         case 'add':
           // add observe on provider (new value)
@@ -71,18 +69,15 @@ export class InventoryProxy implements IInventory {
 
     for (const providers of this._inventory.ingredients$.values()) {
       observe(providers, change => {
-        console.log('- Providers', change);
         return this.updateIngredient(change);
       });
     }
 
     observe(this._inventory.cocktails$, change => {
-      console.log('- Cocktail', change);
       this._cocktails$.next(change);
     });
 
     observe(this._inventory.employees$, change => {
-      console.log('- Employee', change);
       this._employees$.next(change);
     });
   }

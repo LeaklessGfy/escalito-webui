@@ -3,7 +3,7 @@ import { FunctionalComponent, h } from 'preact';
 import { route } from 'preact-router';
 import { useState } from 'preact/hooks';
 
-import { useStore } from '../store';
+import { useStore } from '../../store';
 
 enum AuthType {
   LOGIN,

@@ -3,10 +3,10 @@ import 'mobx-react-lite/batchingForReactDom';
 import { FunctionalComponent, h } from 'preact';
 import { Route, Router } from 'preact-router';
 
-import NavComponent from './components/NavComponent';
-import Home from './routes/Home';
-import Login from './routes/Login';
-import NotFound from './routes/NotFound';
+import NavComponent from './components/Common/NavComponent';
+import Home from './components/Routes/Home';
+import Login from './components/Routes/Login';
+import NotFound from './components/Routes/NotFound';
 import { store, storeContext } from './store';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,6 +19,7 @@ const App: FunctionalComponent = () => {
   return (
     <storeContext.Provider value={store}>
       <NavComponent />
+
       <div class="p-2">
         <Router>
           <Route path="/" component={Home} key="1" />

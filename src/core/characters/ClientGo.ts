@@ -1,5 +1,6 @@
 import { IBehavioral } from '../../entities/game/IBehavioral';
 import { IPoint } from '../../entities/game/IPoint';
+import { Client } from '../../entities/static/Client';
 import { Order } from '../../entities/static/Order';
 import { ClientBuilder } from '../builders/ClientBuilder';
 import { Glass } from '../cocktails/Glass';
@@ -8,37 +9,35 @@ import { Producer } from '../utils/Interfaces';
 import { TintHelper } from '../utils/TintHelper';
 import { AbstractCharacter } from './AbstractCharacter';
 
-export class Client extends AbstractCharacter implements IBehavioral {
+export class ClientGo extends AbstractCharacter implements IBehavioral {
   private static readonly WAITING_BAR_HEIGHT: number = 5;
   private static readonly BAR_OVERFLOW_DIST: number = 4;
 
+  private readonly _client: Client;
   private readonly _waitingBar: Bar;
   private readonly _orderText: Phaser.GameObjects.Text;
+  private readonly _cashText: Phaser.GameObjects.Text;
   private readonly _createCollider: Function;
-  private readonly _increment: Function;
+  private readonly _increment: Producer<number>;
   private readonly _createOrder: Producer<Order | undefined>;
 
-  private _patience: number;
   private _timeAwaited: number;
   private _satisfaction: number;
-  private _satisfactionThreshold: number;
   private _order?: Order;
-
-  private _waitingPos: IPoint = { x: 0, y: 0 };
 
   public constructor(builder: ClientBuilder) {
     super(builder.sprite, builder.spriteKey);
 
+    this._client = builder.client;
     this._waitingBar = builder.waitingBar;
     this._orderText = builder.orderText;
+    this._cashText = builder.cashText;
     this._createCollider = builder.createCollider;
     this._increment = builder.increment;
     this._createOrder = builder.createOrder;
 
-    this._patience = builder.patience;
     this._timeAwaited = 0;
     this._satisfaction = 0;
-    this._satisfactionThreshold = builder.satisfactionThreshold;
   }
 
   public get satisfaction(): number {
@@ -46,7 +45,7 @@ export class Client extends AbstractCharacter implements IBehavioral {
   }
 
   public get satisfied(): boolean {
-    return this._satisfaction > this._satisfactionThreshold;
+    return this._satisfaction > this._client.satisfactionThreshold;
   }
 
   public get order(): Order {
@@ -85,7 +84,7 @@ export class Client extends AbstractCharacter implements IBehavioral {
     }
 
     let next = bar;
-    let dist = Client.BAR_OVERFLOW_DIST;
+    let dist = ClientGo.BAR_OVERFLOW_DIST;
 
     if (leader !== undefined) {
       next = leader;
@@ -103,7 +102,7 @@ export class Client extends AbstractCharacter implements IBehavioral {
         this._state.exhaust();
       }
     } else {
-      // maybe function await in queue ?
+      // maybe await in queue ?
     }
   }
 
@@ -120,9 +119,10 @@ export class Client extends AbstractCharacter implements IBehavioral {
 
     this._orderText.setPosition(this._sprite.x, this._sprite.y);
     this._orderText.setText(this._order.title);
-    this._orderText.on('pointerdown', () => {
+    /*this._orderText.on('pointerdown', () => {
       this._timeAwaited -= 1000;
-    });
+    });*/
+
     this._createCollider();
 
     return true;
@@ -137,16 +137,12 @@ export class Client extends AbstractCharacter implements IBehavioral {
     this._timeAwaited = 0;
 
     const { x, y } = this._sprite;
-    this._waitingPos = {
-      x: x - this._sprite.displayWidth / 2,
-      y: y + this._sprite.displayHeight / 2
-    };
 
     this._waitingBar.show({
-      x: this._waitingPos.x,
-      y: this._waitingPos.y,
+      x: x - this._sprite.displayWidth / 2,
+      y: y + this._sprite.displayHeight / 2,
       width: this._sprite.displayWidth,
-      height: Client.WAITING_BAR_HEIGHT
+      height: ClientGo.WAITING_BAR_HEIGHT
     });
   }
 
@@ -157,7 +153,20 @@ export class Client extends AbstractCharacter implements IBehavioral {
 
     this._state.serve();
     this.satisfaction = this.computeSatisfaction(glass);
-    this._increment();
+    const price = this._increment();
+
+    const text = '+' + price + '$';
+    const measurement = this._cashText.context.measureText(text);
+
+    const x = this._sprite.x - measurement.width / 2;
+    const y =
+      this._sprite.y +
+      this._sprite.displayHeight / 2 -
+      this._cashText.displayHeight / 2;
+
+    this._cashText.setPosition(x, y);
+    this._cashText.setText(text);
+
     this._order = undefined;
     this._orderText.destroy();
     this._waitingBar.destroy();
@@ -166,14 +175,14 @@ export class Client extends AbstractCharacter implements IBehavioral {
   private stepWait(delta: number): void {
     this._timeAwaited += delta;
 
-    if (this._patience === -1) {
+    if (this._client.patience === -1) {
       return;
     }
 
-    const percent = 100 - (this._timeAwaited / this._patience) * 100;
+    const percent = 100 - (this._timeAwaited / this._client.patience) * 100;
     this._waitingBar.update(percent);
 
-    if (this._timeAwaited < this._patience) {
+    if (this._timeAwaited < this._client.patience) {
       return;
     }
 

@@ -6,22 +6,11 @@ import { SpriteKey } from '../sprites/SpriteKey';
 export class BarmaidBuilder {
   private readonly _scene: IScene;
 
-  private _spriteKey: SpriteKey = SpriteKey.Barmaid;
-  private _sprite?: Phaser.GameObjects.Sprite;
+  public spriteKey: SpriteKey = SpriteKey.Barmaid;
+  public sprite!: Phaser.GameObjects.Sprite;
 
   public constructor(scene: IScene) {
     this._scene = scene;
-  }
-
-  public get spriteKey(): SpriteKey {
-    return this._spriteKey;
-  }
-
-  public get sprite(): Phaser.GameObjects.Sprite {
-    if (this._sprite === undefined) {
-      throw new Error('Can not access sprite on un-build builder');
-    }
-    return this._sprite;
   }
 
   public build(): Barmaid {
@@ -35,7 +24,7 @@ export class BarmaidBuilder {
     const x = settings.middleWidth;
     const y = settings.height - settings.floorHeight;
 
-    const sprite = this._scene.add.sprite(x, y, this._spriteKey);
+    const sprite = this._scene.add.sprite(x, y, this.spriteKey);
     sprite
       .setScale(2)
       .setY(sprite.y - sprite.displayHeight / 1.5)
@@ -47,6 +36,6 @@ export class BarmaidBuilder {
     );
     selectCtr.addSelect(this._scene, sprite);
 
-    this._sprite = sprite;
+    this.sprite = sprite;
   }
 }

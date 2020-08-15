@@ -50,6 +50,10 @@ export class Inventory {
     return this.cash$.get();
   }
 
+  public set cash(value: number) {
+    this.cash$.set(value);
+  }
+
   @computed
   public get cocktails(): CocktailExtended[] {
     return Array.from(this.cocktails$.values());
@@ -209,14 +213,14 @@ export class Inventory {
 
     const newCash = cash - employee.price;
     this.cash$.set(newCash);
-    this.employees$.set(employee.subKey, employee);
+    this.employees$.set(employee.key, employee);
     this.$service.setCash(newCash);
-    this.$service.addEmployee(employee.subKey);
+    this.$service.addEmployee(employee.key);
   }
 
   @action
-  public removeEmployee(employeeKey: EmployeeKey): void {
-    this.employees$.delete(employeeKey);
-    this.$service.removeEmployee(employeeKey);
+  public removeEmployee(employee: Employee): void {
+    this.employees$.delete(employee.key);
+    this.$service.removeEmployee(employee.key);
   }
 }

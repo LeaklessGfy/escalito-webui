@@ -1,22 +1,24 @@
 import { IScene } from '../../../entities/game/IScene';
-import { SpriteKey } from '../../sprites/SpriteKey';
+import { SpriteKey, toAtlas, toPath } from '../../sprites/SpriteKey';
 
 export class BarControllerHelper {
   public static preload(scene: IScene) {
-    scene.load.image(SpriteKey.Wall, 'assets/wall_paper.png');
-    scene.load.image(SpriteKey.Wood, 'assets/wood.png');
+    scene.load.image(SpriteKey.WallPaper, toPath(SpriteKey.WallPaper));
+    scene.load.image(SpriteKey.Wood, toPath(SpriteKey.Wood));
 
-    scene.load.image(SpriteKey.Bar, 'assets/bar.png');
-    scene.load.image(SpriteKey.BarTop, 'assets/bar_top.png');
-    scene.load.multiatlas(SpriteKey.Door, 'assets/door.atlas.json', 'assets');
-    scene.load.image(SpriteKey.Window, 'assets/window.png');
-    scene.load.image(SpriteKey.Jukebox, 'assets/jukebox.png');
-    scene.load.image(SpriteKey.Square, 'assets/square.png');
+    scene.load.image(SpriteKey.Bar, toPath(SpriteKey.Bar));
+    scene.load.image(SpriteKey.BarTop, toPath(SpriteKey.BarTop));
+    scene.load.image(SpriteKey.Window, toPath(SpriteKey.Window));
+    scene.load.image(SpriteKey.Jukebox, toPath(SpriteKey.Jukebox));
+    scene.load.image(SpriteKey.Square, toPath(SpriteKey.Square));
 
-    scene.load.image(SpriteKey.GlassDefault, 'assets/glass.default.png');
+    const doorAtlas = toAtlas(SpriteKey.Door);
+    scene.load.multiatlas(SpriteKey.Door, doorAtlas.atlas, doorAtlas.folder);
+
+    scene.load.image(SpriteKey.GlassDefault, toPath(SpriteKey.GlassDefault));
     scene.load.image(
       SpriteKey.GlassDefaultMask,
-      'assets/glass.default.mask.png'
+      toPath(SpriteKey.GlassDefaultMask)
     );
   }
 
@@ -31,7 +33,7 @@ export class BarControllerHelper {
       mid.y,
       dim.x,
       300,
-      SpriteKey.Wall
+      SpriteKey.WallPaper
     );
     spriteWall.setY(mid.y + spriteWall.displayHeight / 2);
 
